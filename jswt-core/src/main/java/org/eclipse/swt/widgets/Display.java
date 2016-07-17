@@ -1,7 +1,9 @@
 package org.eclipse.swt.widgets;
 
 
-public class Display {
+import org.eclipse.swt.graphics.Device;
+
+public class Display extends Device {
 
     /*
     public static boolean isValidClass(Class<? extends Dialog> aClass) {

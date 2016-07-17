@@ -167,6 +167,10 @@ public abstract class Widget {
         return parent;
     }
 
+    public Display getDisplay() {
+        return display;
+    }
+
     public void error(int code) {
         SWT.error(code);
     }

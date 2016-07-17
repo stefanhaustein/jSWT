@@ -26,6 +26,9 @@ public class AwtDisplay extends PlatformDisplay {
       frame.setLayout(new SwtLayoutManager((Composite) control));
       return frame;
     }
+    if (control instanceof Canvas) {
+      return new SwtCanvas((Canvas) control);
+    }
     throw new RuntimeException("Unrecognized component: " + control);
   }
 

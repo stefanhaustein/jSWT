@@ -19,7 +19,6 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
 
-
   @Override
   public Object createPeer(Control control) {
     if (control instanceof Composite) {
@@ -33,6 +32,9 @@ public class AndroidDisplay extends PlatformDisplay {
     }
     if (control instanceof Label) {
       return new android.widget.TextView(activity);
+    }
+    if (control instanceof Canvas) {
+      return new SwtCanvasView(activity, (Canvas) control);
     }
     throw new RuntimeException("Unrecognized control: " + control);
   }
