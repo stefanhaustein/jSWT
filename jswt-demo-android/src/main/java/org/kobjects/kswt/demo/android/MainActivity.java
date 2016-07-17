@@ -6,7 +6,6 @@ import android.os.Bundle;
 import org.eclipse.swt.snippets.Snippet108;
 import org.eclipse.swt.widgets.Display;
 import org.kobjects.jswt.android.AndroidDisplay;
-import org.kobjects.kswt.demo.HelloWorld;
 
 
 public class MainActivity extends Activity {
