@@ -1,6 +1,6 @@
 package org.eclipse.swt.widgets;
 
-public class SwtCanvas extends java.awt.Canvas {
+public class SwtCanvas extends java.awt.Container {
     final Canvas swtCanvas;
 
     public SwtCanvas(Canvas swtCanvas) {

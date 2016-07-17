@@ -21,6 +21,9 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public Object createPeer(Control control) {
+    if (control instanceof Canvas) {
+      return new SwtCanvasView(activity, (Canvas) control);
+    }
     if (control instanceof Composite) {
       return new SwtViewGroup(activity, (Composite) control);
     }
@@ -32,9 +35,6 @@ public class AndroidDisplay extends PlatformDisplay {
     }
     if (control instanceof Label) {
       return new android.widget.TextView(activity);
-    }
-    if (control instanceof Canvas) {
-      return new SwtCanvasView(activity, (Canvas) control);
     }
     throw new RuntimeException("Unrecognized control: " + control);
   }
@@ -119,7 +119,7 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public void pack(Shell shell) {
-
+    ((View) shell.peer).invalidate();
   }
 
   @Override

@@ -3,13 +3,14 @@ package org.eclipse.swt.widgets;
 import android.content.Context;
 import android.view.View;
 
-public class SwtCanvasView extends View {
+public class SwtCanvasView extends SwtViewGroup {
 
     Canvas swtCanvas;
 
     public SwtCanvasView(Context context, Canvas swtCanvas) {
-        super(context);
+        super(context, swtCanvas);
         this.swtCanvas = swtCanvas;
+        this.setWillNotDraw(false);
     }
 
     @Override
