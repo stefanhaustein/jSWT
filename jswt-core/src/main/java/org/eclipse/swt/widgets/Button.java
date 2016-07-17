@@ -9,11 +9,11 @@ public class Button extends Control {
 
 
   public String getText() {
-    return display.getText(this, peer);
+    return display.getText(this);
   }
 
   public void setText(String text) {
-    display.setText(this, peer, text);
+    display.setText(this, text);
   }
 
   public void addSelectionListener(SelectionListener listener) {

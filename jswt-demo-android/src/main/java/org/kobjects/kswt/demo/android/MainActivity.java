@@ -5,7 +5,7 @@ import android.os.Bundle;
 
 import org.eclipse.swt.snippets.Snippet108;
 import org.eclipse.swt.widgets.Display;
-import org.kobjects.jswt.android.AndroidDisplay;
+import org.eclipse.swt.widgets.AndroidDisplay;
 
 
 public class MainActivity extends Activity {

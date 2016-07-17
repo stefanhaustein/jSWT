@@ -1,4 +1,4 @@
-<manifest package="org.kobjects.jswt.android"
+<manifest package="org.eclipse.swt"
           xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application android:label="jSWT Android">

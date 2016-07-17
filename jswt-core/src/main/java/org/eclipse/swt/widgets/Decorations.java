@@ -8,11 +8,11 @@ public class Decorations extends Canvas {
   }
 
   public String getText() {
-    return display.getText(this, peer);
+    return display.getText(this);
   }
 
   public void setText(String text) {
-    display.setText(this, peer, text);
+    display.setText(this, text);
   }
 
 }

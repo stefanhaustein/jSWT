@@ -1,4 +1,4 @@
-package org.kobjects.jswt.android;
+package org.eclipse.swt.widgets;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 
 import org.eclipse.swt.widgets.Composite;
 
-public class SwtViewGroup extends ViewGroup {
+class SwtViewGroup extends ViewGroup {
 
     Composite composite;
     String text;

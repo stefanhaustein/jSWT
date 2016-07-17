@@ -1,4 +1,4 @@
-package org.kobjects.jswt.android;
+package org.eclipse.swt.widgets;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -9,18 +9,11 @@ import android.widget.TextView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
-import org.kobjects.jswt.Insets;
-import org.kobjects.jswt.JswtDisplay;
 
 
-public class AndroidDisplay extends JswtDisplay {
+public class AndroidDisplay extends PlatformDisplay {
   Activity activity;
+
   public AndroidDisplay(Activity activity) {
     this.activity = activity;
   }
@@ -45,8 +38,8 @@ public class AndroidDisplay extends JswtDisplay {
   }
 
   @Override
-  public void openShell(Shell shell, Object peer) {
-    SwtViewGroup view = (SwtViewGroup) peer;
+  public void openShell(Shell shell) {
+    SwtViewGroup view = (SwtViewGroup) shell.peer;
     ActionBar actionBar = activity.getActionBar();
     String text = view.text;
     if (text != null) {
@@ -55,12 +48,12 @@ public class AndroidDisplay extends JswtDisplay {
     } else {
       actionBar.hide();
     }
-    activity.setContentView((View) peer);
+    activity.setContentView(view);
   }
 
   @Override
-  public Rectangle getBounds(Control control, Object peer) {
-    View view = (View) peer;
+  public Rectangle getBounds(Control control) {
+    View view = (View) control.peer;
     ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
     if (layoutParams instanceof SwtViewGroup.LayoutParams) {
       SwtViewGroup.LayoutParams lmlParams = (SwtViewGroup.LayoutParams) layoutParams;
@@ -73,13 +66,13 @@ public class AndroidDisplay extends JswtDisplay {
   }
 
   @Override
-  public Insets getInsets(Shell shell, Object peer) {
+  public Insets getInsets(Shell shell) {
     return new Insets();
   }
 
   @Override
-  public Point computeSize(Control control, Object peer, int wHint, int hHint, boolean changed) {
-    View view = (View) peer;
+  public Point computeSize(Control control, int wHint, int hHint, boolean changed) {
+    View view = (View) control.peer;
     view.measure(
         wHint == SWT.DEFAULT ? View.MeasureSpec.UNSPECIFIED : (View.MeasureSpec.EXACTLY | wHint),
         hHint == SWT.DEFAULT ? View.MeasureSpec.UNSPECIFIED : (View.MeasureSpec.EXACTLY | hHint));
@@ -88,8 +81,8 @@ public class AndroidDisplay extends JswtDisplay {
   }
 
   @Override
-  public void setBounds(Control control, Object peer, int x, int y, int width, int height) {
-    View view = (View) peer;
+  public void setBounds(Control control, int x, int y, int width, int height) {
+    View view = (View) control.peer;
     ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
     if (layoutParams instanceof SwtViewGroup.LayoutParams) {
       SwtViewGroup.LayoutParams lmlParams = (SwtViewGroup.LayoutParams) layoutParams;
@@ -101,7 +94,8 @@ public class AndroidDisplay extends JswtDisplay {
   }
 
   @Override
-  public String getText(Control control, Object peer) {
+  public String getText(Control control) {
+    Object peer = control.peer;
     if (peer instanceof TextView) {
       return ((TextView) peer).getText().toString();
     }
@@ -112,7 +106,8 @@ public class AndroidDisplay extends JswtDisplay {
   }
 
   @Override
-  public void setText(Control control, Object peer, String text) {
+  public void setText(Control control, String text) {
+    Object peer = control.peer;
     if (peer instanceof TextView) {
       ((TextView) peer).setText(text);
     } else if (peer instanceof SwtViewGroup) {
@@ -121,12 +116,12 @@ public class AndroidDisplay extends JswtDisplay {
   }
 
   @Override
-  public void pack(Shell shell, Object peer) {
+  public void pack(Shell shell) {
 
   }
 
   @Override
-  public void addChild(Composite parent, Object parentPeer, Control control, Object peer) {
-    ((ViewGroup) parentPeer).addView((View) peer);
+  public void addChild(Composite parent, Control control) {
+    ((ViewGroup) parent.peer).addView((View) control.peer);
   }
 }

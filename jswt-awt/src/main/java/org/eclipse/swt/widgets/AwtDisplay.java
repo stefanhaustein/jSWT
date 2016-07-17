@@ -1,22 +1,15 @@
-package org.kobjects.jswt.awt;
+package org.eclipse.swt.widgets;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
-import org.kobjects.jswt.Insets;
-import org.kobjects.jswt.JswtDisplay;
 
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.util.Objects;
 
-public class AwtDisplay extends JswtDisplay {
+public class AwtDisplay extends PlatformDisplay {
   @Override
   public Object createPeer(Control control) {
     if (control instanceof Button) {
@@ -30,40 +23,39 @@ public class AwtDisplay extends JswtDisplay {
     }
     if (control instanceof Shell) {
       java.awt.Frame frame = new java.awt.Frame();
-      frame.setLayout(new JswtLayoutManager((Composite) control));
+      frame.setLayout(new SwtLayoutManager((Composite) control));
       return frame;
     }
     throw new RuntimeException("Unrecognized component: " + control);
   }
 
   @Override
-  public void openShell(Shell shell, Object peer) {
-    ((java.awt.Frame) peer).setVisible(true);
+  public void openShell(Shell shell) {
+    ((java.awt.Frame) shell.peer).setVisible(true);
   }
 
   @Override
-  public Rectangle getBounds(Control control, Object peer) {
+  public Rectangle getBounds(Control control) {
     java.awt.Rectangle rect = new java.awt.Rectangle();
-    ((java.awt.Component) peer).getBounds(rect);
-
-    System.out.println("bounds: " + rect);
+    ((java.awt.Component) control.peer).getBounds(rect);
 
     return new Rectangle(rect.x, rect.y, rect.width, rect.height);
   }
 
   @Override
-  public Point computeSize(Control control, Object peer, int wHint, int hHint, boolean changed) {
-    Dimension d = ((Component) peer).getPreferredSize();
+  public Point computeSize(Control control, int wHint, int hHint, boolean changed) {
+    Dimension d = ((Component) control.peer).getPreferredSize();
     return new Point(wHint == SWT.DEFAULT ? d.width : wHint, hHint == SWT.DEFAULT ? d.height : hHint);
   }
 
   @Override
-  public void setBounds(Control control, Object peer, int x, int y, int width, int height) {
-    ((Component) peer).setBounds(x, y, width, height);
+  public void setBounds(Control control, int x, int y, int width, int height) {
+    ((Component) control.peer).setBounds(x, y, width, height);
   }
 
   @Override
-  public String getText(Control control, Object peer) {
+  public String getText(Control control) {
+    Object peer = control.peer;
     if (peer instanceof java.awt.TextComponent) {
       return ((java.awt.TextComponent) peer).getText();
     }
@@ -80,7 +72,8 @@ public class AwtDisplay extends JswtDisplay {
   }
 
   @Override
-  public void setText(Control control, Object peer, String text) {
+  public void setText(Control control, String text) {
+    Object peer = control.peer;
     if (peer instanceof java.awt.TextComponent) {
       ((java.awt.TextComponent) peer).setText(text);
     } else if (peer instanceof java.awt.Button) {
@@ -93,18 +86,18 @@ public class AwtDisplay extends JswtDisplay {
   }
 
   @Override
-  public void pack(Shell shell, Object peer) {
-    ((java.awt.Frame) peer).pack();
+  public void pack(Shell shell) {
+    ((java.awt.Frame) shell.peer).pack();
   }
 
   @Override
-  public void addChild(Composite parent, Object parentPeer, Control control, Object peer) {
-    ((java.awt.Container) parentPeer).add((java.awt.Component) peer);
+  public void addChild(Composite parent, Control control) {
+    ((java.awt.Container) parent.peer).add((java.awt.Component) control.peer);
   }
 
   @Override
-  public Insets getInsets(Shell shell, Object peer) {
-    java.awt.Insets insets = ((Container) peer).getInsets();
+  public Insets getInsets(Shell shell) {
+    java.awt.Insets insets = ((Container) shell.peer).getInsets();
     Insets result = new Insets();
     result.left = insets.left;
     result.top = insets.top;

@@ -3,13 +3,12 @@ package org.eclipse.swt.widgets;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.kobjects.jswt.JswtDisplay;
 
 public class Control extends Widget {
 
   Object layoutData;
   Object peer;
-  JswtDisplay display;
+  PlatformDisplay display;
 
   public Control(Composite parent, int style) {
     super(parent, style);
@@ -17,7 +16,7 @@ public class Control extends Widget {
       this.display = parent.display;
       this.peer = display.createPeer(this);
       parent.children.add(this);
-      display.addChild(parent, parent.peer, this, this.peer);
+      display.addChild(parent, this);
     }
   }
 
@@ -31,7 +30,7 @@ public class Control extends Widget {
     if (wHint != SWT.DEFAULT && hHint != SWT.DEFAULT) {
       return new Point(wHint, hHint);
     }
-    return display.computeSize(this, peer, wHint, hHint, changed);
+    return display.computeSize(this, wHint, hHint, changed);
   }
 
   public int getBorderWidth() {
@@ -39,7 +38,7 @@ public class Control extends Widget {
   }
 
   public Rectangle getBounds() {
-    return display.getBounds(this, peer);
+    return display.getBounds(this);
   }
 
   public Object getLayoutData() {
@@ -47,7 +46,7 @@ public class Control extends Widget {
   }
 
   public void setBounds(int x, int y, int width, int height) {
-    display.setBounds(this, peer, x, y, width, height);
+    display.setBounds(this, x, y, width, height);
   }
 
   public void setBounds(Rectangle rect) {

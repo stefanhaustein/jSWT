@@ -1,7 +1,6 @@
 package org.eclipse.swt.widgets;
 
 import org.eclipse.swt.SWT;
-import org.kobjects.jswt.JswtDisplay;
 
 public abstract class Widget {
 
@@ -140,7 +139,7 @@ public abstract class Widget {
     Widget parent;
     int style;
     int state;
-    JswtDisplay display;
+    PlatformDisplay display;
 
     public Widget(Widget parent, int style) {
       this.parent = parent;

@@ -1,4 +1,4 @@
-package org.kobjects.jswt.awt;
+package org.eclipse.swt.widgets;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
@@ -8,11 +8,11 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.LayoutManager;
 
-public class JswtLayoutManager implements LayoutManager {
+public class SwtLayoutManager implements LayoutManager {
 
   org.eclipse.swt.widgets.Composite swtComposite;
 
-  JswtLayoutManager(org.eclipse.swt.widgets.Composite swtComposite) {
+  SwtLayoutManager(org.eclipse.swt.widgets.Composite swtComposite) {
     this.swtComposite = swtComposite;
   }
 
