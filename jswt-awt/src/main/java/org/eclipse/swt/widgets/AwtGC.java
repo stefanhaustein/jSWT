@@ -1,10 +1,12 @@
 package org.eclipse.swt.widgets;
 
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 
 
-public class AwtGC extends GC {
+class AwtGC extends GC {
     final java.awt.Graphics graphics;
     Color foreground;
     Color background;
@@ -40,6 +42,12 @@ public class AwtGC extends GC {
     }
 
     @Override
+    public void drawText(String string, int x, int y, int flags) {
+        useForegroundColor();
+        graphics.drawString(string, x, y + graphics.getFontMetrics().getAscent());
+    }
+
+    @Override
     public void fillOval(int x, int y, int width, int height) {
         useBackgroundColor();
         graphics.fillOval(x, y, width, height);
@@ -49,6 +57,12 @@ public class AwtGC extends GC {
     public void fillRectangle(int x, int y, int width, int height) {
         useBackgroundColor();
         graphics.fillRect(x, y, width, height);
+    }
+
+    @Override
+    public void fillRoundRectangle(int x, int y, int width, int height, int arcWidth, int arcHeight) {
+        useBackgroundColor();
+        graphics.fillRoundRect(x, y, width, height, arcWidth, arcHeight);
     }
 
     @Override
@@ -69,6 +83,14 @@ public class AwtGC extends GC {
     public void setForeground(Color color) {
         foreground = color;
     }
+
+    @Override
+    public void setFont(Font font) {
+        FontData fd = font.getFontData()[0];
+        java.awt.Font awtFont = graphics.getFont().deriveFont((float) fd.getHeight());
+        graphics.setFont(awtFont);
+    }
+
 
     @Override
     public void setBackground(Color color) {

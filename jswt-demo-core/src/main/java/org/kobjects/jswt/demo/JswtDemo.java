@@ -22,7 +22,7 @@ public class JswtDemo {
         Shell shell = new Shell (display);
         shell.setText("jSWT Demo");
 
-        new OperationCanvas(shell);
+        new DemoCanvas(shell);
 
         shell.setLayout (new FillLayout(SWT.HORIZONTAL));
         shell.pack ();

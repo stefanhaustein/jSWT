@@ -1,6 +1,8 @@
 package org.eclipse.swt.graphics;
 
 
+import org.eclipse.swt.SWT;
+
 public class GC {
     int antialias;
     GC delegate;
@@ -26,6 +28,26 @@ public class GC {
 
     public void drawPoint(int x, int y) {
         drawLine(x, y, x, y);
+    }
+
+    public void drawString(String string, int x, int y, boolean isTransparent) {
+        drawText(string, x, y, isTransparent ? SWT.DRAW_TRANSPARENT : 0);
+    }
+
+    public void drawString(String string, int x, int y) {
+        drawText(string, x, y, 0);
+    }
+
+    public void drawText(String string, int x, int y, boolean isTransparent) {
+        drawText(string, x, y, SWT.DRAW_DELIMITER | SWT.DRAW_TAB | (isTransparent ? SWT.DRAW_TRANSPARENT : 0));
+    }
+
+    public void drawText(String string, int x, int y) {
+        drawText(string, x, y, SWT.DRAW_DELIMITER | SWT.DRAW_TAB );
+    }
+
+    public void drawText(String string, int x, int y, int flags) {
+        delegate.drawText(string, x, y, flags);
     }
 
     public void drawOval(int x, int y, int width, int height) {
@@ -86,6 +108,10 @@ public class GC {
 
     public void setForeground(Color color) {
         delegate.setForeground(color);
+    }
+
+    public void setFont(Font font) {
+        delegate.setFont(font);
     }
 
     public void setAntialias(int antialias) {

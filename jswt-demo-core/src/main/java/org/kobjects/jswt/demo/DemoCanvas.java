@@ -1,18 +1,15 @@
 package org.kobjects.jswt.demo;
 
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
-public class OperationCanvas extends Canvas {
+public class DemoCanvas extends Canvas {
     final Color white;
     final Color gray;
     final Color black;
 
-    public OperationCanvas(Composite parent) {
+    public DemoCanvas(Composite parent) {
         super(parent, 0);
         white = new Color(getDisplay(), 255, 255, 255);
         gray = new Color(getDisplay(), 127, 127, 127);
@@ -65,6 +62,7 @@ public class OperationCanvas extends Canvas {
             gc.setForeground(new Color(getDisplay(), j, j, j));
             gc.drawLine (dx + i + step, dy + 3*step+step/2, dx + i+step, dy + 5*step);
         }
+
         /*
         for (int i = 0; i < 8; i++) {
             gc.setColor (new Color (((i & 1) * 255) ,
@@ -83,22 +81,24 @@ public class OperationCanvas extends Canvas {
         gc.setForeground(white);
         gc.drawOval (dx, dy, m, m);
 
-        int ty = 6*step;
+        int tx = 1 * step + step / 3 + dx;
+        int ty = 5 * step + step / 2 + dy;
 
-        /*
-        gc.setColor (Color.black);
+        gc.setFont(new Font(getDisplay(), "SansSerif", step * 2 / 3, 0));
+
+        gc.setForeground(black);
 
         boolean small = m < 100;
 
         gc.drawString
                 ((small ? "ttl " : "total mem: ")
-                        + Runtime.getRuntime().totalMemory(), 2*step, ty);
+                        + Runtime.getRuntime().totalMemory()/1000000+"MB", tx, ty, true);
 
         long free = Runtime.getRuntime().freeMemory ();
 
         gc.drawString
                 ((small ? "fr " : "free mem: ")
-                        + free, 2*step, ty+step);
+                        + free/1000000+"MB", tx, ty+step, true);
 
         int count = 0;
         while (true) {
@@ -111,9 +111,7 @@ public class OperationCanvas extends Canvas {
 
         gc.drawString
                 ((small ? "gc " : "post gc: ")
-                        + "(" + count +")"+free , 2*step, ty+2*step);
-    }
-*/
+                        + "(" + count +")"+free/1000000+"MB", tx, ty+2*step, true);
 
     }
 
