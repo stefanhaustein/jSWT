@@ -71,7 +71,7 @@ public class AwtDisplay extends PlatformDisplay {
     if (peer instanceof java.awt.Frame) {
       return ((java.awt.Frame) peer).getTitle();
     }
-    return null;
+    return "";
   }
 
   @Override
