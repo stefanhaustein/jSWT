@@ -44,7 +44,7 @@ public class JswtDemo {
         button.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                label.setText("Clicked " + ++clickCount);
+                label.setText("Click " + ++clickCount);
             }
         });
 
