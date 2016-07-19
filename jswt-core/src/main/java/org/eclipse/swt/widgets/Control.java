@@ -3,12 +3,13 @@ package org.eclipse.swt.widgets;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.internal.SWTEventListener;
 
 public class Control extends Widget {
 
   Object layoutData;
   Object peer;
-  PlatformDisplay display;
+  EventTable listeners = new EventTable();
 
   public Control(Composite parent, int style) {
     super(parent, style);
@@ -18,6 +19,11 @@ public class Control extends Widget {
       parent.children.add(this);
       display.addChild(parent, this);
     }
+  }
+
+  void addListener(int eventType, Listener listener) {
+    listeners.hook(eventType, listener);
+    display.addListener(this, eventType, listener);
   }
 
   public Point computeSize(int wHint, int hHint) {

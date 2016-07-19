@@ -126,4 +126,23 @@ public class AndroidDisplay extends PlatformDisplay {
   public void addChild(Composite parent, Control control) {
     ((ViewGroup) parent.peer).addView((View) control.peer);
   }
+
+  @Override
+  public void addListener(final Control control, final int eventType, Listener listener) {
+    View view = (View) control.peer;
+    switch (eventType) {
+      case SWT.Selection:
+        if (view instanceof android.widget.Button) {
+          ((android.widget.Button) view).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+              Event event = new Event();
+              event.type = eventType;
+              event.widget = control;
+              control.listeners.sendEvent(event);
+            }
+          });
+        }
+    }
+  }
 }

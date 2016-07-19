@@ -1,15 +1,25 @@
 package org.eclipse.swt.widgets;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.internal.SWTEventListener;
 
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Objects;
+import java.util.TimerTask;
 
 public class AwtDisplay extends PlatformDisplay {
+  int activeShells = 0;
+
   @Override
   public Object createPeer(Control control) {
     if (control instanceof Button) {
@@ -24,16 +34,43 @@ public class AwtDisplay extends PlatformDisplay {
     if (control instanceof Shell) {
       java.awt.Frame frame = new java.awt.Frame();
       frame.setLayout(new SwtLayoutManager((Composite) control));
+
+      frame.addWindowListener(new WindowAdapter() {
+        @Override
+        public void windowClosing(WindowEvent e) {
+          frame.setVisible(false);
+          // Hack...
+          activeShells--;
+          new Thread(new Runnable() {
+            @Override
+            public void run() {
+              try {
+                Thread.sleep(1000);
+              } catch (InterruptedException e) {
+              }
+              if (activeShells == 0) {
+                System.exit(0);
+              }
+            }
+          }).start();
+        }
+      });
+
       return frame;
     }
+    // BEFORE COMPOSITE!
     if (control instanceof Canvas) {
       return new SwtCanvas((Canvas) control);
+    }
+    if (control instanceof Composite) {
+      return new java.awt.Panel(new SwtLayoutManager((Composite) control));
     }
     throw new RuntimeException("Unrecognized component: " + control);
   }
 
   @Override
   public void openShell(Shell shell) {
+    activeShells++;
     ((java.awt.Frame) shell.peer).setVisible(true);
   }
 
@@ -93,9 +130,32 @@ public class AwtDisplay extends PlatformDisplay {
     ((java.awt.Frame) shell.peer).pack();
   }
 
+
   @Override
   public void addChild(Composite parent, Control control) {
     ((java.awt.Container) parent.peer).add((java.awt.Component) control.peer);
+  }
+
+  @Override
+  public void addListener(final Control control, final int eventType, Listener listener) {
+    java.awt.Component component = (Component) control.peer;
+    switch (eventType) {
+      case SWT.Selection:
+        if (component instanceof java.awt.Button) {
+          java.awt.Button button = (java.awt.Button) component;
+          if (button.getActionListeners().length == 0) {
+            button.addActionListener(new ActionListener() {
+              @Override
+              public void actionPerformed(ActionEvent e) {
+                Event event = new Event();
+                event.widget = control;
+                event.type = eventType;
+                control.listeners.sendEvent(event);
+              }
+            });
+          }
+        }
+    }
   }
 
   @Override

@@ -1,6 +1,9 @@
 package org.eclipse.swt.widgets;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.internal.SWTEventListener;
+
+import java.util.HashSet;
 
 public abstract class Widget {
 
