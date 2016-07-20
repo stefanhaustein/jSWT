@@ -8,6 +8,6 @@ public class SwtCanvas extends java.awt.Container {
     }
 
     public void paint(java.awt.Graphics g) {
-        swtCanvas.drawBackground(new AwtGC(g), 0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE);
+        swtCanvas.drawBackground(new AwtGC(g), 0, 0, getWidth(), getHeight());
     }
 }

@@ -1,6 +1,7 @@
 package org.kobjects.jswt.demo;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -29,8 +30,13 @@ public class JswtDemo {
         Shell shell = new Shell (display);
         shell.setText("jSWT Demo");
 
-        Composite leftBar = new Composite(shell, 0);
-        leftBar.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
+        ScrolledComposite scrolledComposite = new ScrolledComposite(shell, 0);
+        scrolledComposite.setExpandHorizontal(true);
+        scrolledComposite.setExpandVertical(true);
+
+        Composite leftBar = new Composite(scrolledComposite, 0);
+        scrolledComposite.setContent(leftBar);
+        scrolledComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
 
         RowLayout rowLayout = new RowLayout(SWT.VERTICAL);
         rowLayout.fill = true;

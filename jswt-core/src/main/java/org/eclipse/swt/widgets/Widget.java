@@ -166,16 +166,20 @@ public abstract class Widget {
         state |= DISPOSED;
     }
 
-    public Widget getParent() {
-        return parent;
+    public void error(int code) {
+        SWT.error(code);
     }
 
     public Display getDisplay() {
         return display;
     }
 
-    public void error(int code) {
-        SWT.error(code);
+    public Widget getParent() {
+        return parent;
+    }
+
+    public int getStyle() {
+        return style;
     }
 
     public boolean isDisposed() {

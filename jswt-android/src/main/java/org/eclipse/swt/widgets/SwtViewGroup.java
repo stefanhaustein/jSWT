@@ -52,6 +52,12 @@ class SwtViewGroup extends ViewGroup {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec),
                 MeasureSpec.getSize(heightMeasureSpec));
+
+        // TODO(haustein): Hand in more reasonable specs, depending on the layout --
+        // or let SWT child measurement trigger Android measurement.
+        for (int i = 0; i < getChildCount(); i++) {
+            getChildAt(i).measure(widthMeasureSpec, heightMeasureSpec);
+        }
     }
 
     private LayoutParams getChildLayoutParams(int i) {

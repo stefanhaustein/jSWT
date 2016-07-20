@@ -1,9 +1,9 @@
 package org.eclipse.swt.widgets;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.internal.SWTEventListener;
 
 public class Control extends Widget {
 
@@ -17,7 +17,9 @@ public class Control extends Widget {
       this.display = parent.display;
       this.peer = display.createPeer(this);
       parent.children.add(this);
-      display.addChild(parent, this);
+      if (!(parent instanceof ScrolledComposite)) {
+        display.addChild(parent, this);
+      }
     }
   }
 
@@ -44,7 +46,13 @@ public class Control extends Widget {
   }
 
   public Rectangle getBounds() {
+    // Find a way to improve this, e.g. hand in an object that is shared in some way
     return display.getBounds(this);
+  }
+
+  public Point getSize() {
+    Rectangle bounds = getBounds();
+    return new Point(bounds.width, bounds.height);
   }
 
   public Object getLayoutData() {
@@ -63,4 +71,7 @@ public class Control extends Widget {
     this.layoutData = layoutData;
   }
 
+  enum Type {
+
+  }
 }

@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
@@ -21,12 +22,6 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public Object createPeer(Control control) {
-    if (control instanceof Canvas) {
-      return new SwtCanvasView(activity, (Canvas) control);
-    }
-    if (control instanceof Composite) {
-      return new SwtViewGroup(activity, (Composite) control);
-    }
     if (control instanceof Button) {
       return new android.widget.Button(activity);
     }
@@ -35,6 +30,19 @@ public class AndroidDisplay extends PlatformDisplay {
     }
     if (control instanceof Label) {
       return new android.widget.TextView(activity);
+    }
+    if (control instanceof ScrolledComposite) {
+      return new android.widget.ScrollView(activity);
+    }
+    if (control instanceof Shell) {
+      return new SwtViewGroup(activity, (Composite) control);
+    }
+    // Should be last because some other options are subclasses of Composite / Canvas
+    if (control instanceof Canvas) {
+      return new SwtCanvasView(activity, (Canvas) control);
+    }
+    if (control instanceof Composite) {
+      return new SwtViewGroup(activity, (Composite) control);
     }
     throw new RuntimeException("Unrecognized control: " + control);
   }

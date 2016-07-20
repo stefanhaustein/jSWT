@@ -27,7 +27,9 @@ public class DemoCanvas extends Canvas {
         Rectangle bounds = getBounds();
 
         int m = bounds.width > bounds.height ? bounds.height : bounds.width;
-        int step = m / 10;
+
+
+        int step = Math.max(1, m / 10);
         m = step * 10;
 
         gc.setBackground(new Color(getDisplay(), 127, 127, 127));

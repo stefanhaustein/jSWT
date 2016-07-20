@@ -1,4 +1,13 @@
 # jSWT
 
-Stab at a pure Java subset of SWT with Android and AWT bindings.
-Not really useful yet.
+jSWT is a stab at a pure Java subset of SWT with Android, AWT and (planned) GWT bindings.
+It's not really in a useful state yet.
+
+Next steps:
+
+- ScrolledComposite
+- Resize listeners
+- Popup Menus
+- Dialogs
+- Menus
+- Tabs

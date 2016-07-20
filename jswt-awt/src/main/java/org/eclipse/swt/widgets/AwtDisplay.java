@@ -1,6 +1,7 @@
 package org.eclipse.swt.widgets;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
@@ -31,6 +32,9 @@ public class AwtDisplay extends PlatformDisplay {
     if (control instanceof Text) {
       return new java.awt.TextField();
     }
+    if (control instanceof ScrolledComposite) {
+      return new java.awt.ScrollPane();
+    }
     if (control instanceof Shell) {
       java.awt.Frame frame = new java.awt.Frame();
       frame.setLayout(new SwtLayoutManager((Composite) control));
@@ -58,7 +62,7 @@ public class AwtDisplay extends PlatformDisplay {
 
       return frame;
     }
-    // BEFORE COMPOSITE!
+    // Must be last because many components inherit from Composite / Canvas
     if (control instanceof Canvas) {
       return new SwtCanvas((Canvas) control);
     }
