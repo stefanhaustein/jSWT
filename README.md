@@ -5,7 +5,6 @@ It's not really in a useful state yet.
 
 Next steps:
 
-- ScrolledComposite
 - Resize listeners
 - Popup Menus
 - Dialogs
