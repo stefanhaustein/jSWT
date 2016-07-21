@@ -21,7 +21,7 @@ public class AndroidDisplay extends PlatformDisplay {
 
 
   @Override
-  public Object createPeer(Control control) {
+  public Object createControl(Control control) {
     if (control instanceof Button) {
       return new android.widget.Button(activity);
     }
@@ -76,7 +76,7 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
-  public Insets getInsets(Shell shell) {
+  public Insets getInsets(Scrollable scrollable) {
     return new Insets();
   }
 
@@ -123,6 +123,11 @@ public class AndroidDisplay extends PlatformDisplay {
     } else if (peer instanceof SwtViewGroup) {
       ((SwtViewGroup) peer).text = text;
     }
+  }
+
+  @Override
+  public void setMenuBar(Decorations decorations, Menu menu) {
+    // TODO...
   }
 
   @Override

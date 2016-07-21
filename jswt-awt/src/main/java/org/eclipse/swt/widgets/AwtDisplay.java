@@ -8,9 +8,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.internal.SWTEventListener;
 
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -22,7 +20,7 @@ public class AwtDisplay extends PlatformDisplay {
   int activeShells = 0;
 
   @Override
-  public Object createPeer(Control control) {
+  public Object createControl(Control control) {
     if (control instanceof Button) {
       return new java.awt.Button();
     }
@@ -71,6 +69,7 @@ public class AwtDisplay extends PlatformDisplay {
     }
     throw new RuntimeException("Unrecognized component: " + control);
   }
+
 
   @Override
   public void openShell(Shell shell) {
@@ -129,6 +128,34 @@ public class AwtDisplay extends PlatformDisplay {
     }
   }
 
+  private void menuAddAll(Menu source, java.awt.Menu destination) {
+    for (int i = 0; i < source.getItemCount(); i++) {
+      MenuItem item = source.getItem(i);
+      if (item.subMenu == null) {
+        java.awt.MenuItem awtItem = new java.awt.MenuItem(item.text);
+        destination.add(awtItem);
+      } else {
+        java.awt.Menu awtMenu = new java.awt.Menu(item.text);
+        menuAddAll(item.subMenu, awtMenu);
+      }
+    }
+  }
+
+  @Override
+  public void setMenuBar(Decorations decorations, Menu menu) {
+    MenuBar awtMenuBar = new MenuBar();
+
+    for (int i = 0; i < menu.getItemCount(); i++) {
+      MenuItem item = menu.getItem(i);
+      java.awt.Menu awtSubMenu = new java.awt.Menu(item.text);
+      awtMenuBar.add(awtSubMenu);
+      if (item.subMenu != null) {
+        menuAddAll(item.subMenu, awtSubMenu);
+      }
+    }
+    ((Frame) decorations.peer).setMenuBar(awtMenuBar);
+  }
+
   @Override
   public void pack(Shell shell) {
     ((java.awt.Frame) shell.peer).pack();
@@ -163,13 +190,15 @@ public class AwtDisplay extends PlatformDisplay {
   }
 
   @Override
-  public Insets getInsets(Shell shell) {
-    java.awt.Insets insets = ((Container) shell.peer).getInsets();
+  public Insets getInsets(Scrollable scrollable) {
     Insets result = new Insets();
-    result.left = insets.left;
-    result.top = insets.top;
-    result.right = insets.right;
-    result.bottom = insets.bottom;
+    if (scrollable instanceof Composite) {
+      java.awt.Insets insets = ((Container) scrollable.peer).getInsets();
+      result.left = insets.left;
+      result.top = insets.top;
+      result.right = insets.right;
+      result.bottom = insets.bottom;
+    }
     return result;
   }
 }

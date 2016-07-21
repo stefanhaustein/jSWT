@@ -143,6 +143,7 @@ public abstract class Widget {
     int style;
     int state;
     PlatformDisplay display;
+    EventTable listeners = new EventTable();
 
     public Widget(Widget parent, int style) {
       this.parent = parent;

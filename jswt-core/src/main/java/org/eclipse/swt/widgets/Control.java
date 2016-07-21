@@ -9,13 +9,12 @@ public class Control extends Widget {
 
   Object layoutData;
   Object peer;
-  EventTable listeners = new EventTable();
 
   public Control(Composite parent, int style) {
     super(parent, style);
     if (parent != null) {
       this.display = parent.display;
-      this.peer = display.createPeer(this);
+      this.peer = display.createControl(this);
       parent.children.add(this);
       if (!(parent instanceof ScrolledComposite)) {
         display.addChild(parent, this);

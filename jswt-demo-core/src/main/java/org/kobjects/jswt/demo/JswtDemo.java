@@ -62,6 +62,18 @@ public class JswtDemo {
         gridLayout.marginWidth = 0;
         gridLayout.marginHeight = 0;
 
+        Menu menuBar = new Menu(shell);
+        MenuItem fileMenuItem = new MenuItem(menuBar, SWT.DROP_DOWN);
+        fileMenuItem.setText("File");
+        Menu fileMenu = new Menu(fileMenuItem);
+
+        MenuItem aboutItem = new MenuItem(fileMenu, 0);
+        aboutItem.setText("About");
+        MenuItem openItem = new MenuItem(fileMenu, 0);
+        openItem.setText("Open");
+
+        shell.setMenuBar(menuBar);
+
         shell.setLayout (gridLayout);
         shell.pack ();
         shell.open ();

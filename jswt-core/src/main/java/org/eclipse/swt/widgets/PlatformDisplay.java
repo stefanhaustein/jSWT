@@ -17,11 +17,11 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract Point computeSize(Control control, int wHint, int hHint, boolean changed);
 
-  public abstract Object createPeer(Control control);
+  public abstract Object createControl(Control control);
 
   public abstract Rectangle getBounds(Control control);
 
-  public abstract Insets getInsets(Shell shell);
+  public abstract Insets getInsets(Scrollable composite);
 
   public abstract String getText(Control control);
 
@@ -32,6 +32,8 @@ public abstract class PlatformDisplay extends Display {
   public abstract void setBounds(Control control, int x, int y, int width, int height);
 
   public abstract void setText(Control control, String text);
+
+  public abstract void setMenuBar(Decorations decorations, Menu menu);
 
 
   public static class Insets {
