@@ -8,9 +8,9 @@ public class Decorations extends Canvas {
     super(parent, style);
   }
 
-  public void setMenuBar(Menu menu) {
+  public void setMenuBar(Menu menuBar) {
     this.menuBar = menuBar;
-    display.setMenuBar(this, menu);
+    display.setMenuBar(this, menuBar);
   }
 
   public String getText() {

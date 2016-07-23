@@ -1,22 +1,27 @@
 package org.eclipse.swt.widgets;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.*;
 
+import org.eclipse.swt.R;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class AndroidDisplay extends PlatformDisplay {
-  Activity activity;
+  SwtActivity activity;
 
-  public AndroidDisplay(Activity activity) {
+  public AndroidDisplay(SwtActivity activity) {
+
     this.activity = activity;
+
+
   }
 
 
@@ -50,7 +55,7 @@ public class AndroidDisplay extends PlatformDisplay {
   @Override
   public void openShell(Shell shell) {
     SwtViewGroup view = (SwtViewGroup) shell.peer;
-    ActionBar actionBar = activity.getActionBar();
+    android.support.v7.app.ActionBar actionBar = activity.getSupportActionBar();
     String text = view.text;
     if (text != null) {
       actionBar.show();
@@ -58,7 +63,8 @@ public class AndroidDisplay extends PlatformDisplay {
     } else {
       actionBar.hide();
     }
-    activity.setContentView(view);
+    activity.navigationDrawer.addView(view);
+//    activity.setContentView(view);
   }
 
   @Override
@@ -125,9 +131,25 @@ public class AndroidDisplay extends PlatformDisplay {
     }
   }
 
+  private void populateMenu(Menu sourceMenu, android.view.Menu androidMenu, boolean flattenFirst) {
+    for (int i = 0; i < sourceMenu.getItemCount(); i++) {
+      MenuItem item = sourceMenu.getItem(i);
+      if (item.subMenu == null) {
+        androidMenu.add(item.getText());
+      } else if (i == 0 && flattenFirst) {
+        populateMenu(item.subMenu, androidMenu, false);
+      } else {
+        android.view.Menu androidSubMenu = androidMenu.addSubMenu(item.getText());
+        populateMenu(item.subMenu, androidSubMenu, false);
+      }
+    }
+  }
+
   @Override
   public void setMenuBar(Decorations decorations, Menu menu) {
-    // TODO...
+    android.view.Menu androidMenu = activity.navigationView.getMenu();
+    androidMenu.clear();
+    populateMenu(menu, androidMenu, true);
   }
 
   @Override
