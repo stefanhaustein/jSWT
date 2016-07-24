@@ -2,9 +2,7 @@ package org.kobjects.jswt.demo;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -45,7 +43,7 @@ public class JswtDemo {
         final Label label = new Label(leftBar, 0);
         label.setText("Label");
         Text text = new Text(leftBar, 0);
-        Button button = new Button(leftBar, 0);
+        Button button = new Button(leftBar, SWT.PUSH);
         button.setText("Button");
         button.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -53,6 +51,11 @@ public class JswtDemo {
                 label.setText("Click " + ++clickCount);
             }
         });
+
+        new Button(leftBar, SWT.CHECK).setText("Checkbox");
+        new Button(leftBar, SWT.RADIO).setText("Radio 1");
+        new Button(leftBar, SWT.RADIO).setText("Radio 2");
+        new Button(leftBar, SWT.RADIO).setText("Radio 3");
 
         DemoCanvas demoCanvas = new DemoCanvas(shell);
         demoCanvas.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
@@ -90,6 +93,18 @@ public class JswtDemo {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 System.out.println("OPEN");
+            }
+        });
+
+        shell.addControlListener(new ControlListener() {
+            @Override
+            public void controlMoved(ControlEvent e) {
+
+            }
+
+            @Override
+            public void controlResized(ControlEvent e) {
+                System.out.println("Resized: " + shell.getSize());
             }
         });
 

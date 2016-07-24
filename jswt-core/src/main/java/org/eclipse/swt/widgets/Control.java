@@ -2,6 +2,7 @@ package org.eclipse.swt.widgets;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
@@ -20,6 +21,12 @@ public class Control extends Widget {
         display.addChild(parent, this);
       }
     }
+  }
+
+  public void addControlListener(ControlListener controlListener) {
+    TypedListener typedListener = new TypedListener(controlListener);
+    addListener(SWT.Resize, typedListener);
+    addListener(SWT.Move, typedListener);
   }
 
   public Point computeSize(int wHint, int hHint) {

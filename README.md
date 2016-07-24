@@ -5,17 +5,28 @@ It's not really in a useful state yet.
 
 ## Todo
 
+- Checkbox / Radio button selection
+
+- Spinner, ComboBox, Progress bars, Sliders
+
+- Turn demo into a proper stateful class
+
+- Let demo react to resize events implying an orientation change
+
 - Image support
 
-- Button variants, Spinner / ComboBox,
-
-- Resize listener (use to re-arrange demo layout)
-
-- Figure out how to support Android context menus. Perhaps supply a menu title that will be moved there?
+- Figure out how to support Android context menus (probably via item.getToolbar() and let AWT return null).
 
 - Figure out how to hide the toolbar on Android.
 
 - Figure out how to support platform-style dialog buttons.
+
+## Done
+
+
+- 2016-07-24 Some Dialog support, resize listeners, checkboxes
+- 2016-07-23 Android menuBar support (via DrawerLayout)
+
 
 ## Unsupported
 

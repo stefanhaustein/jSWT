@@ -9,10 +9,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.internal.SWTEventListener;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.util.Objects;
 import java.util.TimerTask;
 
@@ -22,7 +19,14 @@ public class AwtDisplay extends PlatformDisplay {
   @Override
   public Object createControl(Control control) {
     if (control instanceof Button) {
-      return new java.awt.Button();
+      switch (control.style) {
+        case SWT.CHECK:
+          return new java.awt.Checkbox();
+        case SWT.RADIO:
+          return new java.awt.Checkbox(null, false, new CheckboxGroup());
+        default:
+          return new java.awt.Button();
+      }
     }
     if (control instanceof Label) {
       return new java.awt.Label();
@@ -119,6 +123,9 @@ public class AwtDisplay extends PlatformDisplay {
     if (peer instanceof java.awt.Frame) {
       return ((java.awt.Frame) peer).getTitle();
     }
+    if (peer instanceof java.awt.Checkbox) {
+      return ((java.awt.Checkbox) peer).getLabel();
+    }
     return "";
   }
 
@@ -135,7 +142,10 @@ public class AwtDisplay extends PlatformDisplay {
       ((java.awt.Frame) peer).setTitle(text);
     } else if (peer instanceof java.awt.Dialog) {
       ((java.awt.Dialog) peer).setTitle(text);
+    } else if (peer instanceof java.awt.Checkbox) {
+      ((java.awt.Checkbox) peer).setLabel(text);
     }
+
   }
 
   private void menuAddAll(Menu source, java.awt.Menu destination) {
@@ -178,7 +188,7 @@ public class AwtDisplay extends PlatformDisplay {
 
   @Override
   public void setMeasuredSize(Control control, int width, int height) {
-
+    // Relevant for Android.
   }
 
   @Override
@@ -192,10 +202,47 @@ public class AwtDisplay extends PlatformDisplay {
     ((java.awt.Container) parent.peer).add((java.awt.Component) control.peer);
   }
 
+  private void sendEvent(Control target, int eventType, AWTEvent awtEvent) {
+    if (target.listeners != null) {
+      Event event = new Event();
+      event.widget = target;
+      event.type = eventType;
+      target.listeners.sendEvent(event);
+    }
+  }
+
   @Override
   public void addListener(final Control control, final int eventType, Listener listener) {
     java.awt.Component component = (Component) control.peer;
     switch (eventType) {
+      case SWT.Move:
+      case SWT.Resize:
+      case SWT.Show:
+      case SWT.Hide:
+        if (component.getComponentListeners().length == 0) {
+          component.addComponentListener(new ComponentListener() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+              sendEvent(control, eventType, e);
+            }
+
+            @Override
+            public void componentMoved(ComponentEvent e) {
+              sendEvent(control, eventType, e);
+            }
+
+            @Override
+            public void componentShown(ComponentEvent e) {
+              sendEvent(control, eventType, e);
+            }
+
+            @Override
+            public void componentHidden(ComponentEvent e) {
+              sendEvent(control, eventType, e);
+            }
+          });
+        }
+        break;
       case SWT.Selection:
         if (component instanceof java.awt.Button) {
           java.awt.Button button = (java.awt.Button) component;
@@ -203,14 +250,12 @@ public class AwtDisplay extends PlatformDisplay {
             button.addActionListener(new ActionListener() {
               @Override
               public void actionPerformed(ActionEvent e) {
-                Event event = new Event();
-                event.widget = control;
-                event.type = eventType;
-                control.listeners.sendEvent(event);
+                sendEvent(control, eventType, e);
               }
             });
           }
         }
+        break;
     }
   }
 

@@ -34,6 +34,7 @@ public class AndroidDisplay extends PlatformDisplay {
         if (topShell != null && topShell.menuBar != null) {
           MenuItem result = findMenuItem(topShell.menuBar, item.getTitle().toString());
           if (result != null) {
+            sendEvent(result, SWT.Selection);
             Event event = new Event();
             event.display = AndroidDisplay.this;
             event.widget = result;
@@ -52,7 +53,14 @@ public class AndroidDisplay extends PlatformDisplay {
   @Override
   public Object createControl(Control control) {
     if (control instanceof Button) {
-      return new android.widget.Button(activity);
+      switch (control.style) {
+        case SWT.RADIO:
+          return new android.widget.RadioButton(activity);
+        case SWT.CHECK:
+          return new android.widget.CheckBox(activity);
+        default:
+          return new android.widget.Button(activity);
+      }
     }
     if (control instanceof Text) {
       return new android.widget.EditText(activity);
@@ -232,6 +240,16 @@ public class AndroidDisplay extends PlatformDisplay {
     }
   }
 
+  void sendEvent(Widget target, int eventType) {
+    if (target.listeners != null) {
+      Event event = new Event();
+      event.display = this;
+      event.widget = target;
+      event.type = eventType;
+      target.listeners.sendEvent(event);
+    }
+  }
+
   @Override
   public void pack(Shell shell) {
     ((View) shell.peer).invalidate();
@@ -251,13 +269,11 @@ public class AndroidDisplay extends PlatformDisplay {
           ((android.widget.Button) view).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-              Event event = new Event();
-              event.type = eventType;
-              event.widget = control;
-              control.listeners.sendEvent(event);
+            sendEvent(control, eventType);
             }
           });
         }
+        break;
     }
   }
 }

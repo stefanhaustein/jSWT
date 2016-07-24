@@ -58,6 +58,12 @@ class SwtViewGroup extends ViewGroup {
                         View.MeasureSpec.getSize(heightMeasureSpec) : SWT.DEFAULT);
     }
 
+    @Override
+    protected void onSizeChanged (int w, int h, int oldw, int oldh) {
+        ((AndroidDisplay) composite.display).sendEvent(composite, SWT.Resize);
+    }
+
+
     /** 
      * This method just enables calling setMeasuredDimension from the outside.
      */
