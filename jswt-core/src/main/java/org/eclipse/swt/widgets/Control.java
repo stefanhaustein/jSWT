@@ -22,22 +22,21 @@ public class Control extends Widget {
     }
   }
 
-  void addListener(int eventType, Listener listener) {
-    listeners.hook(eventType, listener);
-    display.addListener(this, eventType, listener);
-  }
-
   public Point computeSize(int wHint, int hHint) {
     return computeSize(wHint, hHint, true);
   }
 
   public Point computeSize(int wHint, int hHint, boolean changed) {
+    Point size;
     if (wHint != SWT.DEFAULT && wHint < 0) wHint = 0;
     if (hHint != SWT.DEFAULT && hHint < 0) hHint = 0;
     if (wHint != SWT.DEFAULT && hHint != SWT.DEFAULT) {
-      return new Point(wHint, hHint);
+      size = new Point(wHint, hHint);
+    } else {
+      size = display.computeSize(this, wHint, hHint, changed);
     }
-    return display.computeSize(this, wHint, hHint, changed);
+    display.setMeasuredSize(this, size.x, size.y);
+    return size;
   }
 
   public int getBorderWidth() {

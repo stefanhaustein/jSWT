@@ -150,6 +150,15 @@ public abstract class Widget {
      this.style = style;
     }
 
+
+    void addListener(int eventType, Listener listener) {
+        listeners.hook(eventType, listener);
+        if (this instanceof Control) {
+            display.addListener((Control) this, eventType, listener);
+        }
+    }
+
+
     protected void checkWidget() {
         if ((state & DISPOSED) != 0) {
             SWT.error(SWT.ERROR_WIDGET_DISPOSED);

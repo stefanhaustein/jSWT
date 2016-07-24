@@ -5,12 +5,12 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 class SwtViewGroup extends ViewGroup {
 
     Composite composite;
-    String text;
 
     SwtViewGroup(Context context, Composite container) {
         super(context);
@@ -50,14 +50,19 @@ class SwtViewGroup extends ViewGroup {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec),
-                MeasureSpec.getSize(heightMeasureSpec));
+        // For safety; should be called by computeSize with proper values, too.
+        setMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
+        composite.computeSize(View.MeasureSpec.getMode(widthMeasureSpec) == MeasureSpec.EXACTLY ?
+                        View.MeasureSpec.getSize(widthMeasureSpec) : SWT.DEFAULT,
+                View.MeasureSpec.getMode(heightMeasureSpec) == MeasureSpec.EXACTLY ?
+                        View.MeasureSpec.getSize(heightMeasureSpec) : SWT.DEFAULT);
+    }
 
-        // TODO(haustein): Hand in more reasonable specs, depending on the layout --
-        // or let SWT child measurement trigger Android measurement.
-        for (int i = 0; i < getChildCount(); i++) {
-            getChildAt(i).measure(widthMeasureSpec, heightMeasureSpec);
-        }
+    /** 
+     * This method just enables calling setMeasuredDimension from the outside.
+     */
+    void setMeasuredSize(int width, int height) {
+        setMeasuredDimension(width, height);
     }
 
     private LayoutParams getChildLayoutParams(int i) {

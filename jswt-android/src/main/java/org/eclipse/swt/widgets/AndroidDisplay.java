@@ -1,27 +1,51 @@
 package org.eclipse.swt.widgets;
 
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 
-import org.eclipse.swt.R;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class AndroidDisplay extends PlatformDisplay {
-  SwtActivity activity;
 
-  public AndroidDisplay(SwtActivity activity) {
+  AppCompatActivity activity;
+  Shell topShell;
+  DrawerLayout navigationDrawer;
+  NavigationView navigationView;
+  LinearLayout mainLayout;
 
+  public AndroidDisplay(AppCompatActivity activity, final DrawerLayout navigationDrawer, NavigationView navigationView,
+                        LinearLayout mainLayout) {
     this.activity = activity;
+    this.navigationDrawer = navigationDrawer;
+    this.navigationView = navigationView;
+    this.mainLayout = mainLayout;
 
-
+    navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+      @Override
+      public boolean onNavigationItemSelected(android.view.MenuItem item) {
+        if (topShell != null && topShell.menuBar != null) {
+          MenuItem result = findMenuItem(topShell.menuBar, item.getTitle().toString());
+          if (result != null) {
+            Event event = new Event();
+            event.display = AndroidDisplay.this;
+            event.widget = result;
+            event.type = SWT.Selection;
+            result.listeners.sendEvent(event);
+            navigationDrawer.closeDrawers();
+            return true;
+          }
+        }
+        return false;
+      }
+    });
   }
 
 
@@ -40,7 +64,7 @@ public class AndroidDisplay extends PlatformDisplay {
       return new android.widget.ScrollView(activity);
     }
     if (control instanceof Shell) {
-      return new SwtViewGroup(activity, (Composite) control);
+      return new SwtShellView(activity, (Shell) control);
     }
     // Should be last because some other options are subclasses of Composite / Canvas
     if (control instanceof Canvas) {
@@ -54,7 +78,21 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public void openShell(Shell shell) {
-    SwtViewGroup view = (SwtViewGroup) shell.peer;
+    SwtShellView view = (SwtShellView) shell.peer;
+    if (view.dialog!= null) {
+      view.dialog.show();
+      return;
+    }
+
+    if (topShell != null) {
+      if (topShell == shell) {
+        return;
+      }
+      // TODO: stack
+      mainLayout.removeView((View) topShell.peer);
+    }
+    topShell = shell;
+
     android.support.v7.app.ActionBar actionBar = activity.getSupportActionBar();
     String text = view.text;
     if (text != null) {
@@ -63,7 +101,14 @@ public class AndroidDisplay extends PlatformDisplay {
     } else {
       actionBar.hide();
     }
-    activity.navigationDrawer.addView(view);
+
+    mainLayout.addView(view);
+
+    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
+    params.weight = 1;
+
+    // navigationDrawer.addView(view, 0);
+    // TODO: update menu bar!
 //    activity.setContentView(view);
   }
 
@@ -93,7 +138,6 @@ public class AndroidDisplay extends PlatformDisplay {
         wHint == SWT.DEFAULT ? View.MeasureSpec.UNSPECIFIED : (View.MeasureSpec.EXACTLY | wHint),
         hHint == SWT.DEFAULT ? View.MeasureSpec.UNSPECIFIED : (View.MeasureSpec.EXACTLY | hHint));
     return new Point(view.getMeasuredWidth(), view.getMeasuredHeight());
-
   }
 
   @Override
@@ -115,8 +159,8 @@ public class AndroidDisplay extends PlatformDisplay {
     if (peer instanceof TextView) {
       return ((TextView) peer).getText().toString();
     }
-    if (peer instanceof SwtViewGroup) {
-      return ((SwtViewGroup) peer).text;
+    if (peer instanceof SwtShellView) {
+      return ((SwtShellView) peer).text;
     }
     return null;
   }
@@ -126,16 +170,45 @@ public class AndroidDisplay extends PlatformDisplay {
     Object peer = control.peer;
     if (peer instanceof TextView) {
       ((TextView) peer).setText(text);
-    } else if (peer instanceof SwtViewGroup) {
-      ((SwtViewGroup) peer).text = text;
+    } else if (peer instanceof SwtShellView) {
+      ((SwtShellView) peer).setText(text);
     }
+  }
+
+
+  private MenuItem findMenuItem(Menu menu, String title) {
+    for (int i = 0; i < menu.getItemCount(); i++) {
+      MenuItem item = menu.getItem(i);
+      if (item.subMenu != null) {
+        MenuItem result = findMenuItem(item.subMenu, title);
+        if (result != null) {
+          return result;
+        }
+      } else if (item.getText().equals(title)) {
+        return item;
+      }
+    }
+    return null;
   }
 
   private void populateMenu(Menu sourceMenu, android.view.Menu androidMenu, boolean flattenFirst) {
     for (int i = 0; i < sourceMenu.getItemCount(); i++) {
-      MenuItem item = sourceMenu.getItem(i);
+      final MenuItem item = sourceMenu.getItem(i);
       if (item.subMenu == null) {
+        //android.view.MenuItem androidItem =
         androidMenu.add(item.getText());
+        /*
+        androidItem.setOnMenuItemClickListener(new android.view.MenuItem.OnMenuItemClickListener() {
+          @Override
+          public boolean onMenuItemClick(android.view.MenuItem menuItem) {
+            Event event = new Event();
+            event.display = AndroidDisplay.this;
+            event.widget = item;
+            event.type = SWT.Selection;
+            item.listeners.sendEvent(event);
+            return true;
+          }
+        });*/
       } else if (i == 0 && flattenFirst) {
         populateMenu(item.subMenu, androidMenu, false);
       } else {
@@ -146,10 +219,17 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
-  public void setMenuBar(Decorations decorations, Menu menu) {
-    android.view.Menu androidMenu = activity.navigationView.getMenu();
+  public void updateMenuBar(Decorations decorations) {
+    android.view.Menu androidMenu = navigationView.getMenu();
     androidMenu.clear();
-    populateMenu(menu, androidMenu, true);
+    populateMenu(decorations.menuBar, androidMenu, true);
+  }
+
+  @Override
+  public void setMeasuredSize(Control control, int width, int height) {
+    if (control.peer instanceof SwtViewGroup) {
+      ((SwtViewGroup) control.peer).setMeasuredSize(width, height);
+    }
   }
 
   @Override

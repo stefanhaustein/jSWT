@@ -1,15 +1,30 @@
 package org.eclipse.swt.widgets;
 
 
+import org.eclipse.swt.SWT;
+
 public class Shell extends Decorations {
 
+  public Shell(Shell parent) {
+    this(parent.display, parent, SWT.DIALOG_TRIM);
+  }
+
+  public Shell(Shell parent, int style) {
+    this(parent.display, parent, style);
+  }
+
   public Shell(Display display) {
-    this(display, 0);
+    this(display, null, SWT.SHELL_TRIM);
   }
 
   public Shell(Display display, int style) {
+    this(display, null, style);
+  }
+
+  private Shell(Display display, Shell parent, int style) {
     super(null, style);
     this.display = (PlatformDisplay) display;
+    this.parent = parent;
     this.peer = this.display.createControl(this);
   }
 

@@ -27,7 +27,7 @@ public class JswtDemo {
     }
 
     public static Shell run(Display display) {
-        Shell shell = new Shell (display);
+        final Shell shell = new Shell (display);
         shell.setText("jSWT Demo");
 
         ScrolledComposite scrolledComposite = new ScrolledComposite(shell, 0);
@@ -68,9 +68,30 @@ public class JswtDemo {
         Menu fileMenu = new Menu(fileMenuItem);
 
         MenuItem aboutItem = new MenuItem(fileMenu, 0);
+        aboutItem.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                Shell dialogShell = new Shell(shell);
+                dialogShell.setLayout(new RowLayout());
+                dialogShell.setText("Alert");
+                Label label = new Label(dialogShell, 0);
+                label.setText("About dialog text");
+                Button button = new Button(dialogShell, 0);
+                button.setText("Ok");
+                dialogShell.pack();
+                dialogShell.open();
+            }
+        });
+
         aboutItem.setText("About");
         MenuItem openItem = new MenuItem(fileMenu, 0);
         openItem.setText("Open");
+        openItem.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                System.out.println("OPEN");
+            }
+        });
 
         shell.setMenuBar(menuBar);
 

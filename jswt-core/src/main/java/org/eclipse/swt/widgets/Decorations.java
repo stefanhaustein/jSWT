@@ -10,7 +10,7 @@ public class Decorations extends Canvas {
 
   public void setMenuBar(Menu menuBar) {
     this.menuBar = menuBar;
-    display.setMenuBar(this, menuBar);
+    display.updateMenuBar(this);
   }
 
   public String getText() {

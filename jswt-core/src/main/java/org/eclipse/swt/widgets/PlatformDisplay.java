@@ -33,10 +33,12 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract void setText(Control control, String text);
 
-  public abstract void setMenuBar(Decorations decorations, Menu menu);
+  public abstract void updateMenuBar(Decorations decorations);
+
+    public abstract void setMeasuredSize(Control control, int width, int height);
 
 
-  public static class Insets {
+    public static class Insets {
     public int top;
     public int left;
     public int right;

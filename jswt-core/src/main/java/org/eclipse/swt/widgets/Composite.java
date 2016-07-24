@@ -49,6 +49,7 @@ public class Composite extends Scrollable {
     if (wHint != SWT.DEFAULT) size.x = wHint;
     if (hHint != SWT.DEFAULT) size.y = hHint;
     Rectangle trim = computeTrim (0, 0, size.x, size.y);
+    display.setMeasuredSize(this, trim.width, trim.height);
     return new Point (trim.width, trim.height);
   }
 

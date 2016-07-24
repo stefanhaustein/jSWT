@@ -34,31 +34,37 @@ public class AwtDisplay extends PlatformDisplay {
       return new java.awt.ScrollPane();
     }
     if (control instanceof Shell) {
-      java.awt.Frame frame = new java.awt.Frame();
-      frame.setLayout(new SwtLayoutManager((Composite) control));
-
-      frame.addWindowListener(new WindowAdapter() {
+      Shell shell = (Shell) control;
+      java.awt.Window window;
+      if (shell.parent != null) {
+        window = new java.awt.Dialog((java.awt.Frame) ((Shell) shell.parent).peer);
+      } else {
+        window = new java.awt.Frame();
+      }
+      window.setLayout(new SwtLayoutManager((Composite) control));
+      window.addWindowListener(new WindowAdapter() {
         @Override
         public void windowClosing(WindowEvent e) {
-          frame.setVisible(false);
+          window.setVisible(false);
           // Hack...
-          activeShells--;
-          new Thread(new Runnable() {
-            @Override
-            public void run() {
-              try {
-                Thread.sleep(1000);
-              } catch (InterruptedException e) {
+          if (shell.parent == null) {
+            activeShells--;
+            new Thread(new Runnable() {
+              @Override
+              public void run() {
+                try {
+                  Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                }
+                if (activeShells == 0) {
+                  System.exit(0);
+                }
               }
-              if (activeShells == 0) {
-                System.exit(0);
-              }
-            }
-          }).start();
+            }).start();
+          }
         }
       });
-
-      return frame;
+      return window;
     }
     // Must be last because many components inherit from Composite / Canvas
     if (control instanceof Canvas) {
@@ -73,8 +79,10 @@ public class AwtDisplay extends PlatformDisplay {
 
   @Override
   public void openShell(Shell shell) {
-    activeShells++;
-    ((java.awt.Frame) shell.peer).setVisible(true);
+    if (shell.parent == null) {
+      activeShells++;
+    }
+    ((java.awt.Component) shell.peer).setVisible(true);
   }
 
   @Override
@@ -125,14 +133,26 @@ public class AwtDisplay extends PlatformDisplay {
       ((java.awt.Label) peer).setText(text);
     } else if (peer instanceof java.awt.Frame) {
       ((java.awt.Frame) peer).setTitle(text);
+    } else if (peer instanceof java.awt.Dialog) {
+      ((java.awt.Dialog) peer).setTitle(text);
     }
   }
 
   private void menuAddAll(Menu source, java.awt.Menu destination) {
     for (int i = 0; i < source.getItemCount(); i++) {
-      MenuItem item = source.getItem(i);
+      final MenuItem item = source.getItem(i);
       if (item.subMenu == null) {
         java.awt.MenuItem awtItem = new java.awt.MenuItem(item.text);
+        awtItem.addActionListener(new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            Event event = new Event();
+            event.type = SWT.Selection;
+            event.display = AwtDisplay.this;
+            event.widget = item;
+            item.listeners.sendEvent(event);
+          }
+        });
         destination.add(awtItem);
       } else {
         java.awt.Menu awtMenu = new java.awt.Menu(item.text);
@@ -142,11 +162,11 @@ public class AwtDisplay extends PlatformDisplay {
   }
 
   @Override
-  public void setMenuBar(Decorations decorations, Menu menu) {
+  public void updateMenuBar(Decorations decorations) {
     MenuBar awtMenuBar = new MenuBar();
 
-    for (int i = 0; i < menu.getItemCount(); i++) {
-      MenuItem item = menu.getItem(i);
+    for (int i = 0; i < decorations.menuBar.getItemCount(); i++) {
+      MenuItem item = decorations.menuBar.getItem(i);
       java.awt.Menu awtSubMenu = new java.awt.Menu(item.text);
       awtMenuBar.add(awtSubMenu);
       if (item.subMenu != null) {
@@ -157,8 +177,13 @@ public class AwtDisplay extends PlatformDisplay {
   }
 
   @Override
+  public void setMeasuredSize(Control control, int width, int height) {
+
+  }
+
+  @Override
   public void pack(Shell shell) {
-    ((java.awt.Frame) shell.peer).pack();
+    ((java.awt.Window) shell.peer).pack();
   }
 
 
