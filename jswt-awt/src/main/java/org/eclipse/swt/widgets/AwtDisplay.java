@@ -17,22 +17,21 @@ import java.util.TimerTask;
 public class AwtDisplay extends PlatformDisplay {
   int activeShells = 0;
 
-  // Clean up on composite dispose or make weak?
-  HashMap<Widget, CheckboxGroup> checkBoxGroups = new HashMap<>();
+  HashMap<Widget, CheckboxGroup> checkBoxGroupMap = new HashMap<>();
 
   @Override
-  public Object createControl(Control control) {
+  public Object createControl(final Control control) {
     if (control instanceof Button) {
       switch (control.style) {
         case SWT.CHECK:
-          return new java.awt.Checkbox();
+          return new Checkbox();
         case SWT.RADIO: {
-          CheckboxGroup group = checkBoxGroups.get(control.parent);
+          CheckboxGroup group = checkBoxGroupMap.get(control.parent);
           if (group == null) {
             group = new CheckboxGroup();
-            checkBoxGroups.put(control.parent, group);
+            checkBoxGroupMap.put(control.parent, group);
           }
-          return new java.awt.Checkbox(null, false, group);
+          return new Checkbox(null, group, false);
         }
         default:
           return new java.awt.Button();
@@ -120,6 +119,11 @@ public class AwtDisplay extends PlatformDisplay {
   }
 
   @Override
+  public boolean getSelection(Button button) {
+    return (button.peer instanceof Checkbox) ? ((Checkbox) button.peer).getState() : false;
+  }
+
+  @Override
   public String getText(Control control) {
     Object peer = control.peer;
     if (peer instanceof java.awt.TextComponent) {
@@ -167,7 +171,7 @@ public class AwtDisplay extends PlatformDisplay {
         awtItem.addActionListener(new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
-            sendEvent(item, SWT.Selection, e);
+            item.notifyListeners(SWT.Selection, null);
           }
         });
         destination.add(awtItem);
@@ -199,6 +203,13 @@ public class AwtDisplay extends PlatformDisplay {
   }
 
   @Override
+  public void setSelection(Button button, boolean selected) {
+    if (button.peer instanceof Checkbox) {
+        ((Checkbox) button.peer).setState(selected);
+    }
+  }
+
+    @Override
   public void pack(Shell shell) {
     ((java.awt.Window) shell.peer).pack();
   }
@@ -207,15 +218,6 @@ public class AwtDisplay extends PlatformDisplay {
   @Override
   public void addChild(Composite parent, Control control) {
     ((java.awt.Container) parent.peer).add((java.awt.Component) control.peer);
-  }
-
-  private void sendEvent(Widget target, int eventType, AWTEvent awtEvent) {
-    if (target.listeners != null) {
-      Event event = new Event();
-      event.widget = target;
-      event.type = eventType;
-      target.listeners.sendEvent(event);
-    }
   }
 
   @Override
@@ -230,22 +232,22 @@ public class AwtDisplay extends PlatformDisplay {
           component.addComponentListener(new ComponentListener() {
             @Override
             public void componentResized(ComponentEvent e) {
-              sendEvent(control, eventType, e);
+              control.notifyListeners(SWT.Resize, null);
             }
 
             @Override
             public void componentMoved(ComponentEvent e) {
-              sendEvent(control, eventType, e);
+              control.notifyListeners(SWT.Move, null);
             }
 
             @Override
             public void componentShown(ComponentEvent e) {
-              sendEvent(control, eventType, e);
+              control.notifyListeners(SWT.Show, null);
             }
 
             @Override
             public void componentHidden(ComponentEvent e) {
-              sendEvent(control, eventType, e);
+              control.notifyListeners(SWT.Hide, null);
             }
           });
         }
@@ -257,7 +259,7 @@ public class AwtDisplay extends PlatformDisplay {
             button.addActionListener(new ActionListener() {
               @Override
               public void actionPerformed(ActionEvent e) {
-                sendEvent(control, eventType, e);
+                control.notifyListeners(SWT.Selection, null);
               }
             });
           }
@@ -278,4 +280,22 @@ public class AwtDisplay extends PlatformDisplay {
     }
     return result;
   }
+
+  static class RadioButton extends Checkbox {
+    Checkbox other;
+    RadioButton() {
+      super(null, new CheckboxGroup(), false);
+      other = new Checkbox(null, getCheckboxGroup(), false);
+    }
+
+    @Override
+    public void setState(boolean state) {
+      if (!state) {
+        other.setState(true);
+      } else {
+        super.setState(true);
+      }
+    }
+  }
+
 }

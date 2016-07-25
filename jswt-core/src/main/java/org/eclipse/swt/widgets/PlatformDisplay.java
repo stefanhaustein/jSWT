@@ -23,6 +23,8 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract Insets getInsets(Scrollable composite);
 
+  public abstract boolean getSelection(Button button);
+
   public abstract String getText(Control control);
 
   public abstract void openShell(Shell shell);
@@ -35,10 +37,11 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract void updateMenuBar(Decorations decorations);
 
-    public abstract void setMeasuredSize(Control control, int width, int height);
+  public abstract void setMeasuredSize(Control control, int width, int height);
 
+  public abstract void setSelection(Button button, boolean selected);
 
-    public static class Insets {
+  public static class Insets {
     public int top;
     public int left;
     public int right;

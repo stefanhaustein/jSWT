@@ -3,6 +3,7 @@ package org.eclipse.swt.widgets;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.*;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
@@ -34,7 +35,7 @@ public class AndroidDisplay extends PlatformDisplay {
         if (topShell != null && topShell.menuBar != null) {
           MenuItem result = findMenuItem(topShell.menuBar, item.getTitle().toString());
           if (result != null) {
-            sendEvent(result, SWT.Selection);
+            result.notifyListeners(SWT.Selection, null);
             Event event = new Event();
             event.display = AndroidDisplay.this;
             event.widget = result;
@@ -50,23 +51,48 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
 
+  public void handleRadioGroup(Button button, boolean selected) {
+    if (button.style != SWT.RADIO || !selected) {
+      return;
+    }
+    CompoundButton androidButton = (CompoundButton) button.peer;
+    if (button.style == SWT.RADIO) {
+      Composite parent = (Composite) button.parent;
+      for (Control child: parent.children) {
+        if (child != button && child.style == SWT.RADIO && (child instanceof Button)) {
+          ((CompoundButton) child.peer).setChecked(false);
+        }
+      }
+    }
+  }
+
+
   @Override
-  public Object createControl(Control control) {
+  public Object createControl(final Control control) {
     if (control instanceof Button) {
       switch (control.style) {
-        case SWT.RADIO:
-          return new android.widget.RadioButton(activity);
+        case SWT.RADIO: {
+          RadioButton radioButton = new AppCompatRadioButton(activity);
+          radioButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+              handleRadioGroup((Button) control, b);
+              control.notifyListeners(SWT.Selection, null);
+            }
+          });
+          return radioButton;
+        }
         case SWT.CHECK:
-          return new android.widget.CheckBox(activity);
+          return new AppCompatCheckBox(activity);
         default:
-          return new android.widget.Button(activity);
+          return new AppCompatButton(activity);
       }
     }
     if (control instanceof Text) {
-      return new android.widget.EditText(activity);
+      return new AppCompatEditText(activity);
     }
     if (control instanceof Label) {
-      return new android.widget.TextView(activity);
+      return new AppCompatTextView(activity);
     }
     if (control instanceof ScrolledComposite) {
       return new android.widget.ScrollView(activity);
@@ -137,6 +163,11 @@ public class AndroidDisplay extends PlatformDisplay {
   @Override
   public Insets getInsets(Scrollable scrollable) {
     return new Insets();
+  }
+
+  @Override
+  public boolean getSelection(Button button) {
+    return (button.peer instanceof CompoundButton) ? ((CompoundButton) button.peer).isChecked() : false;
   }
 
   @Override
@@ -237,17 +268,18 @@ public class AndroidDisplay extends PlatformDisplay {
   public void setMeasuredSize(Control control, int width, int height) {
     if (control.peer instanceof SwtViewGroup) {
       ((SwtViewGroup) control.peer).setMeasuredSize(width, height);
+    } else {
+      ((View) control.peer).measure(View.MeasureSpec.EXACTLY | width, View.MeasureSpec.EXACTLY | height);
     }
   }
 
-  void sendEvent(Widget target, int eventType) {
-    if (target.listeners != null) {
-      Event event = new Event();
-      event.display = this;
-      event.widget = target;
-      event.type = eventType;
-      target.listeners.sendEvent(event);
+  @Override
+  public void setSelection(Button button, boolean selected) {
+    if (!(button.peer instanceof CompoundButton)) {
+      return;
     }
+    handleRadioGroup(button, selected);
+    ((CompoundButton) button.peer).setChecked(selected);
   }
 
   @Override
@@ -269,7 +301,14 @@ public class AndroidDisplay extends PlatformDisplay {
           ((android.widget.Button) view).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            sendEvent(control, eventType);
+              control.notifyListeners(eventType, null);
+            }
+          });
+        } else if (view instanceof android.widget.CheckBox) {
+          ((android.widget.CheckBox) view).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+              control.notifyListeners(SWT.Selection, null);
             }
           });
         }

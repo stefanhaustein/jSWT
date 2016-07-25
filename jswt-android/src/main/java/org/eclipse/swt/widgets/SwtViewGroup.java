@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Composite;
 
 class SwtViewGroup extends ViewGroup {
 
@@ -60,7 +59,7 @@ class SwtViewGroup extends ViewGroup {
 
     @Override
     protected void onSizeChanged (int w, int h, int oldw, int oldh) {
-        ((AndroidDisplay) composite.display).sendEvent(composite, SWT.Resize);
+        composite.notifyListeners(SWT.Resize, null);
     }
 
 

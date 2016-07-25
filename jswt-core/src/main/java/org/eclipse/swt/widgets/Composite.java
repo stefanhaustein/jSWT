@@ -76,4 +76,5 @@ public class Composite extends Scrollable {
     }
     return new Point (width, height);
   }
+
 }

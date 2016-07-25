@@ -110,6 +110,18 @@ public abstract class Widget {
         return (state & DISPOSED) != 0;
     }
 
+    public void notifyListeners(int eventType, Event event) {
+        if (listeners != null) {
+            if (event == null) {
+                event = new Event();
+                event.display = display;
+                event.widget = this;
+            }
+            event.type = eventType;
+            listeners.sendEvent(event);
+        }
+    }
+
     void releaseWidget () {
     }
 }
