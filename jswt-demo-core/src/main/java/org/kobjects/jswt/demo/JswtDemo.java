@@ -74,7 +74,7 @@ public class JswtDemo {
         aboutItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                Shell dialogShell = new Shell(shell);
+                Shell dialogShell = new Shell(shell, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
                 dialogShell.setLayout(new RowLayout());
                 dialogShell.setText("Alert");
                 Label label = new Label(dialogShell, 0);

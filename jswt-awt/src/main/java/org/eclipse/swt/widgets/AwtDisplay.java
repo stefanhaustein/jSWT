@@ -10,11 +10,15 @@ import org.eclipse.swt.internal.SWTEventListener;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.TimerTask;
 
 public class AwtDisplay extends PlatformDisplay {
   int activeShells = 0;
+
+  // Clean up on composite dispose or make weak?
+  HashMap<Widget, CheckboxGroup> checkBoxGroups = new HashMap<>();
 
   @Override
   public Object createControl(Control control) {
@@ -22,8 +26,14 @@ public class AwtDisplay extends PlatformDisplay {
       switch (control.style) {
         case SWT.CHECK:
           return new java.awt.Checkbox();
-        case SWT.RADIO:
-          return new java.awt.Checkbox(null, false, new CheckboxGroup());
+        case SWT.RADIO: {
+          CheckboxGroup group = checkBoxGroups.get(control.parent);
+          if (group == null) {
+            group = new CheckboxGroup();
+            checkBoxGroups.put(control.parent, group);
+          }
+          return new java.awt.Checkbox(null, false, group);
+        }
         default:
           return new java.awt.Button();
       }
@@ -41,7 +51,8 @@ public class AwtDisplay extends PlatformDisplay {
       Shell shell = (Shell) control;
       java.awt.Window window;
       if (shell.parent != null) {
-        window = new java.awt.Dialog((java.awt.Frame) ((Shell) shell.parent).peer);
+        boolean modal = (shell.style & (SWT.APPLICATION_MODAL | SWT.SYSTEM_MODAL | SWT.PRIMARY_MODAL)) != 0;
+        window = new java.awt.Dialog((java.awt.Frame) ((Shell) shell.parent).peer, modal);
       } else {
         window = new java.awt.Frame();
       }
@@ -156,11 +167,7 @@ public class AwtDisplay extends PlatformDisplay {
         awtItem.addActionListener(new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
-            Event event = new Event();
-            event.type = SWT.Selection;
-            event.display = AwtDisplay.this;
-            event.widget = item;
-            item.listeners.sendEvent(event);
+            sendEvent(item, SWT.Selection, e);
           }
         });
         destination.add(awtItem);
@@ -202,7 +209,7 @@ public class AwtDisplay extends PlatformDisplay {
     ((java.awt.Container) parent.peer).add((java.awt.Component) control.peer);
   }
 
-  private void sendEvent(Control target, int eventType, AWTEvent awtEvent) {
+  private void sendEvent(Widget target, int eventType, AWTEvent awtEvent) {
     if (target.listeners != null) {
       Event event = new Event();
       event.widget = target;
