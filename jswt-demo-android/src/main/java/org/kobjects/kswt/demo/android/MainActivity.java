@@ -18,7 +18,7 @@ public class MainActivity extends SwtActivity {
         super.onCreate(savedInstanceState);
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-        JswtDemo.run(getDisplay());
+        new JswtDemo(getDisplay());
     }
 
 }

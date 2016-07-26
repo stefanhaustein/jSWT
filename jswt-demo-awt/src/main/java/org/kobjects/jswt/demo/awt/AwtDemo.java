@@ -8,7 +8,7 @@ import org.kobjects.jswt.demo.JswtDemo;
 public class AwtDemo {
   public static void main(String[] args) {
     Display display = new AwtDisplay();
-    JswtDemo.run(display);
+    new JswtDemo(display);
 
   }
 }

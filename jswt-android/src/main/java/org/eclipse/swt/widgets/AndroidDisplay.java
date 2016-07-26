@@ -89,7 +89,11 @@ public class AndroidDisplay extends PlatformDisplay {
       }
     }
     if (control instanceof Text) {
-      return new AppCompatEditText(activity);
+      AppCompatEditText editText = new AppCompatEditText(activity);
+      if ((control.style & SWT.MULTI) == 0) {
+        editText.setMaxLines(1);
+      }
+      return editText;
     }
     if (control instanceof Label) {
       return new AppCompatTextView(activity);
@@ -173,6 +177,9 @@ public class AndroidDisplay extends PlatformDisplay {
   @Override
   public Point computeSize(Control control, int wHint, int hHint, boolean changed) {
     View view = (View) control.peer;
+    if (view instanceof EditText) {
+      ((EditText) view).setMaxWidth(Integer.MAX_VALUE);
+    }
     view.measure(
         wHint == SWT.DEFAULT ? View.MeasureSpec.UNSPECIFIED : (View.MeasureSpec.EXACTLY | wHint),
         hHint == SWT.DEFAULT ? View.MeasureSpec.UNSPECIFIED : (View.MeasureSpec.EXACTLY | hHint));
@@ -189,6 +196,9 @@ public class AndroidDisplay extends PlatformDisplay {
       lmlParams.assignedY = y;
       lmlParams.assignedWidth = width;
       lmlParams.assignedHeight = height;
+    }
+    if (view instanceof EditText) {
+      ((EditText) view).setMaxWidth(width);
     }
   }
 

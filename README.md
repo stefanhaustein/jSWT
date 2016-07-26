@@ -5,11 +5,10 @@ It's not really in a useful state yet.
 
 ## Todo
 
+- Fix ScrolledComposite layout (in particular for AWT): Take scroll bar width/height into account, try to
+  get closer to original layout code.
+
 - Spinner, ComboBox, Progress bars, Sliders
-
-- Turn demo into a proper stateful class
-
-- Let demo react to resize events implying an orientation change
 
 - Image support
 
@@ -21,6 +20,7 @@ It's not really in a useful state yet.
 
 ## Done
 
+- 2016-07-26 Turned demo into a stateful class, landscape / portrait adjustment
 - 2016-07-25 Checkbox / Radio button selection, EditText issues
 - 2016-07-24 Some Dialog support, resize listeners, checkboxes
 - 2016-07-23 Android menuBar support (via DrawerLayout)

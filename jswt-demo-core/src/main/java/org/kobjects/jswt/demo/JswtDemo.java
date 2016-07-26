@@ -3,48 +3,59 @@ package org.kobjects.jswt.demo;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.*;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.*;
 import org.eclipse.swt.widgets.*;
 
 public class JswtDemo {
 
-    static int clickCount = 0;
 
     public static void main (String [] args) {
         Display display = new Display();
 
-        Shell shell = run(display);
+        JswtDemo jswtDemo = new JswtDemo(display);
 
-        while (!shell.isDisposed()) {
+        while (!jswtDemo.shell.isDisposed()) {
             if (!display.readAndDispatch()) display.sleep();
         }
         display.dispose();
     }
 
-    public static Shell run(Display display) {
-        final Shell shell = new Shell (display);
+    final Display display;
+    final Shell shell;
+    final GridLayout mainLayout;
+    final GridLayout controlLayout = new GridLayout(1, true);
+    final GridData scrolledCompositeGridData = new GridData(SWT.FILL, SWT.FILL, false, true);
+    int clickCount = 0;
+
+    public JswtDemo(Display display) {
+        this.display = display;
+        shell = new Shell (display);
         shell.setText("jSWT Demo");
 
         ScrolledComposite scrolledComposite = new ScrolledComposite(shell, 0);
         scrolledComposite.setExpandHorizontal(true);
         scrolledComposite.setExpandVertical(true);
 
-        Composite leftBar = new Composite(scrolledComposite, 0);
-        scrolledComposite.setContent(leftBar);
-        scrolledComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
+        Composite controlComposite = new Composite(scrolledComposite, 0);
+        scrolledComposite.setContent(controlComposite);
+        scrolledComposite.setLayoutData(scrolledCompositeGridData);
 
-        RowLayout rowLayout = new RowLayout(SWT.VERTICAL);
-        rowLayout.fill = true;
-        leftBar.setLayout(rowLayout);
+        controlComposite.setLayout(controlLayout);
 
-        final Label label = new Label(leftBar, 0);
+        final Label label = new Label(controlComposite, 0);
         label.setText("Label");
-        Text text = new Text(leftBar, 0);
-        Button button = new Button(leftBar, SWT.PUSH);
+        label.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
+
+        final Label label2 = new Label(controlComposite, 0);
+        label2.setText("Another label");
+        label2.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
+
+        Text text = new Text(controlComposite, 0);
+        text.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
+        Button button = new Button(controlComposite, SWT.PUSH);
         button.setText("Button");
+        button.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
         button.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -52,18 +63,18 @@ public class JswtDemo {
             }
         });
 
-        new Button(leftBar, SWT.CHECK).setText("Checkbox");
-        new Button(leftBar, SWT.RADIO).setText("Radio 1");
-        new Button(leftBar, SWT.RADIO).setText("Radio 2");
-        new Button(leftBar, SWT.RADIO).setText("Radio 3");
+        new Button(controlComposite, SWT.RADIO).setText("Radio 1");
+        new Button(controlComposite, SWT.RADIO).setText("Radio 2");
+        new Button(controlComposite, SWT.RADIO).setText("Radio 3");
+        new Button(controlComposite, SWT.CHECK).setText("Checkbox");
 
         DemoCanvas demoCanvas = new DemoCanvas(shell);
         demoCanvas.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
                 true /* expand horizontally */, true /* expand vertically */));
 
-        GridLayout gridLayout = new GridLayout(2, false);
-        gridLayout.marginWidth = 0;
-        gridLayout.marginHeight = 0;
+        mainLayout = new GridLayout(2, false);
+        mainLayout.marginWidth = 0;
+        mainLayout.marginHeight = 0;
 
         Menu menuBar = new Menu(shell);
         MenuItem fileMenuItem = new MenuItem(menuBar, SWT.DROP_DOWN);
@@ -99,21 +110,40 @@ public class JswtDemo {
         shell.addControlListener(new ControlListener() {
             @Override
             public void controlMoved(ControlEvent e) {
-
             }
 
             @Override
             public void controlResized(ControlEvent e) {
-                System.out.println("Resized: " + shell.getSize());
+                adjustLayout();
             }
         });
 
         shell.setMenuBar(menuBar);
 
-        shell.setLayout (gridLayout);
+        shell.setLayout (mainLayout);
         shell.pack ();
+
+        shell.setBounds(100, 100, shell.getSize().x * 2, shell.getSize().y);
+
         shell.open ();
-        return shell;
     }
+
+    void adjustLayout() {
+        Rectangle bounds = shell.getClientArea();
+        if (bounds.width > bounds.height) {
+            mainLayout.numColumns = 2;
+            controlLayout.numColumns = 1;
+            scrolledCompositeGridData.grabExcessHorizontalSpace = false;
+            scrolledCompositeGridData.grabExcessVerticalSpace = true;
+        } else {
+            mainLayout.numColumns = 1;
+            controlLayout.numColumns = 2;
+            scrolledCompositeGridData.grabExcessHorizontalSpace = true;
+            scrolledCompositeGridData.grabExcessVerticalSpace = false;
+        }
+        shell.layout();
+    }
+
+
 
 }
