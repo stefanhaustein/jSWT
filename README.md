@@ -5,8 +5,6 @@ It's not really in a useful state yet.
 
 ## Todo
 
-- Checkbox / Radio button selection
-
 - Spinner, ComboBox, Progress bars, Sliders
 
 - Turn demo into a proper stateful class
@@ -23,7 +21,7 @@ It's not really in a useful state yet.
 
 ## Done
 
-
+- 2016-07-25 Checkbox / Radio button selection, EditText issues
 - 2016-07-24 Some Dialog support, resize listeners, checkboxes
 - 2016-07-23 Android menuBar support (via DrawerLayout)
 
