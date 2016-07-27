@@ -43,6 +43,10 @@ public class AwtDisplay extends PlatformDisplay {
     if (control instanceof Text) {
       return new java.awt.TextField();
     }
+    if (control instanceof Slider) {
+      return new java.awt.Scrollbar((control.style & SWT.VERTICAL) != 0 ?
+              java.awt.Scrollbar.VERTICAL : java.awt.Scrollbar.HORIZONTAL);
+    }
     if (control instanceof ScrolledComposite) {
       return new java.awt.ScrollPane();
     }
