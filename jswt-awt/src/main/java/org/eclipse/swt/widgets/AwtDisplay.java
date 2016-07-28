@@ -209,7 +209,13 @@ public class AwtDisplay extends PlatformDisplay {
     }
   }
 
-    @Override
+  @Override
+  public int getScrollBarSize(ScrolledComposite scrolledComposite, int orientation) {
+    ScrollPane scrollPane = (ScrollPane) ((Composite) scrolledComposite).peer;
+    return orientation == SWT.HORIZONTAL ? scrollPane.getHScrollbarHeight() : scrollPane.getVScrollbarWidth();
+  }
+
+  @Override
   public void pack(Shell shell) {
     ((java.awt.Window) shell.peer).pack();
   }
@@ -277,6 +283,17 @@ public class AwtDisplay extends PlatformDisplay {
       result.top = insets.top;
       result.right = insets.right;
       result.bottom = insets.bottom;
+
+      if (scrollable.peer instanceof ScrollPane) {
+        ScrollPane scrollPane = (ScrollPane) scrollable.peer;
+        if (result.right >= scrollPane.getVScrollbarWidth()) {
+          result.right -= scrollPane.getVScrollbarWidth();
+        }
+        if (result.bottom > scrollPane.getHScrollbarHeight()) {
+          result.bottom -= scrollPane.getHScrollbarHeight();
+        }
+      }
+
     }
     return result;
   }

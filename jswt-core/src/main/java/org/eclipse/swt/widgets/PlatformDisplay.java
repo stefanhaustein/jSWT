@@ -1,6 +1,7 @@
 package org.eclipse.swt.widgets;
 
 
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.internal.SWTEventListener;
@@ -40,6 +41,8 @@ public abstract class PlatformDisplay extends Display {
   public abstract void setMeasuredSize(Control control, int width, int height);
 
   public abstract void setSelection(Button button, boolean selected);
+
+  public abstract int getScrollBarSize(ScrolledComposite scrolledComposite, int orientation);
 
   public static class Insets {
     public int top;

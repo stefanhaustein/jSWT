@@ -17,6 +17,10 @@ public class Composite extends Scrollable {
   }
 
   public void layout() {
+    layout(true);
+  }
+
+  public void layout(boolean changed) {
     if (layout != null) {
       layout.layout(this, true);
     }

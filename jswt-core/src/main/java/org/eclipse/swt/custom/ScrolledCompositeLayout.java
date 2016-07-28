@@ -32,8 +32,8 @@ protected Point computeSize(Composite composite, int wHint, int hHint, boolean f
 	if (sc.content != null) {
 		Point preferredSize = sc.content.computeSize(wHint, hHint, flushCache);
 		Point currentSize = sc.content.getSize();
-		size.x = sc.getExpandHorizontal() ? preferredSize.x : currentSize.x;
-		size.y = sc.getExpandVertical() ? preferredSize.y : currentSize.y;
+		size.x = sc.getExpandHorizontal() ? (preferredSize.x + ((PlatformDisplay) sc.getDisplay()).getScrollBarSize(sc, SWT.VERTICAL)) : currentSize.x;
+		size.y = sc.getExpandVertical() ? (preferredSize.y + ((PlatformDisplay) sc.getDisplay()).getScrollBarSize(sc, SWT.HORIZONTAL)) : currentSize.y;
 	}
 	size.x = Math.max(size.x, sc.minWidth);
 	size.y = Math.max(size.y, sc.minHeight);
@@ -53,11 +53,6 @@ protected void layout(Composite composite, boolean flushCache) {
 	ScrolledComposite sc = (ScrolledComposite)composite;
 	if (sc.content == null) return;
 
-	// TODO(haustein): Replace with original ScrolledComposite behavior (resize dep.?)
-	if (sc.content instanceof Composite) {
-		((Composite) sc.content).layout();
-	}
-
 	/*
 	ScrollBar hBar = sc.getHorizontalBar();
 	ScrollBar vBar = sc.getVerticalBar();
@@ -73,16 +68,21 @@ protected void layout(Composite composite, boolean flushCache) {
 	}*/
 	inLayout = true;
 	Rectangle contentRect = sc.content.getBounds();
-	/*
-	if (!sc.alwaysShowScroll) {
+
+	Rectangle hostRect = sc.getClientArea();
+
+	//if (!sc.alwaysShowScroll) {
 		boolean hVisible = sc.needHScroll(contentRect, false);
 		boolean vVisible = sc.needVScroll(contentRect, hVisible);
 		if (!hVisible && vVisible) hVisible = sc.needHScroll(contentRect, vVisible);
-		if (hBar != null) hBar.setVisible(hVisible);
-		if (vBar != null) vBar.setVisible(vVisible);
-	}
-	*/
-	Rectangle hostRect = sc.getClientArea();
+		//if (hBar != null) hBar.setVisible(hVisible);
+		//if (vBar != null) vBar.setVisible(vVisible);
+
+	    if (vVisible) hostRect.width -= ((PlatformDisplay) sc.getDisplay()).getScrollBarSize(sc, SWT.VERTICAL);
+		if (hVisible) hostRect.height -= ((PlatformDisplay) sc.getDisplay()).getScrollBarSize(sc, SWT.HORIZONTAL);
+
+	//}
+
 	if (sc.expandHorizontal) {
 		contentRect.width = Math.max(sc.minWidth, hostRect.width);
 	}
@@ -125,6 +125,8 @@ protected void layout(Composite composite, boolean flushCache) {
 	gc.dispose ();
 */
 	sc.content.setBounds (contentRect);
+
+
 	inLayout = false;
 }
 }

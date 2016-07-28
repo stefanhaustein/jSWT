@@ -62,7 +62,7 @@ public abstract class Widget {
     }
 
 
-    void addListener(int eventType, Listener listener) {
+    public void addListener(int eventType, Listener listener) {
         if (listeners == null) {
             listeners = new EventTable();
         }

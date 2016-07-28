@@ -293,6 +293,11 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
+  public int getScrollBarSize(ScrolledComposite scrolledComposite, int orientation) {
+    return 0;
+  }
+
+  @Override
   public void pack(Shell shell) {
     ((View) shell.peer).invalidate();
   }
