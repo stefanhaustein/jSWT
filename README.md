@@ -5,9 +5,6 @@ It's not really in a useful state yet.
 
 ## Todo
 
-- Fix ScrolledComposite layout (in particular for AWT): Take scroll bar width/height into account, try to
-  get closer to original layout code.
-
 - Spinner, ComboBox, Progress bars, Sliders
 
 - Image support
@@ -20,6 +17,8 @@ It's not really in a useful state yet.
 
 ## Done
 
+- 2016-07-28 Improved ScrolledComposite handling
+- 2016-07-27 ScrollBar starting point
 - 2016-07-26 Turned demo into a stateful class, landscape / portrait adjustment
 - 2016-07-25 Checkbox / Radio button selection, EditText issues
 - 2016-07-24 Some Dialog support, resize listeners, checkboxes
