@@ -101,6 +101,9 @@ public class AndroidDisplay extends PlatformDisplay {
     if (control instanceof ScrolledComposite) {
       return new android.widget.ScrollView(activity);
     }
+    if (control instanceof Slider) {
+      return new android.widget.SeekBar(activity);
+    }
     if (control instanceof Shell) {
       return new SwtShellView(activity, (Shell) control);
     }

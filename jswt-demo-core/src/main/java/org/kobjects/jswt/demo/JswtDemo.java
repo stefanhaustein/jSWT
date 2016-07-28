@@ -68,6 +68,9 @@ public class JswtDemo {
         new Button(controlComposite, SWT.RADIO).setText("Radio 3");
         new Button(controlComposite, SWT.CHECK).setText("Checkbox");
 
+        Slider slider = new Slider(controlComposite, SWT.HORIZONTAL);
+        slider.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
+
         DemoCanvas demoCanvas = new DemoCanvas(shell);
         demoCanvas.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
                 true /* expand horizontally */, true /* expand vertically */));
