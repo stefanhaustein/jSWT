@@ -6,13 +6,9 @@ It's not really in a useful state yet.
 ## Todo
 
 - Spinner, ComboBox, Progress bars, Sliders
-
 - Image support
-
 - Figure out how to support Android context menus (probably via item.getToolbar() and let AWT return null).
-
 - Figure out how to hide the toolbar on Android.
-
 - Figure out how to support platform-style dialog buttons.
 
 ## Done
