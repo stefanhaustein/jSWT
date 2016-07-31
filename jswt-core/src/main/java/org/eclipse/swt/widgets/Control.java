@@ -15,7 +15,6 @@ public class Control extends Widget {
   public Control(Composite parent, int style) {
     super(parent, style);
     if (parent != null) {
-      this.display = parent.display;
       this.peer = display.createControl(this);
       parent.children.add(this);
       if (!(parent instanceof ScrolledComposite)) {
@@ -72,6 +71,7 @@ public class Control extends Widget {
     return layoutData;
   }
 
+
   public void setBounds(int x, int y, int width, int height) {
     display.setBounds(this, x, y, width, height);
   }
@@ -83,5 +83,24 @@ public class Control extends Widget {
   public void setLayoutData(Object layoutData) {
     this.layoutData = layoutData;
   }
+
+  public void setLocation(int x, int y) {
+    Rectangle bounds = getBounds();
+    setBounds(x, y, bounds.width, bounds.height);
+  }
+
+  public void setLocation(Point p) {
+    setLocation(p.x, p.y);
+  }
+
+  public void setSize(int width, int height) {
+    Rectangle bounds = getBounds();
+    setBounds(bounds.x, bounds.y, width, height);
+  }
+
+  public void setSize(Point p) {
+    setSize(p.x, p.y);
+  }
+
 
 }

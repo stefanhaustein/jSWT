@@ -44,10 +44,11 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract void setSelection(Button button, boolean selected);
 
+  public abstract void showPopupMenu(Menu menu);
+
   public abstract void updateMenuBar(Decorations decorations);
 
   public abstract int getScrollBarSize(ScrolledComposite scrolledComposite, int orientation);
-
 
 
   public static class Insets {

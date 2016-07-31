@@ -1,8 +1,13 @@
 package org.kobjects.jswt.demo;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 
 public class DemoCanvas extends Canvas {
     final Color white;
@@ -14,6 +19,28 @@ public class DemoCanvas extends Canvas {
         white = new Color(getDisplay(), 255, 255, 255);
         gray = new Color(getDisplay(), 127, 127, 127);
         black = new Color(getDisplay(), 0, 0, 0);
+
+        final Menu menu = new Menu(this);
+        new MenuItem(menu, SWT.CASCADE).setText("Dummy Item 1");
+        new MenuItem(menu, SWT.CASCADE).setText("Dummy Item 2");
+        new MenuItem(menu, SWT.CASCADE).setText("Dummy Item 3");
+
+        addMouseListener(new MouseListener() {
+            @Override
+            public void mouseDoubleClick(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseDown(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseUp(MouseEvent e) {
+                menu.setVisible(true);
+            }
+        });
     }
 
     @Override

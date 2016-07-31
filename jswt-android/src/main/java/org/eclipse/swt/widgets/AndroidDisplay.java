@@ -4,6 +4,8 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.*;
+import android.support.v7.widget.PopupMenu;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
@@ -305,6 +307,14 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
+  public void showPopupMenu(Menu menu) {
+    View anchor = (View) ((Control) menu.getParent()).peer;
+    PopupMenu popupMenu = new PopupMenu(activity, anchor);
+    populateMenu(menu, popupMenu.getMenu(), false);
+    popupMenu.show();
+  }
+
+  @Override
   public int getScrollBarSize(ScrolledComposite scrolledComposite, int orientation) {
     return 0;
   }
@@ -328,6 +338,26 @@ public class AndroidDisplay extends PlatformDisplay {
   public void addListener(final Control control, final int eventType, Listener listener) {
     View view = (View) control.peer;
     switch (eventType) {
+      case SWT.MouseDown:
+      case SWT.MouseUp:
+        view.setOnTouchListener(new View.OnTouchListener() {
+          @Override
+          public boolean onTouch(View view, MotionEvent motionEvent) {
+            switch (motionEvent.getAction()) {
+              case MotionEvent.ACTION_DOWN:
+              case MotionEvent.ACTION_POINTER_DOWN:
+                control.notifyListeners(SWT.MouseDown, null);
+                return true;
+              case MotionEvent.ACTION_UP:
+              case MotionEvent.ACTION_POINTER_UP:
+                control.notifyListeners(SWT.MouseUp, null);
+                return true;
+            }
+            return false;
+          }
+        });
+        break;
+
       case SWT.Selection:
         if (view instanceof android.widget.Button) {
           ((android.widget.Button) view).setOnClickListener(new View.OnClickListener() {

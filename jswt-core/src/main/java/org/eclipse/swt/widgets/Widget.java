@@ -57,8 +57,11 @@ public abstract class Widget {
     EventTable listeners;
 
     public Widget(Widget parent, int style) {
-      this.parent = parent;
-     this.style = style;
+        if (parent != null) {
+            this.display = parent.display;
+        }
+        this.parent = parent;
+        this.style = style;
     }
 
 

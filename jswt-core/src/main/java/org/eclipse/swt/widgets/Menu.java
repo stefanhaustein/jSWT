@@ -30,4 +30,10 @@ public class Menu extends Widget {
     public MenuItem getItem(int index) {
         return items.get(index);
     }
+
+    public void setVisible(boolean visible) {
+        if (visible) {
+            display.showPopupMenu(this);
+        }
+    }
 }

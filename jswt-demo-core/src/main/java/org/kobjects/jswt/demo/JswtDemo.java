@@ -3,6 +3,7 @@ package org.kobjects.jswt.demo;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.*;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.widgets.*;
@@ -27,6 +28,15 @@ public class JswtDemo {
     final GridLayout controlLayout = new GridLayout(1, true);
     final GridData scrolledCompositeGridData = new GridData(SWT.FILL, SWT.FILL, false, true);
     int clickCount = 0;
+
+    void center(Control child, Control parent) {
+        Rectangle parentBounds = parent.getBounds();
+        Rectangle childBounds = child.getBounds();
+
+        child.setLocation(parentBounds.x + (parentBounds.width - childBounds.width) / 2,
+                parentBounds.y + (parentBounds.height - childBounds.height) / 2);
+
+    }
 
     public JswtDemo(Display display) {
         this.display = display;
@@ -96,6 +106,7 @@ public class JswtDemo {
                 Button button = new Button(dialogShell, 0);
                 button.setText("Ok");
                 dialogShell.pack();
+                center(dialogShell, shell);
                 dialogShell.open();
             }
         });
@@ -129,6 +140,8 @@ public class JswtDemo {
         shell.setBounds(100, 100, shell.getSize().x * 2, shell.getSize().y);
 
         shell.open ();
+
+
     }
 
     void adjustLayout() {
