@@ -302,10 +302,17 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
-  public void showPopupMenu(Menu menu) {
+  public void showPopupMenu(final Menu menu) {
     View anchor = (View) ((Control) menu.getParent()).peer;
     PopupMenu popupMenu = new PopupMenu(activity, anchor);
     populateMenu(menu, popupMenu.getMenu(), false);
+    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+      @Override
+      public boolean onMenuItemClick(android.view.MenuItem item) {
+        findMenuItem(menu, item.getTitle().toString());
+        return true;
+      }
+    });
     popupMenu.show();
   }
 
