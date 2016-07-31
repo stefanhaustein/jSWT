@@ -38,11 +38,6 @@ public class AndroidDisplay extends PlatformDisplay {
           MenuItem result = findMenuItem(topShell.menuBar, item.getTitle().toString());
           if (result != null) {
             result.notifyListeners(SWT.Selection, null);
-            Event event = new Event();
-            event.display = AndroidDisplay.this;
-            event.widget = result;
-            event.type = SWT.Selection;
-            result.listeners.sendEvent(event);
             navigationDrawer.closeDrawers();
             return true;
           }

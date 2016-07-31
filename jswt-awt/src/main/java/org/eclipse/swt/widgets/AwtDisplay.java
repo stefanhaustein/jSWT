@@ -17,6 +17,9 @@ import java.util.TimerTask;
 public class AwtDisplay extends PlatformDisplay {
   int activeShells = 0;
 
+  PopupMenu popupMenu;
+  MenuContainer lastPopupMenuContainer;
+
   HashMap<Widget, CheckboxGroup> checkBoxGroupMap = new HashMap<>();
 
   @Override
@@ -215,6 +218,18 @@ public class AwtDisplay extends PlatformDisplay {
     if (button.peer instanceof Checkbox) {
         ((Checkbox) button.peer).setState(selected);
     }
+  }
+
+  @Override
+  public void showPopupMenu(Menu menu) {
+    if (popupMenu != null) {
+      popupMenu.getParent().remove(popupMenu);
+    }
+    popupMenu = new PopupMenu();
+    menuAddAll(menu, popupMenu);
+    Component parent = (Component) ((Composite) menu.parent).peer;
+    parent.add(popupMenu);
+    popupMenu.show(parent, 0, 0);
   }
 
   @Override
