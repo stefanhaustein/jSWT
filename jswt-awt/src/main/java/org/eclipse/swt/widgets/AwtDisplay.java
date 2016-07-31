@@ -94,6 +94,10 @@ public class AwtDisplay extends PlatformDisplay {
     throw new RuntimeException("Unrecognized component: " + control);
   }
 
+  @Override
+  public void disposeShell(Shell shell) {
+    ((Window) shell.peer).setVisible(false);
+  }
 
   @Override
   public void openShell(Shell shell) {
@@ -224,6 +228,11 @@ public class AwtDisplay extends PlatformDisplay {
     ((java.awt.Window) shell.peer).pack();
   }
 
+  @Override
+  public void removeChild(Composite composite, Control child) {
+    ((Container) composite.peer).remove((Component) child.peer);
+  }
+
 
   @Override
   public void addChild(Composite parent, Control control) {
@@ -234,6 +243,41 @@ public class AwtDisplay extends PlatformDisplay {
   public void addListener(final Control control, final int eventType, Listener listener) {
     java.awt.Component component = (Component) control.peer;
     switch (eventType) {
+      case SWT.MouseDoubleClick:
+      case SWT.MouseDown:
+      case SWT.MouseUp:
+      case SWT.MouseEnter:
+      case SWT.MouseExit:
+        if (component.getMouseListeners().length == 0) {
+          component.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+              if (e.getClickCount() == 2) {
+                control.notifyListeners(SWT.MouseDoubleClick, null);
+              }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+              control.notifyListeners(SWT.MouseDoubleClick, null);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+              control.notifyListeners(SWT.MouseUp, null);
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+              control.notifyListeners(SWT.MouseEnter, null);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+              control.notifyListeners(SWT.MouseExit, null);
+            }
+          });
+        }
       case SWT.Move:
       case SWT.Resize:
       case SWT.Show:

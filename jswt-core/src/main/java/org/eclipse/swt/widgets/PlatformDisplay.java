@@ -20,6 +20,8 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract Object createControl(Control control);
 
+  public abstract void disposeShell(Shell shell);
+
   public abstract Rectangle getBounds(Control control);
 
   public abstract Insets getInsets(Scrollable composite);
@@ -32,17 +34,21 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract void pack(Shell shell);
 
+  public abstract void removeChild(Composite composite, Control child);
+
   public abstract void setBounds(Control control, int x, int y, int width, int height);
 
   public abstract void setText(Control control, String text);
-
-  public abstract void updateMenuBar(Decorations decorations);
 
   public abstract void setMeasuredSize(Control control, int width, int height);
 
   public abstract void setSelection(Button button, boolean selected);
 
+  public abstract void updateMenuBar(Decorations decorations);
+
   public abstract int getScrollBarSize(ScrolledComposite scrolledComposite, int orientation);
+
+
 
   public static class Insets {
     public int top;

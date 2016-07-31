@@ -3,6 +3,7 @@ package org.eclipse.swt.widgets;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
@@ -27,6 +28,13 @@ public class Control extends Widget {
     TypedListener typedListener = new TypedListener(controlListener);
     addListener(SWT.Resize, typedListener);
     addListener(SWT.Move, typedListener);
+  }
+
+  public void addMouseListener(MouseListener mouseListener) {
+    TypedListener typedListener = new TypedListener(mouseListener);
+    addListener(SWT.MouseUp, typedListener);
+    addListener(SWT.MouseDown, typedListener);
+    addListener(SWT.MouseDoubleClick, typedListener);
   }
 
   public Point computeSize(int wHint, int hHint) {
@@ -76,7 +84,4 @@ public class Control extends Widget {
     this.layoutData = layoutData;
   }
 
-  enum Type {
-
-  }
 }

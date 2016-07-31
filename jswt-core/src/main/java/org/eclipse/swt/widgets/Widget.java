@@ -87,7 +87,20 @@ public abstract class Widget {
     }
 
     public void dispose() {
+        if (isDisposed()) {
+            return;
+        }
+        if (this instanceof Shell) {
+            display.disposeShell((Shell) this);
+        }
+        if (parent != null) {
+            parent.removeChild(this);
+        }
         state |= DISPOSED;
+    }
+
+    // Called from dispose
+    void removeChild(Widget widget) {
     }
 
     public void error(int code) {

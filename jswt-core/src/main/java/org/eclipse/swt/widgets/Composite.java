@@ -68,6 +68,14 @@ public class Composite extends Scrollable {
     return _getChildren();
   }
 
+  // Called from dispose
+  void removeChild(Widget widget) {
+    children.remove(widget);
+    if (widget instanceof Control) {
+      display.removeChild(this, (Control) widget);
+    }
+  }
+
 
   Point minimumSize (int wHint, int hHint, boolean changed) {
     Control [] children = _getChildren ();

@@ -1,18 +1,26 @@
 package org.eclipse.swt.widgets;
 
-import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Color;
+
+import java.awt.*;
 
 
 class AwtGC extends GC {
-    final java.awt.Graphics graphics;
+    final java.awt.Graphics2D graphics;
     Color foreground;
     Color background;
     Color current;
 
-    AwtGC(java.awt.Graphics graphics) {
+    int lineCap = SWT.CAP_FLAT;
+    int lineJoin = SWT.JOIN_BEVEL;
+    int lineWidth = 1;
+
+    AwtGC(java.awt.Graphics2D graphics) {
         super(null);
         this.graphics = graphics;
     }
@@ -80,6 +88,30 @@ class AwtGC extends GC {
     }
 
     @Override
+    public Color getBackground() {
+        return background;
+    }
+
+    @Override
+    public Color getForeground() {
+        return foreground;
+    }
+
+    @Override
+    public void setAntialias(int antialias) {
+        if (antialias == SWT.ON) {
+            graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        } else if (antialias == SWT.OFF) {
+            graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+        }
+    }
+
+    @Override
+    public void setBackground(Color color) {
+        background = color;
+    }
+
+    @Override
     public void setForeground(Color color) {
         foreground = color;
     }
@@ -91,10 +123,39 @@ class AwtGC extends GC {
         graphics.setFont(awtFont);
     }
 
-
     @Override
-    public void setBackground(Color color) {
-        background = color;
+    public void setLineWidth(int width) {
+        if (width != lineWidth) {
+            lineWidth = width;
+            updateStroke();
+        }
+    }
+
+    public void setLineCap(int cap) {
+        if (cap != lineCap) {
+            lineCap = cap;
+            updateStroke();
+        }
+    }
+
+    public void setLineJoin(int join) {
+        if (join != lineJoin) {
+            lineJoin = join;
+            updateStroke();
+        }
+    }
+
+    public Point stringExtent(String string) {
+        FontMetrics metrics = graphics.getFontMetrics();
+        return new Point(metrics.stringWidth(string), metrics.getHeight());
+    }
+
+    private void updateStroke() {
+        graphics.setStroke(new BasicStroke(lineWidth,
+                lineCap == SWT.CAP_ROUND ? BasicStroke.CAP_ROUND :
+                        lineCap == SWT.CAP_SQUARE ? BasicStroke.CAP_SQUARE : BasicStroke.CAP_BUTT,
+                lineJoin == SWT.JOIN_MITER ? BasicStroke.JOIN_MITER :
+                        lineJoin == SWT.JOIN_ROUND ? BasicStroke.JOIN_ROUND : BasicStroke.JOIN_BEVEL));
     }
 
     private void useBackgroundColor() {

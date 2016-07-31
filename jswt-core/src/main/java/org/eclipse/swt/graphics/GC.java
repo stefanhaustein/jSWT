@@ -55,7 +55,7 @@ public class GC {
     }
 
     public void drawPolygon(int[] pointArray) {
-        drawPolygon(pointArray);
+        drawPolyline(pointArray);
         drawLine(pointArray[0], pointArray[1],
                 pointArray[pointArray.length - 2], pointArray[pointArray.length - 1]);
     }
@@ -102,6 +102,14 @@ public class GC {
         delegate.fillRoundRectangle(x, y, width, height, arcWidth, arcHeight);
     }
 
+    public Color getBackground() {
+        return delegate.getBackground();
+    }
+
+    public Color getForeground() {
+        return delegate.getForeground();
+    }
+
     public void setBackground(Color color) {
         delegate.setBackground(color);
     }
@@ -118,6 +126,20 @@ public class GC {
         delegate.setAntialias(antialias);
     }
 
+    public void setLineCap(int cap) {
+        delegate.setLineCap(cap);
+    }
 
+    public void setLineJoin(int join) {
+        delegate.setLineJoin(join);
+    }
+
+    public void setLineWidth(int width) {
+        delegate.setLineWidth(width);
+    }
+
+    public Point stringExtent(String text) {
+        return delegate.stringExtent(text);
+    }
 }
 

@@ -1,5 +1,7 @@
 package org.eclipse.swt.widgets;
 
+import java.awt.*;
+
 public class SwtCanvas extends java.awt.Container {
     final Canvas swtCanvas;
 
@@ -8,6 +10,6 @@ public class SwtCanvas extends java.awt.Container {
     }
 
     public void paint(java.awt.Graphics g) {
-        swtCanvas.drawBackground(new AwtGC(g), 0, 0, getWidth(), getHeight());
+        swtCanvas.drawBackground(new AwtGC((Graphics2D) g), 0, 0, getWidth(), getHeight());
     }
 }
