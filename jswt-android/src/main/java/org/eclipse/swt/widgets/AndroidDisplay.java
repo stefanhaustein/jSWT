@@ -118,10 +118,19 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
+  public void disposeShell(Shell shell) {
+    SwtShellView shellView = (SwtShellView) shell.peer;
+    if (shellView.dialog != null) {
+      shellView.dialog.hide();
+      shellView.dialog = null;
+    }
+  }
+
+  @Override
   public void openShell(Shell shell) {
     SwtShellView view = (SwtShellView) shell.peer;
-    if (view.dialog!= null) {
-      view.dialog.show();
+    if (view.dialogBuilder != null) {
+      view.dialog = view.dialogBuilder.show();
       return;
     }
 
@@ -303,6 +312,11 @@ public class AndroidDisplay extends PlatformDisplay {
   @Override
   public void pack(Shell shell) {
     ((View) shell.peer).invalidate();
+  }
+
+  @Override
+  public void removeChild(Composite composite, Control child) {
+    ((ViewGroup) composite.peer).removeView((View) child.peer);
   }
 
   @Override

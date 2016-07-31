@@ -5,7 +5,8 @@ import android.content.Context;
 import android.support.v7.app.AlertDialog;
 
 public class SwtShellView extends SwtViewGroup {
-    AlertDialog.Builder dialog;
+    AlertDialog.Builder dialogBuilder;
+    AlertDialog dialog;
     String text;
     Shell shell;
 
@@ -13,16 +14,16 @@ public class SwtShellView extends SwtViewGroup {
         super(context, shell);
         this.shell = shell;
         if (shell.parent != null) {
-            dialog = new AlertDialog.Builder(getContext());
-            dialog.setView(this);
+            dialogBuilder = new AlertDialog.Builder(getContext());
+            dialogBuilder.setView(this);
         }
     }
 
     void setText(String text) {
         this.text = text;
 
-        if (dialog != null) {
-            dialog.setTitle(text);
+        if (dialogBuilder != null) {
+            dialogBuilder.setTitle(text);
         } else {
             AndroidDisplay display = (AndroidDisplay) composite.display;
             if (display.topShell == composite) {
