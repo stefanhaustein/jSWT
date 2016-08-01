@@ -1,7 +1,7 @@
 package org.eclipse.swt.widgets;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionListener;
 
 public class MenuItem extends Item {
 
@@ -13,7 +13,7 @@ public class MenuItem extends Item {
     }
 
 
-    public void addSelectionListener(SelectionAdapter selectionListener) {
+    public void addSelectionListener(SelectionListener selectionListener) {
         addListener(SWT.Selection, new TypedListener(selectionListener));
     }
 }

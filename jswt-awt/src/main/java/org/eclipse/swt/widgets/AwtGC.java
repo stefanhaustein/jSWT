@@ -160,7 +160,7 @@ class AwtGC extends GC {
 
     private void useBackgroundColor() {
         if (background != current) {
-            graphics.setColor(new java.awt.Color(background.getRed(), background.getGreen(), background.getBlue()));
+            graphics.setColor(new java.awt.Color(background.getRed(), background.getGreen(), background.getBlue(), background.getAlpha()));
             current = background;
         }
     }

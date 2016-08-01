@@ -2,14 +2,15 @@ package org.eclipse.swt.widgets;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.internal.SWTEventListener;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.TimerTask;
@@ -227,15 +228,20 @@ public class AwtDisplay extends PlatformDisplay {
     }
     popupMenu = new PopupMenu();
     menuAddAll(menu, popupMenu);
-    Component parent = (Component) ((Composite) menu.parent).peer;
+    Component parent = (Component) ((Control) menu.parent).peer;
     parent.add(popupMenu);
-    popupMenu.show(parent, 0, 0);
+    popupMenu.show(parent, parent.getWidth() / 2, parent.getHeight() / 2);
   }
 
   @Override
   public int getScrollBarSize(ScrolledComposite scrolledComposite, int orientation) {
     ScrollPane scrollPane = (ScrollPane) ((Composite) scrolledComposite).peer;
     return orientation == SWT.HORIZONTAL ? scrollPane.getHScrollbarHeight() : scrollPane.getVScrollbarWidth();
+  }
+
+  @Override
+  public void redraw(Control control, int x, int y, int w, int h, boolean all) {
+    ((Component) control.peer).repaint(x, y, w, h);
   }
 
   @Override
@@ -252,6 +258,20 @@ public class AwtDisplay extends PlatformDisplay {
   @Override
   public void addChild(Composite parent, Control control) {
     ((java.awt.Container) parent.peer).add((java.awt.Component) control.peer);
+  }
+
+  void notifyListeners(Control control, int type, AWTEvent awtEvent) {
+      Event event = new Event();
+      event.type = type;
+      event.widget = control;
+      event.display = this;
+
+      if (awtEvent instanceof java.awt.event.MouseEvent) {
+          event.x = ((MouseEvent) awtEvent).getX();
+          event.y = ((MouseEvent) awtEvent).getY();
+      }
+
+      control.notifyListeners(type, event);
   }
 
   @Override
@@ -274,22 +294,22 @@ public class AwtDisplay extends PlatformDisplay {
 
             @Override
             public void mousePressed(MouseEvent e) {
-              control.notifyListeners(SWT.MouseDoubleClick, null);
+              notifyListeners(control, SWT.MouseDown, e);
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
-              control.notifyListeners(SWT.MouseUp, null);
+              notifyListeners(control, SWT.MouseUp, e);
             }
 
             @Override
             public void mouseEntered(MouseEvent e) {
-              control.notifyListeners(SWT.MouseEnter, null);
+              notifyListeners(control, SWT.MouseEnter, e);
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-              control.notifyListeners(SWT.MouseExit, null);
+              notifyListeners(control, SWT.MouseExit, e);
             }
           });
         }
@@ -301,22 +321,22 @@ public class AwtDisplay extends PlatformDisplay {
           component.addComponentListener(new ComponentListener() {
             @Override
             public void componentResized(ComponentEvent e) {
-              control.notifyListeners(SWT.Resize, null);
+              notifyListeners(control, SWT.Resize, e);
             }
 
             @Override
             public void componentMoved(ComponentEvent e) {
-              control.notifyListeners(SWT.Move, null);
+              notifyListeners(control, SWT.Move, e);
             }
 
             @Override
             public void componentShown(ComponentEvent e) {
-              control.notifyListeners(SWT.Show, null);
+              notifyListeners(control, SWT.Show, e);
             }
 
             @Override
             public void componentHidden(ComponentEvent e) {
-              control.notifyListeners(SWT.Hide, null);
+              notifyListeners(control, SWT.Hide, e);
             }
           });
         }
@@ -328,7 +348,7 @@ public class AwtDisplay extends PlatformDisplay {
             button.addActionListener(new ActionListener() {
               @Override
               public void actionPerformed(ActionEvent e) {
-                control.notifyListeners(SWT.Selection, null);
+                notifyListeners(control, SWT.Selection, e);
               }
             });
           }

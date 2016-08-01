@@ -1,9 +1,15 @@
 package org.eclipse.swt.widgets;
 
 
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 
 public class Display extends Device {
+
+    private Color black = new Color(this, 0, 0, 0);
+    private Color blue = new Color(this, 255, 0, 0);
+    private Color white = new Color(this, 0, 0, 0);
+    private Color red = new Color(this, 255, 0, 0);
 
     /*
     public static boolean isValidClass(Class<? extends Dialog> aClass) {
@@ -34,6 +40,7 @@ public class Display extends Device {
         return true;
     }
 */
+
     public boolean readAndDispatch() {
         throw new RuntimeException("N/A on android.");
     }

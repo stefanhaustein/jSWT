@@ -50,6 +50,8 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract int getScrollBarSize(ScrolledComposite scrolledComposite, int orientation);
 
+  public abstract void redraw(Control control, int x, int y, int w, int h, boolean all);
+
 
   public static class Insets {
     public int top;

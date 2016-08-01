@@ -4,16 +4,32 @@ public class Color {
     int red;
     int green;
     int blue;
-    RGB rgb;
+    int alpha;
 
     public Color(Device device, int red, int green, int blue) {
         this.red = red;
         this.green = green;
         this.blue = blue;
+        this.alpha = 255;
+    }
+
+    public Color(Device device, int red, int green, int blue, int alpha) {
+        this.red = red;
+        this.green = green;
+        this.blue = blue;
+        this.alpha = alpha;
     }
 
     public Color(Device device, RGB rgb) {
         this(device, rgb.red, rgb.green, rgb.blue);
+    }
+
+    public Color(Device device, RGBA rgba) {
+        this(device, rgba.rgb, rgba.alpha);
+    }
+
+    public Color(Device device, RGB rgb, int alpha) {
+        this(device, rgb.red, rgb.green, rgb.blue, alpha);
     }
 
     public int getRed() {
@@ -26,5 +42,9 @@ public class Color {
 
     public int getBlue() {
         return blue;
+    }
+
+    public int getAlpha() {
+        return alpha;
     }
 }

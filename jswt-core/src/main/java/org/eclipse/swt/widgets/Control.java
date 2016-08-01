@@ -71,6 +71,15 @@ public class Control extends Widget {
     return layoutData;
   }
 
+  public void redraw() {
+    Rectangle bounds = getBounds();
+    redraw(0, 0, bounds.width, bounds.height, true);
+  }
+
+  public void redraw(int x, int y, int w, int h, boolean all) {
+    display.redraw(this, x, y, w, h, all);
+  }
+
 
   public void setBounds(int x, int y, int width, int height) {
     display.setBounds(this, x, y, width, height);
@@ -102,5 +111,7 @@ public class Control extends Widget {
     setSize(p.x, p.y);
   }
 
-
+  public String toString() {
+    return this.getClass().getName() + "; peer: " + peer;
+  }
 }
