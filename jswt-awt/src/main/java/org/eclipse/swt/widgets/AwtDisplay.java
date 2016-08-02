@@ -11,6 +11,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseWheelListener;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.TimerTask;
@@ -267,8 +268,12 @@ public class AwtDisplay extends PlatformDisplay {
       event.display = this;
 
       if (awtEvent instanceof java.awt.event.MouseEvent) {
-          event.x = ((MouseEvent) awtEvent).getX();
-          event.y = ((MouseEvent) awtEvent).getY();
+          java.awt.event.MouseEvent awtMouseEvent = (java.awt.event.MouseEvent) awtEvent;
+          event.x = awtMouseEvent.getX();
+          event.y = awtMouseEvent.getY();
+          event.count = awtMouseEvent instanceof java.awt.event.MouseWheelEvent
+                  ? ((java.awt.event.MouseWheelEvent) awtMouseEvent).getWheelRotation()
+                  : awtMouseEvent.getClickCount();
       }
 
       control.notifyListeners(type, event);
@@ -278,6 +283,31 @@ public class AwtDisplay extends PlatformDisplay {
   public void addListener(final Control control, final int eventType, Listener listener) {
     java.awt.Component component = (Component) control.peer;
     switch (eventType) {
+      case SWT.MouseWheel:
+        if (component.getMouseWheelListeners().length == 0) {
+          component.addMouseWheelListener(new java.awt.event.MouseWheelListener() {
+            @Override
+            public void mouseWheelMoved(java.awt.event.MouseWheelEvent e) {
+              notifyListeners(control, SWT.MouseWheel, e);
+            }
+          });
+        }
+        break;
+      case SWT.MouseMove:
+        if (component.getMouseMotionListeners().length == 0) {
+          component.addMouseMotionListener(new MouseMotionListener() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+              notifyListeners(control, SWT.MouseMove, e);
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+              notifyListeners(control, SWT.MouseMove, e);
+            }
+          });
+        }
+        break;
       case SWT.MouseDoubleClick:
       case SWT.MouseDown:
       case SWT.MouseUp:

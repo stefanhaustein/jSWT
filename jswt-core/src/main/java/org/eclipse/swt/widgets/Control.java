@@ -4,6 +4,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
@@ -34,6 +36,14 @@ public class Control extends Widget {
     addListener(SWT.MouseUp, typedListener);
     addListener(SWT.MouseDown, typedListener);
     addListener(SWT.MouseDoubleClick, typedListener);
+  }
+
+  public void addMouseMoveListener(MouseMoveListener mouseMoveListener) {
+    addListener(SWT.MouseMove, new TypedListener(mouseMoveListener));
+  }
+
+  public void addMouseWheelListener(MouseWheelListener mouseWheelListener) {
+    addListener(SWT.MouseWheel, new TypedListener(mouseWheelListener));
   }
 
   public Point computeSize(int wHint, int hHint) {
