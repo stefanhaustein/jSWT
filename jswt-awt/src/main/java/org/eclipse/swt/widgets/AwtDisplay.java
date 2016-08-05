@@ -128,7 +128,13 @@ public class AwtDisplay extends PlatformDisplay {
 
   @Override
   public void setBounds(Control control, int x, int y, int width, int height) {
-    ((Component) control.peer).setBounds(x, y, width, height);
+    Component component = ((Component) control.peer);
+    component.setBounds(x, y, width, height);
+    if (component.getParent() instanceof ScrollPane) {
+      component.getParent().doLayout();
+    }
+
+
   }
 
   @Override

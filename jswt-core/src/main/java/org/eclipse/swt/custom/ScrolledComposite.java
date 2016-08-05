@@ -2,6 +2,7 @@ package org.eclipse.swt.custom;
 
 import javafx.scene.control.ScrollBar;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.*;
 
@@ -52,9 +53,9 @@ public class ScrolledComposite extends Composite {
 
     boolean needHScroll(Rectangle contentRect, boolean vVisible) {
 
-        Rectangle hostRect = getBounds();
-        int border = getBorderWidth();
-        hostRect.width -= 2*border;
+        Rectangle hostRect = getClientArea();
+        //int border = getBorderWidth();
+        //hostRect.width -= 2*border;
         // ScrollBar vBar = getVerticalBar();
         if (vVisible) hostRect.width -= ((PlatformDisplay) getDisplay()).getScrollBarSize(this, SWT.VERTICAL);
 
@@ -67,9 +68,9 @@ public class ScrolledComposite extends Composite {
         //ScrollBar vBar = getVerticalBar();
         //if (vBar == null) return false;
 
-        Rectangle hostRect = getBounds();
-        int border = getBorderWidth();
-        hostRect.height -= 2*border;
+        Rectangle hostRect = getClientArea();
+        //int border = getBorderWidth();
+        //hostRect.height -= 2*border;
         //ScrollBar hBar = getHorizontalBar();
         if (hVisible) hostRect.height -= ((PlatformDisplay) getDisplay()).getScrollBarSize(this, SWT.HORIZONTAL);
 
@@ -85,5 +86,10 @@ public class ScrolledComposite extends Composite {
 
     public void setExpandVertical(boolean expandVertical) {
         this.expandVertical = expandVertical;
+    }
+
+    public void setMinSize(Point minSize) {
+        minWidth = minSize.x;
+        minHeight = minSize.y;
     }
 }

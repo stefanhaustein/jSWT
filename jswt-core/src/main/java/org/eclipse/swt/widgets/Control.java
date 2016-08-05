@@ -60,6 +60,7 @@ public class Control extends Widget {
       size = display.computeSize(this, wHint, hHint, changed);
     }
     display.setMeasuredSize(this, size.x, size.y);
+    System.out.println(this + ".computeSize(" + wHint + ", " + hHint + "): " + size);
     return size;
   }
 
@@ -81,6 +82,10 @@ public class Control extends Widget {
     return layoutData;
   }
 
+  void markLayout (boolean changed, boolean all) {
+	/* Do nothing */
+  }
+
   public void redraw() {
     Rectangle bounds = getBounds();
     redraw(0, 0, bounds.width, bounds.height, true);
@@ -92,6 +97,7 @@ public class Control extends Widget {
 
 
   public void setBounds(int x, int y, int width, int height) {
+    System.out.println(this + ".setBounds(" + x + ", " + y + ", " + width + ", " + height);
     display.setBounds(this, x, y, width, height);
   }
 
@@ -124,4 +130,10 @@ public class Control extends Widget {
   public String toString() {
     return this.getClass().getName() + "; peer: " + peer;
   }
+
+
+  void updateLayout (boolean all) {
+	/* Do nothing */
+  }
+
 }

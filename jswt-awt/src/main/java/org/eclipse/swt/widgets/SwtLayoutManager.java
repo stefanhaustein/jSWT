@@ -1,12 +1,10 @@
 package org.eclipse.swt.widgets;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.graphics.Point;
 
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.LayoutManager;
+import java.awt.*;
 
 public class SwtLayoutManager implements LayoutManager {
 
@@ -28,6 +26,10 @@ public class SwtLayoutManager implements LayoutManager {
 
   @Override
   public Dimension preferredLayoutSize(Container parent) {
+   /* if (parent.getParent() instanceof ScrollPane) {
+      org.eclipse.swt.graphics.Rectangle bounds = swtComposite.getBounds();
+      return new Dimension(bounds.width, bounds.height);
+    } */
     Point p = swtComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT);
     return new Dimension(p.x, p.y);
   }
