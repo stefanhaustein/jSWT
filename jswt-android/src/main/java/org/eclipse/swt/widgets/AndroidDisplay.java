@@ -322,6 +322,11 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
+  public void redraw(Control control, int x, int y, int w, int h, boolean all) {
+    ((View) control.peer).invalidate(x, y, x+w, y+h);
+  }
+
+  @Override
   public void pack(Shell shell) {
     ((View) shell.peer).invalidate();
   }
