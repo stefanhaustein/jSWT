@@ -48,6 +48,9 @@ public class GwtDisplay extends PlatformDisplay {
                     "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent");
             return button;
         }
+        if (control instanceof Canvas) {
+            return Document.get().createElement("canvas");
+        }
         if (control instanceof Shell) {
             Element shell = Document.get().createElement("div");
             Document.get().getBody().appendChild(shell);
