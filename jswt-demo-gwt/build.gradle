@@ -1,0 +1,54 @@
+
+apply plugin: 'war'
+apply plugin: 'java'
+apply plugin: 'gwt'
+apply plugin: 'jetty'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+version = '1.0'
+
+
+compileJava{
+    options.incremental = true
+}
+
+
+dependencies {
+    compile project(':jswt-core')
+    compile project(':jswt-demo-core')
+    compile project(':jswt-gwt')
+}
+
+gwt {
+    evaluationDependsOn(':jswt-gwt')
+    evaluationDependsOn(':jswt-core')
+    evaluationDependsOn(':jswt-demo-core')
+
+    gwtVersion = '2.7.0'
+
+    modules 'JswtDemoGwt'
+
+//    logLevel = 'ERROR'
+    minHeapSize = "256M";
+    maxHeapSize = "1024M";
+
+    src += files(project(':jswt-core').sourceSets.main.allJava.srcDirs) + files(project(':jswt-core').sourceSets.main.output.resourcesDir)
+    src += files(project(':jswt-gwt').sourceSets.main.allJava.srcDirs) + files(project(':jswt-gwt').sourceSets.main.output.resourcesDir)
+    src += files(project(':jswt-demo-core').sourceSets.main.allJava.srcDirs) + files(project(':jswt-demo-core').sourceSets.main.output.resourcesDir)
+
+    superDev {
+        noPrecompile = true
+    }
+
+    // specify the deployment port
+    jettyRunWar.httpPort = 8089
+}
+
+
+task jettyDraftWar(type: JettyRunWar) {
+    dependsOn draftWar
+    dependsOn.remove('war')
+    webApp=draftWar.archivePath
+}
+

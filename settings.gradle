@@ -1,7 +1,8 @@
-include ':jswt-android', ':jswt-demo-android', 'jswt-demo-core', ':jswt-core', ':jswt-awt', ':jswt-demo-awt'
+include ':jswt-android', ':jswt-demo-android', 'jswt-demo-core', ':jswt-core', ':jswt-awt', ':jswt-demo-awt', 'jswt-demo-gwt', 'jswt-gwt'
 project(':jswt-android').projectDir = new File('jswt-android')
 project(':jswt-awt').projectDir = new File('jswt-awt')
 project(':jswt-core').projectDir = new File('jswt-core')
 project(':jswt-demo-android').projectDir = new File('jswt-demo-android')
 project(':jswt-demo-awt').projectDir = new File('jswt-demo-awt')
 project(':jswt-demo-core').projectDir = new File('jswt-demo-core')
+project(':jswt-demo-gwt').projectDir = new File('jswt-demo-gwt')

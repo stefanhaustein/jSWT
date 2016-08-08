@@ -120,27 +120,27 @@ public class DemoCanvas extends Canvas {
         boolean small = m < 100;
 
         gc.drawString
-                ((small ? "ttl " : "total mem: ")
-                        + Runtime.getRuntime().totalMemory()/1000000+"MB", tx, ty, true);
+                ((small ? "ttl " : "total mem: ") + 1234, tx, ty, true);
+         //               + Runtime.getRuntime().totalMemory()/1000000+"MB", tx, ty, true);
 
-        long free = Runtime.getRuntime().freeMemory ();
+       // long free = Runtime.getRuntime().freeMemory ();
 
         gc.drawString
-                ((small ? "fr " : "free mem: ")
-                        + free/1000000+"MB", tx, ty+step, true);
+                ((small ? "fr " : "free mem: ") + 567, tx, ty+step, true);
+//                        + free/1000000+"MB", tx, ty+step, true);
 
-        int count = 0;
+        /*      int count = 0;
         while (true) {
             Runtime.getRuntime().gc();
             long newFree = Runtime.getRuntime().freeMemory ();
             if (newFree <= free) break;
             count ++;
             free = newFree;
-        }
+        }*/
 
         gc.drawString
-                ((small ? "gc " : "post gc: ")
-                        + "(" + count +")"+free/1000000+"MB", tx, ty+2*step, true);
+                ((small ? "gc " : "post gc: ") + 890, tx, ty+2*step, true);
+        //             + "(" + count +")"+free/1000000+"MB", tx, ty+2*step, true);
 
     }
 
