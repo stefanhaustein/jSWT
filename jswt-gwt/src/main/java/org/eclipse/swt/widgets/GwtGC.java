@@ -127,11 +127,14 @@ public class GwtGC extends GC {
     @Override
     public void setBackground(Color color) {
         background = color;
+        ctx.setFillStyle("rgba(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + "," + color.getAlpha()/255f+")");
     }
 
     @Override
     public void setForeground(Color color) {
         foreground = color;
+        ctx.setStrokeStyle("rgba(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + "," + color.getAlpha()/255f+")");
+
     }
 
     @Override

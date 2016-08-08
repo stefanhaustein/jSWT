@@ -1,15 +1,15 @@
 apply plugin: 'java'
-apply plugin: 'gwt-base'
+//apply plugin: 'gwt-base'
 
 compileJava {
     sourceCompatibility = 1.7
     targetCompatibility = 1.7
 }
 
-
+/*
 gwt {
     gwtVersion='2.7.0'
-}
+}*/
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])

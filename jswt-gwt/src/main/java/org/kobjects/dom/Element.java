@@ -4,14 +4,6 @@ import com.google.gwt.core.client.JavaScriptObject;
 
 public final class Element extends JavaScriptObject {
 
-    public native static String getTitle() /*-{
-        return $doc.title;
-    }-*/;
-
-    public native static void setTitle(String title) /*-{
-        $doc.title = title;
-    }-*/;
-
     protected Element() {
     }
 
@@ -26,6 +18,10 @@ public final class Element extends JavaScriptObject {
 
     public native Element getLastElementChild() /*-{
         return this.lastElementChild;
+    }-*/;
+
+    public native Element getParentElement() /*-{
+        return this.parentElement;
     }-*/;
 
     public native String getTextContent() /*-{

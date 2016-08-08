@@ -20,4 +20,12 @@ public final class Document extends JavaScriptObject {
     }-*/;
 
 
+    public native String getTitle() /*-{
+        return this.title;
+    }-*/;
+
+    public native void setTitle(String title) /*-{
+        this.title = title;
+    }-*/;
+
 }

@@ -1,11 +1,13 @@
 package org.eclipse.swt.widgets;
 
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayInteger;
+import com.google.gwt.core.client.JsArrayNumber;
 import org.kobjects.dom.Element;
-import com.google.gwt.core.client.JavaScriptObject;
 
-public final class Elements extends JavaScriptObject {
+public final class Elements {
 
-    protected Elements() {}
+    private Elements() {}
 
     public static native void setBounds(Element element, int x, int y, int width, int height) /*-{
         var style = element.style;
@@ -17,6 +19,11 @@ public final class Elements extends JavaScriptObject {
         style.width = width + "px";
         style.height = height + "px";
     }-*/;
+
+    public static native JsArrayNumber getBounds(Element element) /*-{
+        return [0, 0, element.clientWidth, element.clientHeight];
+    }-*/;
+
 
     public static native int getMinWidth(Element element) /*-{
         var style = element.style;

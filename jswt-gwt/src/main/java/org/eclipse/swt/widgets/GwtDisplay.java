@@ -1,5 +1,6 @@
 package org.eclipse.swt.widgets;
 
+import com.google.gwt.core.client.JsArrayNumber;
 import org.kobjects.dom.Document;
 import org.kobjects.dom.Element;
 
@@ -11,9 +12,15 @@ import org.eclipse.swt.graphics.Rectangle;
 
 public class GwtDisplay extends PlatformDisplay {
 
+    public static native void log(Object... args) /*-{
+        $wnd.console.log(args);
+    }-*/;
+
     @Override
     public void addChild(Composite composite, Control control) {
+        log("addChild to: ", composite.peer, "; child: ", control);
         ((Element) composite.peer).appendChild((Element) control.peer);
+
     }
 
     @Override
@@ -30,6 +37,7 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public Object createControl(Control control) {
+        log("createControl:", control);
         if (control instanceof Text) {
             return Document.get().createElement("input");
         }
@@ -48,13 +56,16 @@ public class GwtDisplay extends PlatformDisplay {
                     "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent");
             return button;
         }
-        if (control instanceof Canvas) {
-            return Document.get().createElement("canvas");
-        }
         if (control instanceof Shell) {
             Element shell = Document.get().createElement("div");
+            shell.setAttribute("style", "width:100%;max-width:1024px;background-color:#eee;min-height:100vh;margin:auto;position:relative");
+         //   Document.get().getBody().setAttribute("style", "min-height:100%");
+         //   Document.get().getBody().getParentElement().setAttribute("style", "height:100%");
             Document.get().getBody().appendChild(shell);
             return shell;
+        }
+        if (control instanceof Canvas) {
+            return Document.get().createElement("canvas");
         }
 
         return Document.get().createElement("div");
@@ -67,7 +78,12 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public Rectangle getBounds(Control control) {
-        return new Rectangle(10, 10, 100, 100);
+        JsArrayNumber bounds = Elements.getBounds((Element) control.peer);
+        return new Rectangle(
+                Math.round((float) bounds.get(0)),
+                Math.round((float) bounds.get(1)),
+                Math.round((float) bounds.get(2)),
+                Math.round((float) bounds.get(3)));
     }
 
     @Override
@@ -106,13 +122,23 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public void setBounds(Control control, int x, int y, int w, int h) {
-        Elements.setBounds((Element) control.peer, x, y, w, h);
+        if (control instanceof Shell) {
+            return;
+        }
+        Element element = (Element) control.peer;
+        Elements.setBounds(element, x, y, w, h);
+        if (element.getLocalName().equals("canvas")) {
+            // FIXME: Invalidate instead
+            element.setAttribute("width", String.valueOf(w));
+            element.setAttribute("height", String.valueOf(h));
+            ((Canvas) control).drawBackground(new GwtGC(element), 0, 0, w, h);
+        }
     }
 
     @Override
     public void setText(Control control, String s) {
         if (control instanceof Shell) {
-            Element.setTitle(s);
+            Document.get().setTitle(s);
         } else {
             Element element = (Element) control.peer;
             if (element.getLocalName().equals("input")) {
