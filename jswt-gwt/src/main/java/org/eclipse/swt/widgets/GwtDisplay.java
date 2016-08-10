@@ -16,6 +16,10 @@ public class GwtDisplay extends PlatformDisplay {
         $wnd.console.log(args);
     }-*/;
 
+    public void asyncExec(Runnable runnable) {
+        runnable.run();                                   // FIXME
+    }
+
     @Override
     public void addChild(Composite composite, Control control) {
         log("addChild to: ", composite.peer, "; child: ", control);

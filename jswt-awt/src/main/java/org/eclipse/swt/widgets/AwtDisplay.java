@@ -7,6 +7,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.internal.SWTEventListener;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.event.MouseEvent;
@@ -23,6 +24,11 @@ public class AwtDisplay extends PlatformDisplay {
   MenuContainer lastPopupMenuContainer;
 
   HashMap<Widget, CheckboxGroup> checkBoxGroupMap = new HashMap<>();
+
+  @Override
+  public void asyncExec(Runnable runnable) {
+    SwingUtilities.invokeLater(runnable);
+  }
 
   @Override
   public Object createControl(final Control control) {

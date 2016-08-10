@@ -49,6 +49,10 @@ public class Display extends Device {
         throw new RuntimeException("N/A on android.");
     }
 
+    public void asyncExec(Runnable runnable) {
+        throw new RuntimeException("Implement in platform display!");
+    }
+
     public void dispose() {
     }
 }

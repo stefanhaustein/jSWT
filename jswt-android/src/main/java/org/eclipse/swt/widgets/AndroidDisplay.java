@@ -47,6 +47,10 @@ public class AndroidDisplay extends PlatformDisplay {
     });
   }
 
+  @Override
+  public void asyncExec(Runnable runnable) {
+    activity.runOnUiThread(runnable);
+  }
 
   public void handleRadioGroup(Button button, boolean selected) {
     if (button.style != SWT.RADIO || !selected) {
