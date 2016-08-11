@@ -68,7 +68,14 @@ public class AwtDisplay extends PlatformDisplay {
         boolean modal = (shell.style & (SWT.APPLICATION_MODAL | SWT.SYSTEM_MODAL | SWT.PRIMARY_MODAL)) != 0;
         window = new java.awt.Dialog((java.awt.Frame) ((Shell) shell.parent).peer, modal);
       } else {
-        window = new java.awt.Frame();
+        window = new java.awt.Frame() {
+          @Override
+          public void update(Graphics g) {
+            // Make this hack dependent on the layout manager?                                                FIXME
+            // Another option might be to make the whole frame double-buffered if any child requests to be.
+            paint(g);
+          }
+        };
       }
       window.setLayout(new SwtLayoutManager((Composite) control));
       window.addWindowListener(new WindowAdapter() {
