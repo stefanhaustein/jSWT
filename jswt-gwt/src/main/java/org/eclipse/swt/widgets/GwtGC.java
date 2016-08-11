@@ -15,23 +15,25 @@ public class GwtGC extends GC {
     int lineWidth;
     int lineCap;
     int lineJoin;
+    Font font;
 
 
     public GwtGC(Element canvas) {
         super(null);
         ctx = canvas.getContext2d();
+        ctx.setTextBaseline("top");
     }
 
 
     @Override
     public void drawLine(int x1, int y1, int x2, int y2) {
         ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x2, y2);
+        ctx.moveTo(x1 + 0.5, y1 + 0.5);
+        ctx.lineTo(x2 + 0.5, y2 + 0.5);
         ctx.stroke();
     }
 
-    private CanvasRenderingContext2D roundRect(int x, int y, int width, int height, int rx, int ry) {
+    private CanvasRenderingContext2D roundRect(double x, double y, double width, double height, double rx, double ry) {
         ctx.beginPath();
         ctx.moveTo(x + rx, y);
         ctx.lineTo(x + width - rx, y);
@@ -46,7 +48,7 @@ public class GwtGC extends GC {
         return ctx;
     }
 
-    private CanvasRenderingContext2D ellipse(int x, int y, int w, int h) {
+    private CanvasRenderingContext2D ellipse(double x, double y, double w, double h) {
         double kappa = .5522848,
                 ox = (w / 2) * kappa, // control point offset horizontal
                 oy = (h / 2) * kappa, // control point offset vertical
@@ -66,22 +68,26 @@ public class GwtGC extends GC {
 
     @Override
     public void drawOval(int x, int y, int width, int height) {
-        ellipse(x, y, width, height).stroke();
+        ellipse(x + 0.5, y + 0.5, width, height).stroke();
     }
 
     @Override
     public void drawRectangle(int x, int y, int width, int height) {
-        ctx.strokeRect(x, y, width, height);
+        ctx.strokeRect(x + 0.5, y + 0.5, width, height);
     }
 
     @Override
     public void drawRoundRectangle(int x, int y, int width, int height, int arcWidth, int arcHeight) {
-        roundRect(x, y, width, height, arcWidth, arcHeight).stroke();
+        roundRect(x + 0.5, y + 0.5, width, height, arcWidth, arcHeight).stroke();
     }
 
     @Override
-    public void drawText(String string, int x, int y, int flags) {
+    public void drawText(String s, int x, int y, int flags) {
+        Color savedBackground = background;
+        setBackground(foreground);
+        ctx.fillText(s, x, y);
 //        graphics.drawString(string, x, y + graphics.getFontMetrics().getAscent());
+        setBackground(savedBackground);
     }
 
     @Override
@@ -124,45 +130,72 @@ public class GwtGC extends GC {
         // FIXME
     }
 
+    String colorString(Color color) {
+        return color.getAlpha() == 255 ?
+                ("rgb(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + ")") :
+                ("rgba(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + "," + color.getAlpha()/255f+")");
+    }
+
     @Override
     public void setBackground(Color color) {
-        background = color;
-        ctx.setFillStyle("rgba(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + "," + color.getAlpha()/255f+")");
+        if (color != background) {
+            background = color;
+            ctx.setFillStyle(colorString(color));
+        }
     }
 
     @Override
     public void setForeground(Color color) {
-        foreground = color;
-        ctx.setStrokeStyle("rgba(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + "," + color.getAlpha()/255f+")");
-
+        if (color != foreground) {
+            foreground = color;
+            ctx.setStrokeStyle(colorString(color));
+        }
     }
 
     @Override
     public void setFont(org.eclipse.swt.graphics.Font font) {
-        // FIXME
+        if (font != this.font) {
+            this.font = font;
+            FontData fontData = font.getFontData()[0];
+            StringBuilder sb = new StringBuilder();
+            int style = fontData.getStyle();
+            if ((style & SWT.ITALIC) != 0) {
+                sb.append("italic ");
+            }
+            if ((style & SWT.BOLD) != 0) {
+                sb.append("bold ");
+            }
+            sb.append(fontData.getHeight());
+            sb.append("px ");
+            sb.append(fontData.getName());
+            ctx.setFont(sb.toString());
+        }
     }
 
     @Override
     public void setLineWidth(int width) {
         if (width != lineWidth) {
-            // FIXME
+            this.lineWidth = width;
+            ctx.setLineWidth(width);
         }
     }
 
     public void setLineCap(int cap) {
         if (cap != lineCap) {
-// FIXME
+            this.lineCap = cap;
+            ctx.setLineCap(cap == SWT.CAP_ROUND ? "round" : cap == SWT.CAP_SQUARE ? "square" : "butt");
         }
     }
 
     public void setLineJoin(int join) {
         if (join != lineJoin) {
-            lineJoin = join;     // FIXME
+            lineJoin = join;
+            ctx.setLineJoin(join == SWT.JOIN_MITER ? "miter" : join == SWT.JOIN_ROUND ? "round" : "bevel");
         }
     }
 
     public Point stringExtent(String text) {
-        return new Point(Math.round((float) ctx.measureText(text)), 20);  // FIXME
+        return new Point(Math.round((float) ctx.measureText(text)), font == null ? 10 : font.getFontData()[0].getHeight());
     }
 
 }

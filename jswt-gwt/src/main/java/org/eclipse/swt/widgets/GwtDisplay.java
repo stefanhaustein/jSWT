@@ -13,7 +13,22 @@ import org.eclipse.swt.graphics.Rectangle;
 public class GwtDisplay extends PlatformDisplay {
 
     public static native void log(Object... args) /*-{
-        $wnd.console.log(args);
+        switch (args.length) {
+            case 1:
+                $wnd.console.log(args[0]);
+                break;
+            case 2:
+                $wnd.console.log(args[0], args[1]);
+                break;
+            case 3:
+                $wnd.console.log(args[0], args[1], args[2]);
+                break;
+            case 4:
+                $wnd.console.log(args[0], args[1], args[2], args[3]);
+                break;
+            default:
+                $wnd.console.log(args);
+        }
     }-*/;
 
     public void asyncExec(Runnable runnable) {
