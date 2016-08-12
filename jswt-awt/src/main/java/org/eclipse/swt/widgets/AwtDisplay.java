@@ -302,6 +302,18 @@ public class AwtDisplay extends PlatformDisplay {
   public void addListener(final Control control, final int eventType, Listener listener) {
     java.awt.Component component = (Component) control.peer;
     switch (eventType) {
+      case SWT.Modify:
+        if (component instanceof TextComponent) {
+          TextComponent textComponent = (TextComponent) component;
+          if (textComponent.getTextListeners().length == 0) {
+            textComponent.addTextListener(new TextListener() {
+              @Override
+              public void textValueChanged(TextEvent e) {
+                notifyListeners(control, SWT.Modify, e);
+              }
+            });
+          }
+        }
       case SWT.MouseWheel:
         if (component.getMouseWheelListeners().length == 0) {
           component.addMouseWheelListener(new java.awt.event.MouseWheelListener() {
