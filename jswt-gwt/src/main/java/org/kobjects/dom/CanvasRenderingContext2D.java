@@ -22,6 +22,10 @@ public final class CanvasRenderingContext2D extends JavaScriptObject {
         this.fillRect(x, y, width, height);
     }-*/;
 
+    public native void fillText(String s, int x, int y) /*-{
+        this.fillText(s, x, y);
+    }-*/;
+
     public native void lineTo(double x, double y) /*-{
         this.lineTo(x, y);
     }-*/;
@@ -34,8 +38,28 @@ public final class CanvasRenderingContext2D extends JavaScriptObject {
         this.fillStyle = style;
     }-*/;
 
+    public native void setFont(String s) /*-{
+        this.font = s;
+    }-*/;
+
+    public native void setLineCap(String cap) /*-{
+        this.lineCap = cap;
+    }-*/;
+
+    public native void setLineJoin(String join) /*-{
+        this.lineJoin = join;
+    }-*/;
+
+    public native void setLineWidth(double width) /*-{
+        this.lineWidth = width;
+    }-*/;
+
     public native void setStrokeStyle(String style) /*-{
         this.strokeStyle = style;
+    }-*/;
+
+    public native void setTextBaseline(String value) /*-{
+        this.textBaseline = value;
     }-*/;
 
     public native void stroke() /*-{
@@ -57,5 +81,4 @@ public final class CanvasRenderingContext2D extends JavaScriptObject {
     public native double measureText(String text) /*-{
         return this.measureText(text).width;
     }-*/;
-
 }

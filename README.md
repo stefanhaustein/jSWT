@@ -1,18 +1,23 @@
 # jSWT
 
-jSWT is a stab at a pure Java subset of SWT with Android, AWT and (planned) GWT bindings.
-It's not really in a useful state yet.
+jSWT is a stab at a pure Java subset of SWT with Android, AWT and GWT bindings.
+It's not really in a useful state yet. Main motivation for this is to get FlowGrid running
+on differnet platforms without re-implementing the UI.
+
+![Screenshot](https://raw.githubusercontent.com/stefanhaustein/jSWT/master/img/screenshot.png)
 
 ## Todo
 
-- Spinner, ComboBox, Progress bars, Sliders
+- Spinner, ComboBox, Progress bars
+- Missing methods
+- GWT events
 - Image support
-- Figure out how to support Android context menus (probably via item.getToolbar() and let AWT return null).
-- Figure out how to hide the toolbar on Android.
+- Android toolbar / GWT menu support 
 - Figure out how to support platform-style dialog buttons.
 
 ## Done
 
+- 2016-08-11 GWT GC improvements, slider
 - 2016-07-28 Improved ScrolledComposite handling
 - 2016-07-27 ScrollBar starting point
 - 2016-07-26 Turned demo into a stateful class, landscape / portrait adjustment

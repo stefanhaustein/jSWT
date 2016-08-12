@@ -12,8 +12,25 @@ import org.eclipse.swt.graphics.Rectangle;
 
 public class GwtDisplay extends PlatformDisplay {
 
+    static int id = 0;
+
     public static native void log(Object... args) /*-{
-        $wnd.console.log(args);
+        switch (args.length) {
+            case 1:
+                $wnd.console.log(args[0]);
+                break;
+            case 2:
+                $wnd.console.log(args[0], args[1]);
+                break;
+            case 3:
+                $wnd.console.log(args[0], args[1], args[2]);
+                break;
+            case 4:
+                $wnd.console.log(args[0], args[1], args[2], args[3]);
+                break;
+            default:
+                $wnd.console.log(args);
+        }
     }-*/;
 
     public void asyncExec(Runnable runnable) {
@@ -52,17 +69,36 @@ public class GwtDisplay extends PlatformDisplay {
                 Element span = Document.get().createElement("span");
                 result.appendChild(input);
                 result.appendChild(span);
-                input.setAttribute("type", (control.style & SWT.RADIO) != 0 ? "radio" : "checkbox");
+                String inputId = "i" + GwtDisplay.id++;
+                result.setAttribute("for", inputId);
+                input.setAttribute("id", inputId);
+                if ((control.style & SWT.RADIO) != 0) {
+                    input.setAttribute("type", "radio");
+                //    result.setAttribute("class", "mdl-radio mdl-js-radio mdl-js-ripple-effect");
+                 //   input.setAttribute("class", "mdl-radio__button");
+                 //   span.setAttribute("class", "mdl-radio__label");
+                } else {
+                    input.setAttribute("type", "checkbox");
+                  //  result.setAttribute("class", "mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect");
+                  //  input.setAttribute("class", "mdl-checkbox__input");
+                  //  span.setAttribute("class", "mdl-checkbox__label");
+                }
                 return result;
             }
             Element button = Document.get().createElement("button");
-            button.setAttribute("class",
-                    "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent");
+         //   button.setAttribute("class",
+          //          "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent");
             return button;
+        }
+        if (control instanceof Slider) {
+            Element result = Document.get().createElement("input");
+        //    result.setAttribute("class", "mdl-slider mdl-js-slider");
+            result.setAttribute("type", "range");
+            return result;
         }
         if (control instanceof Shell) {
             Element shell = Document.get().createElement("div");
-            shell.setAttribute("style", "width:100%;max-width:1024px;background-color:#eee;min-height:100vh;margin:auto;position:relative");
+            shell.setAttribute("style", "width:100%;background-color:#eee;min-height:100vh;margin:auto;position:relative");
          //   Document.get().getBody().setAttribute("style", "min-height:100%");
          //   Document.get().getBody().getParentElement().setAttribute("style", "height:100%");
             Document.get().getBody().appendChild(shell);

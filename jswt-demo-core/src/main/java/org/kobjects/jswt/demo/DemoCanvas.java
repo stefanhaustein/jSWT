@@ -55,7 +55,6 @@ public class DemoCanvas extends Canvas {
 
         int m = bounds.width > bounds.height ? bounds.height : bounds.width;
 
-
         int step = Math.max(1, m / 10);
         m = step * 10;
 
@@ -76,7 +75,7 @@ public class DemoCanvas extends Canvas {
         int dy = (bounds.height - m) / 2;
 
         gc.setBackground(white);
-        gc.fillRectangle(dx + step, dy + 5 * step, 8*step, 4*step);
+        gc.fillRectangle(dx + step, dy + step, 8*step, 8*step);
 
         int w = 8*step;
         for (int i = 0; i < w; i++) {
