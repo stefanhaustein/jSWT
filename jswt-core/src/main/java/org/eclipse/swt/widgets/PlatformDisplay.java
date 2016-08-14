@@ -22,11 +22,17 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract void disposeShell(Shell shell);
 
+  public abstract boolean getEnabled(Control control);
+
   public abstract Rectangle getBounds(Control control);
 
   public abstract Insets getInsets(Scrollable composite);
 
   public abstract boolean getSelection(Button button);
+
+  public abstract int getScrollBarSize(ScrolledComposite scrolledComposite, int orientation);
+
+  public abstract int getSelection(Control control);
 
   public abstract String getText(Control control);
 
@@ -34,23 +40,29 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract void pack(Shell shell);
 
+  public abstract void redraw(Control control, int x, int y, int w, int h, boolean all);
+
   public abstract void removeChild(Composite composite, Control child);
 
   public abstract void setBounds(Control control, int x, int y, int width, int height);
 
-  public abstract void setText(Control control, String text);
-
   public abstract void setMeasuredSize(Control control, int width, int height);
 
+  public abstract void setRange(Control control, int minimum, int maximum);
+
+  public abstract void setSliderProperties(Control control, int thumb, int increment, int pageIncrement);
+
   public abstract void setSelection(Button button, boolean selected);
+
+  public abstract void setSelection(Control control, int selection);
+
+  public abstract void setText(Control control, String text);
 
   public abstract void showPopupMenu(Menu menu);
 
   public abstract void updateMenuBar(Decorations decorations);
 
-  public abstract int getScrollBarSize(ScrolledComposite scrolledComposite, int orientation);
 
-  public abstract void redraw(Control control, int x, int y, int w, int h, boolean all);
 
 
   public static class Insets {

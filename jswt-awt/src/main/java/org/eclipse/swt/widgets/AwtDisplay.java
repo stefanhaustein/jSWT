@@ -54,7 +54,7 @@ public class AwtDisplay extends PlatformDisplay {
     if (control instanceof Text) {
       return new java.awt.TextField();
     }
-    if (control instanceof Slider) {
+    if (control instanceof Slider || control instanceof Scale) {
       return new java.awt.Scrollbar((control.style & SWT.VERTICAL) != 0 ?
               java.awt.Scrollbar.VERTICAL : java.awt.Scrollbar.HORIZONTAL);
     }
@@ -113,16 +113,14 @@ public class AwtDisplay extends PlatformDisplay {
   }
 
   @Override
-  public void disposeShell(Shell shell) {
-    ((Window) shell.peer).setVisible(false);
+  public Point computeSize(Control control, int wHint, int hHint, boolean changed) {
+    Dimension d = ((Component) control.peer).getPreferredSize();
+    return new Point(wHint == SWT.DEFAULT ? d.width : wHint, hHint == SWT.DEFAULT ? d.height : hHint);
   }
 
   @Override
-  public void openShell(Shell shell) {
-    if (shell.parent == null) {
-      activeShells++;
-    }
-    ((java.awt.Component) shell.peer).setVisible(true);
+  public void disposeShell(Shell shell) {
+    ((Window) shell.peer).setVisible(false);
   }
 
   @Override
@@ -134,20 +132,8 @@ public class AwtDisplay extends PlatformDisplay {
   }
 
   @Override
-  public Point computeSize(Control control, int wHint, int hHint, boolean changed) {
-    Dimension d = ((Component) control.peer).getPreferredSize();
-    return new Point(wHint == SWT.DEFAULT ? d.width : wHint, hHint == SWT.DEFAULT ? d.height : hHint);
-  }
-
-  @Override
-  public void setBounds(Control control, int x, int y, int width, int height) {
-    Component component = ((Component) control.peer);
-    component.setBounds(x, y, width, height);
-    if (component.getParent() instanceof ScrollPane) {
-      component.getParent().doLayout();
-    }
-
-
+  public boolean getEnabled(Control control) {
+    return ((java.awt.Component) control.peer).isEnabled();
   }
 
   @Override
@@ -176,25 +162,6 @@ public class AwtDisplay extends PlatformDisplay {
     return "";
   }
 
-  @Override
-  public void setText(Control control, String text) {
-    Object peer = control.peer;
-    if (peer instanceof java.awt.TextComponent) {
-      ((java.awt.TextComponent) peer).setText(text);
-    } else if (peer instanceof java.awt.Button) {
-      ((java.awt.Button) peer).setLabel(text);
-    } else if (peer instanceof java.awt.Label) {
-      ((java.awt.Label) peer).setText(text);
-    } else if (peer instanceof java.awt.Frame) {
-      ((java.awt.Frame) peer).setTitle(text);
-    } else if (peer instanceof java.awt.Dialog) {
-      ((java.awt.Dialog) peer).setTitle(text);
-    } else if (peer instanceof java.awt.Checkbox) {
-      ((java.awt.Checkbox) peer).setLabel(text);
-    }
-
-  }
-
   private void menuAddAll(Menu source, java.awt.Menu destination) {
     for (int i = 0; i < source.getItemCount(); i++) {
       final MenuItem item = source.getItem(i);
@@ -211,6 +178,41 @@ public class AwtDisplay extends PlatformDisplay {
         java.awt.Menu awtMenu = new java.awt.Menu(item.text);
         menuAddAll(item.subMenu, awtMenu);
       }
+    }
+  }
+
+  @Override
+  public void openShell(Shell shell) {
+    if (shell.parent == null) {
+      activeShells++;
+    }
+    ((java.awt.Component) shell.peer).setVisible(true);
+  }
+
+  @Override
+  public void setBounds(Control control, int x, int y, int width, int height) {
+    Component component = ((Component) control.peer);
+    component.setBounds(x, y, width, height);
+    if (component.getParent() instanceof ScrollPane) {
+      component.getParent().doLayout();
+    }
+  }
+
+  @Override
+  public void setText(Control control, String text) {
+    Object peer = control.peer;
+    if (peer instanceof java.awt.TextComponent) {
+      ((java.awt.TextComponent) peer).setText(text);
+    } else if (peer instanceof java.awt.Button) {
+      ((java.awt.Button) peer).setLabel(text);
+    } else if (peer instanceof java.awt.Label) {
+      ((java.awt.Label) peer).setText(text);
+    } else if (peer instanceof java.awt.Frame) {
+      ((java.awt.Frame) peer).setTitle(text);
+    } else if (peer instanceof java.awt.Dialog) {
+      ((java.awt.Dialog) peer).setTitle(text);
+    } else if (peer instanceof java.awt.Checkbox) {
+      ((java.awt.Checkbox) peer).setLabel(text);
     }
   }
 
@@ -235,9 +237,45 @@ public class AwtDisplay extends PlatformDisplay {
   }
 
   @Override
+  public void setRange(Control control, int minimum, int maximum) {
+    Component component = (Component) control.peer;
+    if (component instanceof java.awt.Scrollbar) {
+
+      // Add one to account for the thumb size.
+      if (control instanceof Scale) {
+        maximum++;
+      }
+
+      java.awt.Scrollbar scrollbar = (java.awt.Scrollbar) component;
+      scrollbar.setMinimum(minimum);
+      scrollbar.setMaximum(maximum);
+    }
+  }
+
+  @Override
   public void setSelection(Button button, boolean selected) {
     if (button.peer instanceof Checkbox) {
         ((Checkbox) button.peer).setState(selected);
+    }
+  }
+
+  @Override
+  public void setSliderProperties(Control slider, int thumb, int increment, int pageIncrement) {
+    java.awt.Scrollbar scrollbar = (java.awt.Scrollbar) slider.peer;
+    scrollbar.setUnitIncrement(increment);
+    scrollbar.setBlockIncrement(pageIncrement);
+    scrollbar.setVisibleAmount(thumb);
+  }
+
+  @Override
+  public void setSelection(Control control, int selection) {
+    java.awt.Component component = (Component) control.peer;
+    if (component instanceof java.awt.Scrollbar) {
+      java.awt.Scrollbar scrollbar = (java.awt.Scrollbar) component;
+      if (scrollbar.getOrientation() == Scrollbar.VERTICAL && control instanceof Scale) {
+        selection = scrollbar.getMaximum() - 1 - (selection - scrollbar.getMinimum());
+      }
+      scrollbar.setValue(selection);
     }
   }
 
@@ -257,6 +295,20 @@ public class AwtDisplay extends PlatformDisplay {
   public int getScrollBarSize(ScrolledComposite scrolledComposite, int orientation) {
     ScrollPane scrollPane = (ScrollPane) ((Composite) scrolledComposite).peer;
     return orientation == SWT.HORIZONTAL ? scrollPane.getHScrollbarHeight() : scrollPane.getVScrollbarWidth();
+  }
+
+  @Override
+  public int getSelection(Control control) {
+    java.awt.Component component = (java.awt.Component) control.peer;
+    if (component instanceof java.awt.Scrollbar) {
+      java.awt.Scrollbar scrollbar = (java.awt.Scrollbar) component;
+      int selection = scrollbar.getValue();
+      if (scrollbar.getOrientation() == Scrollbar.VERTICAL && control instanceof Scale) {
+        selection = scrollbar.getMaximum() - 1 - (selection - scrollbar.getMinimum());
+      }
+      return selection;
+    }
+    return 0;
   }
 
   @Override
@@ -409,6 +461,16 @@ public class AwtDisplay extends PlatformDisplay {
             button.addActionListener(new ActionListener() {
               @Override
               public void actionPerformed(ActionEvent e) {
+                notifyListeners(control, SWT.Selection, e);
+              }
+            });
+          }
+        } else if (component instanceof java.awt.Scrollbar) {
+          java.awt.Scrollbar scrollbar = (java.awt.Scrollbar) component;
+          if (scrollbar.getAdjustmentListeners().length == 0) {
+            scrollbar.addAdjustmentListener(new AdjustmentListener() {
+              @Override
+              public void adjustmentValueChanged(AdjustmentEvent e) {
                 notifyListeners(control, SWT.Selection, e);
               }
             });

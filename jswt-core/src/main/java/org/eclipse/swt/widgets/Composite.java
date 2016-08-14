@@ -63,6 +63,7 @@ public class Composite extends Scrollable {
     }
   }
 
+  @Override
   public Point computeSize(int wHint, int hHint, boolean changed) {
     checkWidget ();
     //display.runSkin();

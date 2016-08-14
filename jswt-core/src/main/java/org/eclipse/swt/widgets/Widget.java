@@ -140,4 +140,16 @@ public abstract class Widget {
 
     void releaseWidget () {
     }
+
+    void removeListener(int eventType, Listener listener) {
+        if (listeners != null) {
+            listeners.unhook(eventType, listener);
+        }
+    }
+
+    void removeListener(int eventType, SWTEventListener listener) {
+        if (listeners != null) {
+            listeners.unhook(eventType, listener);
+        }
+    }
 }
