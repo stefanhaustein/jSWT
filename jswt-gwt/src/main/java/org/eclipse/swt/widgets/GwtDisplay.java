@@ -117,6 +117,11 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
+    public boolean getEnabled(Control control) {
+        return true;
+    }
+
+    @Override
     public Rectangle getBounds(Control control) {
         JsArrayNumber bounds = Elements.getBounds((Element) control.peer);
         return new Rectangle(
@@ -197,7 +202,22 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
+    public void setRange(Control control, int minimum, int maximum) {
+
+    }
+
+    @Override
+    public void setSliderProperties(Control control, int thumb, int increment, int pageIncrement) {
+
+    }
+
+    @Override
     public void setSelection(Button button, boolean b) {
+
+    }
+
+    @Override
+    public void setSelection(Control control, int selection) {
 
     }
 
@@ -213,6 +233,11 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public int getScrollBarSize(ScrolledComposite scrolledComposite, int i) {
+        return 0;
+    }
+
+    @Override
+    public int getSelection(Control control) {
         return 0;
     }
 

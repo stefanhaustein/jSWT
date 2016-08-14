@@ -128,6 +128,11 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
+  public boolean getEnabled(Control control) {
+    return true;                                 // FIXME
+  }
+
+  @Override
   public void openShell(Shell shell) {
     SwtShellView view = (SwtShellView) shell.peer;
     if (view.dialogBuilder != null) {
@@ -297,12 +302,27 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
+  public void setRange(Control control, int minimum, int maximum) {
+
+  }
+
+  @Override
+  public void setSliderProperties(Control control, int thumb, int increment, int pageIncrement) {
+
+  }
+
+  @Override
   public void setSelection(Button button, boolean selected) {
     if (!(button.peer instanceof CompoundButton)) {
       return;
     }
     handleRadioGroup(button, selected);
     ((CompoundButton) button.peer).setChecked(selected);
+  }
+
+  @Override
+  public void setSelection(Control control, int selection) {
+
   }
 
   @Override
@@ -322,6 +342,11 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public int getScrollBarSize(ScrolledComposite scrolledComposite, int orientation) {
+    return 0;
+  }
+
+  @Override
+  public int getSelection(Control control) {
     return 0;
   }
 
