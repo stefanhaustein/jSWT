@@ -25,4 +25,7 @@ public class Font extends Resource {
         }
         return result;
     }
+
+    public void dispose() {
+    }
 }
