@@ -1,13 +1,13 @@
-package org.kobjects.jswt.demo.awt;
+package org.kobjects.jswt.demo.swing;
 
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.AwtDisplay;
+import org.eclipse.swt.widgets.SwingDisplay;
 
 import org.kobjects.jswt.demo.JswtDemo;
 
-public class AwtDemo {
+public class SwingDemo {
   public static void main(String[] args) {
-    Display display = new AwtDisplay();
+    Display display = new SwingDisplay();
     new JswtDemo(display);
 
   }

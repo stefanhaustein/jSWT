@@ -6,11 +6,11 @@ import org.eclipse.swt.graphics.Point;
 
 import java.awt.*;
 
-public class SwtLayoutManager implements LayoutManager {
+public class SwingSwtLayoutManager implements LayoutManager {
 
   org.eclipse.swt.widgets.Composite swtComposite;
 
-  SwtLayoutManager(org.eclipse.swt.widgets.Composite swtComposite) {
+  SwingSwtLayoutManager(org.eclipse.swt.widgets.Composite swtComposite) {
     this.swtComposite = swtComposite;
   }
 

@@ -10,7 +10,7 @@ import org.eclipse.swt.graphics.Color;
 import java.awt.*;
 
 
-class AwtGC extends GC {
+class SwingGC extends GC {
     final java.awt.Graphics2D graphics;
     Color foreground;
     Color background;
@@ -20,7 +20,7 @@ class AwtGC extends GC {
     int lineJoin = SWT.JOIN_BEVEL;
     int lineWidth = 1;
 
-    AwtGC(java.awt.Graphics2D graphics) {
+    SwingGC(java.awt.Graphics2D graphics) {
         super(null);
         this.graphics = graphics;
     }

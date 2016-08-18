@@ -17,7 +17,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
-import javax.swing.JRootPane;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -25,13 +24,10 @@ import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import java.awt.AWTEvent;
 import java.awt.CheckboxGroup;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.MenuContainer;
-import java.awt.TextComponent;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -42,13 +38,11 @@ import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.event.TextEvent;
-import java.awt.event.TextListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.HashMap;
 
-public class AwtDisplay extends PlatformDisplay {
+public class SwingDisplay extends PlatformDisplay {
   int activeShells = 0;
 
   HashMap<Widget, CheckboxGroup> checkBoxGroupMap = new HashMap<>();
@@ -99,7 +93,7 @@ public class AwtDisplay extends PlatformDisplay {
         window = new javax.swing.JFrame();
       }
       Container contentPane = ((RootPaneContainer) window).getContentPane();
-      contentPane.setLayout(new SwtLayoutManager((Composite) control));
+      contentPane.setLayout(new SwingSwtLayoutManager((Composite) control));
       window.addWindowListener(new WindowAdapter() {
         @Override
         public void windowClosing(WindowEvent e) {
@@ -126,10 +120,10 @@ public class AwtDisplay extends PlatformDisplay {
     }
     // Must be last because many components inherit from Composite / Canvas
     if (control instanceof Canvas) {
-      return new SwtCanvas((Canvas) control);
+      return new SwingSwtCanvas((Canvas) control);
     }
     if (control instanceof Composite) {
-      return new JPanel(new SwtLayoutManager((Composite) control));
+      return new JPanel(new SwingSwtLayoutManager((Composite) control));
     }
     throw new RuntimeException("Unrecognized component: " + control);
   }
