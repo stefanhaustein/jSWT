@@ -28,7 +28,9 @@ public class Shell extends Decorations {
     this.peer = this.display.createControl(this);
   }
 
-
+  ControlType getControlType() {
+    return parent == null ? ControlType.SHELL_ROOT : ControlType.SHELL_DIALOG;
+  }
 
   public void open() {
     display.openShell(this);

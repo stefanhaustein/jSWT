@@ -102,10 +102,6 @@ public abstract class Widget {
         state |= DISPOSED;
     }
 
-    // Called from dispose
-    void removeChild(Widget widget) {
-    }
-
     public void error(int code) {
         SWT.error(code);
     }
@@ -139,6 +135,10 @@ public abstract class Widget {
     }
 
     void releaseWidget () {
+    }
+
+    // Called from dispose
+    void removeChild(Widget widget) {
     }
 
     void removeListener(int eventType, Listener listener) {

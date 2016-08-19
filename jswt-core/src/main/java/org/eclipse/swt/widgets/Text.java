@@ -12,6 +12,10 @@ public class Text extends Control {
     addListener(SWT.Modify, new TypedListener(modifyListener));
   }
 
+  ControlType getControlType() {
+    return ControlType.TEXT;
+  }
+
   public String getText() {
     return display.getText(this);
   }

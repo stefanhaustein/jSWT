@@ -11,6 +11,18 @@ import org.eclipse.swt.graphics.Rectangle;
 
 public class Control extends Widget {
 
+  enum ControlType {
+    BUTTON_CHECKBOY, BUTTON_PUSH, BUTTON_RADIO,
+    CANVAS,
+    COMPOSITE,
+    LABEL,
+    SCALE,
+    SHELL_ROOT, SHELL_DIALOG,
+    SLIDER,
+    TEXT, SCROLLED_COMPOSITE,
+  }
+
+
   Object layoutData;
   Object peer;
 
@@ -62,6 +74,10 @@ public class Control extends Widget {
     display.setMeasuredSize(this, size.x, size.y);
     System.out.println(this + ".computeSize(" + wHint + ", " + hHint + "): " + size);
     return size;
+  }
+
+  ControlType getControlType() {
+    throw new RuntimeException("Abstract");
   }
 
   public int getBorderWidth() {

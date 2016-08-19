@@ -9,7 +9,12 @@ public class Label extends Control {
     return display.getText(this);
   }
 
-  public void setText(String text) {
+  ControlType getControlType() {
+    return ControlType.LABEL;
+  }
+
+
+    public void setText(String text) {
     display.setText(this, text);
   }
 }

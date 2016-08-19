@@ -12,6 +12,16 @@ public class Button extends Control {
     addListener(SWT.Selection, new TypedListener(listener));
   }
 
+  ControlType getControlType() {
+    if ((style & SWT.CHECK) != 0) {
+      return ControlType.BUTTON_CHECKBOY;
+    }
+    if ((style & SWT.RADIO) != 0) {
+      return ControlType.BUTTON_RADIO;
+    }
+    return ControlType.BUTTON_PUSH;
+  }
+
   public boolean getSelection() {
     return display.getSelection(this);
   }

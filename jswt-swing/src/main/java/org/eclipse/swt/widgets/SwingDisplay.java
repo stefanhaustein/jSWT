@@ -5,6 +5,7 @@ import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
+import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -19,6 +20,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
+import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
@@ -48,95 +50,94 @@ public class SwingDisplay extends PlatformDisplay {
   HashMap<Widget, CheckboxGroup> checkBoxGroupMap = new HashMap<>();
 
   @Override
+  public void addChild(Composite parent, Control control) {
+    if (parent instanceof ScrolledComposite) {
+      ((javax.swing.JScrollPane) parent.peer).setViewportView((Component) control.peer);
+    } else {
+      ((java.awt.Container) parent.peer).add((java.awt.Component) control.peer);
+    }
+  }
+
+  @Override
   public void asyncExec(Runnable runnable) {
     SwingUtilities.invokeLater(runnable);
   }
 
   @Override
   public Object createControl(final Control control) {
-    if (control instanceof Button) {
-      switch (control.style) {
-        case SWT.CHECK:
-          return new JCheckBox();
-        case SWT.RADIO: {/*
-          CheckboxGroup group = checkBoxGroupMap.get(control.parent);
-          if (group == null) {
-            group = new CheckboxGroup();
-            checkBoxGroupMap.put(control.parent, group);
-          }*/
-          return new JRadioButton();
+    switch (control.getControlType()) {
+      case BUTTON_CHECKBOY:
+        return new JCheckBox();
+      case BUTTON_RADIO:
+        return new JRadioButton();
+      case BUTTON_PUSH:
+        return new JButton();
+      case CANVAS:
+        return new SwingSwtCanvas((Canvas) control);
+      case COMPOSITE:
+        return new JPanel(new SwingSwtLayoutManager((Composite) control));
+      case LABEL:
+        return new javax.swing.JLabel();
+      case TEXT:
+        return new javax.swing.JTextField();
+      case SLIDER:
+        return new javax.swing.JScrollBar((control.style & SWT.VERTICAL) != 0 ?
+                javax.swing.JScrollBar.VERTICAL : javax.swing.JScrollBar.HORIZONTAL);
+      case SCALE:
+        return new javax.swing.JSlider((control.style & SWT.VERTICAL) != 0 ?
+                javax.swing.JScrollBar.VERTICAL : javax.swing.JScrollBar.HORIZONTAL);
+      case SCROLLED_COMPOSITE:
+        return new javax.swing.JScrollPane();
+      case SHELL_DIALOG:
+      case SHELL_ROOT: {
+        Shell shell = (Shell) control;
+        java.awt.Window window;
+        if (shell.parent != null) {
+          boolean modal = (shell.style & (SWT.APPLICATION_MODAL | SWT.SYSTEM_MODAL | SWT.PRIMARY_MODAL)) != 0;
+          window = new javax.swing.JDialog((javax.swing.JFrame) SwingUtilities.getRoot((Component) ((Shell) shell.parent).peer), modal);
+        } else {
+          window = new javax.swing.JFrame();
         }
-        default:
-          return new JButton();
-      }
-    }
-    if (control instanceof Label) {
-      return new javax.swing.JLabel();
-    }
-    if (control instanceof Text) {
-      return new javax.swing.JTextField();
-    }
-    if (control instanceof Slider || control instanceof Scale) {
-      return new javax.swing.JScrollBar((control.style & SWT.VERTICAL) != 0 ?
-              javax.swing.JScrollBar.VERTICAL : javax.swing.JScrollBar.HORIZONTAL);
-    }
-    if (control instanceof ScrolledComposite) {
-      return new javax.swing.JScrollPane();
-    }
-    if (control instanceof Shell) {
-      Shell shell = (Shell) control;
-      java.awt.Window window;
-      if (shell.parent != null) {
-        boolean modal = (shell.style & (SWT.APPLICATION_MODAL | SWT.SYSTEM_MODAL | SWT.PRIMARY_MODAL)) != 0;
-        window = new javax.swing.JDialog((javax.swing.JFrame) SwingUtilities.getRoot((Component) ((Shell) shell.parent).peer), modal);
-      } else {
-        window = new javax.swing.JFrame();
-      }
-      Container contentPane = ((RootPaneContainer) window).getContentPane();
-      contentPane.setLayout(new SwingSwtLayoutManager((Composite) control));
-      window.addWindowListener(new WindowAdapter() {
-        @Override
-        public void windowClosing(WindowEvent e) {
-          window.setVisible(false);
-          // Hack...
-          if (shell.parent == null) {
-            activeShells--;
-            new Thread(new Runnable() {
-              @Override
-              public void run() {
-                try {
-                  Thread.sleep(1000);
-                } catch (InterruptedException e) {
+        Container contentPane = ((RootPaneContainer) window).getContentPane();
+        contentPane.setLayout(new SwingSwtLayoutManager((Composite) control));
+        window.addWindowListener(new WindowAdapter() {
+          @Override
+          public void windowClosing(WindowEvent e) {
+            window.setVisible(false);
+            // Hack...
+            if (shell.parent == null) {
+              activeShells--;
+              new Thread(new Runnable() {
+                @Override
+                public void run() {
+                  try {
+                    Thread.sleep(1000);
+                  } catch (InterruptedException e) {
+                  }
+                  if (activeShells == 0) {
+                    System.exit(0);
+                  }
                 }
-                if (activeShells == 0) {
-                  System.exit(0);
-                }
-              }
-            }).start();
+              }).start();
+            }
           }
-        }
-      });
-      return contentPane;
+        });
+        return contentPane;
+      }
+      default:
+        throw new RuntimeException("Unrecognized component: " + control);
     }
-    // Must be last because many components inherit from Composite / Canvas
-    if (control instanceof Canvas) {
-      return new SwingSwtCanvas((Canvas) control);
-    }
-    if (control instanceof Composite) {
-      return new JPanel(new SwingSwtLayoutManager((Composite) control));
-    }
-    throw new RuntimeException("Unrecognized component: " + control);
   }
 
   @Override
   public Point computeSize(Control control, int wHint, int hHint, boolean changed) {
-    Dimension d = ((JComponent) control.peer).getPreferredSize();
+    Dimension d = ((Component) control.peer).getPreferredSize();
     return new Point(wHint == SWT.DEFAULT ? d.width : wHint, hHint == SWT.DEFAULT ? d.height : hHint);
   }
 
   @Override
   public void disposeShell(Shell shell) {
-    ((Window) shell.peer).setVisible(false);
+    SwingUtilities.getRoot((Component) shell.peer).setVisible(false);
   }
 
   @Override
@@ -159,23 +160,24 @@ public class SwingDisplay extends PlatformDisplay {
 
   @Override
   public String getText(Control control) {
-    Object peer = control.peer;
-    if (peer instanceof JTextField) {
-      return ((JTextField) peer).getText();
+    Component peer = (Component) control.peer;
+    switch (control.getControlType()) {
+      case BUTTON_CHECKBOY:
+      case BUTTON_PUSH:
+      case BUTTON_RADIO:
+        return ((AbstractButton) peer).getText();
+      case LABEL:
+        return ((JLabel) peer).getText();
+      case SHELL_DIALOG:
+        return ((JDialog) SwingUtilities.getRoot(peer)).getTitle();
+      case SHELL_ROOT:
+        return ((JFrame) SwingUtilities.getRoot(peer)).getTitle();
+      case TEXT:
+        return ((JTextField) peer).getText();
+      default:
+        System.err.println(control.getControlType() + ".getText()");
+        return "";
     }
-    if (peer instanceof JButton) {
-      return ((JButton) peer).getText();
-    }
-    if (peer instanceof JLabel) {
-      return ((JLabel) peer).getText();
-    }
-    if (peer instanceof Window) {
-      return ((Window) peer).getName();
-    }
-    if (peer instanceof JCheckBox) {
-      return ((JCheckBox) peer).getText();
-    }
-    return "";
   }
 
   private void menuAddAll(Menu source, JMenu destination) {
@@ -239,35 +241,26 @@ public class SwingDisplay extends PlatformDisplay {
 
   @Override
   public void setText(Control control, String text) {
-    Object peer = control.peer;
-    if (peer instanceof JTextField) {
-      ((JTextField) peer).setText(text);
-    } else if (peer instanceof JButton) {
-      ((JButton) peer).setText(text);
-    } else if (peer instanceof JLabel) {
-      ((JLabel) peer).setText(text);
-    } else if (peer instanceof JFrame) {
-      ((JFrame) peer).setTitle(text);
-    } else if (peer instanceof JDialog) {
-      ((JDialog) peer).setTitle(text);
-    } else if (peer instanceof JCheckBox) {
-      ((JCheckBox) peer).setText(text);
+    Component peer = (Component) control.peer;
+    switch (control.getControlType()) {
+      case TEXT:
+        ((JTextField) peer).setText(text);
+        break;
+      case BUTTON_CHECKBOY:
+      case BUTTON_PUSH:
+      case BUTTON_RADIO:
+        ((AbstractButton) peer).setText(text);
+        break;
+      case LABEL:
+        ((JLabel) peer).setText(text);
+        break;
+      case SHELL_ROOT:
+        ((JFrame) SwingUtilities.getRoot(peer)).setTitle(text);
+        break;
+      case SHELL_DIALOG:
+        ((JDialog) SwingUtilities.getRoot(peer)).setTitle(text);
+        break;
     }
-  }
-
-  @Override
-  public void updateMenuBar(Decorations decorations) {
-    JMenuBar awtMenuBar = new JMenuBar();
-
-    for (int i = 0; i < decorations.menuBar.getItemCount(); i++) {
-      MenuItem item = decorations.menuBar.getItem(i);
-      JMenu awtSubMenu = new JMenu(item.text);
-      awtMenuBar.add(awtSubMenu);
-      if (item.subMenu != null) {
-        menuAddAll(item.subMenu, awtSubMenu);
-      }
-    }
-    ((JFrame) SwingUtilities.getRoot((Component) decorations.peer)).setJMenuBar(awtMenuBar);
   }
 
   @Override
@@ -277,33 +270,47 @@ public class SwingDisplay extends PlatformDisplay {
 
   @Override
   public void setRange(Control control, int minimum, int maximum) {
-    JComponent component = (JComponent) control.peer;
-    if (component instanceof JScrollBar) {
-
-      // Add one to account for the thumb size.
-      if (control instanceof Scale) {
-        maximum++;
+    switch (control.getControlType()) {
+      case SLIDER: {
+        JScrollBar scrollbar = (JScrollBar) control.peer;
+        scrollbar.setMinimum(minimum);
+        scrollbar.setMaximum(maximum);
+        break;
       }
-
-      JScrollBar scrollbar = (JScrollBar) component;
-      scrollbar.setMinimum(minimum);
-      scrollbar.setMaximum(maximum);
+      case SCALE: {
+        JSlider slider = (JSlider) control.peer;
+        slider.setMinimum(minimum);
+        slider.setMaximum(maximum);
+        break;
+      }
     }
   }
 
   @Override
   public void setSelection(Button button, boolean selected) {
-    if (button.peer instanceof JCheckBox) {
+    switch (button.getControlType()) {
+      case BUTTON_CHECKBOY:
         ((JCheckBox) button.peer).setSelected(selected);
+        break;
+      case BUTTON_RADIO:
+        ((JRadioButton) button.peer).setSelected(selected);
+        break;
+    }
+    if (button.peer instanceof JCheckBox) {
     }
   }
 
   @Override
   public void setSliderProperties(Control slider, int thumb, int increment, int pageIncrement) {
-    JScrollBar scrollbar = (JScrollBar) slider.peer;
-    scrollbar.setUnitIncrement(increment);
-    scrollbar.setBlockIncrement(pageIncrement);
-    scrollbar.setVisibleAmount(thumb);
+    if (slider.peer instanceof JScrollBar) {
+      JScrollBar scrollbar = (JScrollBar) slider.peer;
+      scrollbar.setUnitIncrement(increment);
+      scrollbar.setBlockIncrement(pageIncrement);
+      scrollbar.setVisibleAmount(thumb);
+    } /*else if (slider.peer instanceof JSlider) {
+      JSlider jSlider = (JSlider) slider.peer;
+      jSlider.set
+    }*/
   }
 
   @Override
@@ -311,11 +318,15 @@ public class SwingDisplay extends PlatformDisplay {
     Component component = (Component) control.peer;
     if (component instanceof JScrollBar) {
       JScrollBar scrollbar = (JScrollBar) component;
-      if (scrollbar.getOrientation() == JScrollBar.VERTICAL && control instanceof Scale) {
+   /*   if (scrollbar.getOrientation() == JScrollBar.VERTICAL && control instanceof Scale) {
         selection = scrollbar.getMaximum() - 1 - (selection - scrollbar.getMinimum());
-      }
+      }*/
       scrollbar.setValue(selection);
+    } else if (component instanceof JSlider) {
+      JSlider jslider = (JSlider) component;
+      jslider.setValue(selection);
     }
+
   }
 
   @Override
@@ -340,10 +351,13 @@ public class SwingDisplay extends PlatformDisplay {
     if (component instanceof JScrollBar) {
       JScrollBar scrollbar = (JScrollBar) component;
       int selection = scrollbar.getValue();
-      if (scrollbar.getOrientation() == JScrollBar.VERTICAL && control instanceof Scale) {
+     /* if (scrollbar.getOrientation() == JScrollBar.VERTICAL && control instanceof Scale) {
         selection = scrollbar.getMaximum() - 1 - (selection - scrollbar.getMinimum());
-      }
+      }*/
       return selection;
+    } else if (component instanceof JSlider) {
+      JSlider jslider = (JSlider) component;
+      return jslider.getValue();
     }
     return 0;
   }
@@ -365,13 +379,22 @@ public class SwingDisplay extends PlatformDisplay {
 
 
   @Override
-  public void addChild(Composite parent, Control control) {
-    if (parent instanceof ScrolledComposite) {
-      ((javax.swing.JScrollPane) parent.peer).setViewportView((Component) control.peer);
-    } else {
-      ((java.awt.Container) parent.peer).add((java.awt.Component) control.peer);
+  public void updateMenuBar(Decorations decorations) {
+    JMenuBar awtMenuBar = new JMenuBar();
+
+    for (int i = 0; i < decorations.menuBar.getItemCount(); i++) {
+      MenuItem item = decorations.menuBar.getItem(i);
+      JMenu awtSubMenu = new JMenu(item.text);
+      awtMenuBar.add(awtSubMenu);
+      if (item.subMenu != null) {
+        menuAddAll(item.subMenu, awtSubMenu);
+      }
     }
+    ((JFrame) SwingUtilities.getRoot((Component) decorations.peer)).setJMenuBar(awtMenuBar);
   }
+
+
+
 
   void notifyListeners(Control control, int type, Object awtEvent) {
       Event event = new Event();

@@ -20,6 +20,10 @@ public class Slider extends Control {
         addListener(SWT.Selection, new TypedListener(listener));
     }
 
+    ControlType getControlType() {
+        return ControlType.SLIDER;
+    }
+
     public boolean getEnabled() {
         return display.getEnabled(this);
     }
@@ -40,7 +44,9 @@ public class Slider extends Control {
         return display.getSelection(this);
     }
 
-    public int getThumb() {
+
+
+        public int getThumb() {
         return thumb;
     }
 

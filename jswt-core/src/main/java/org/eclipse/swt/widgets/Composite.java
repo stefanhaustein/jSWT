@@ -2,12 +2,15 @@ package org.eclipse.swt.widgets;
 
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
 import java.util.ArrayList;
 
 public class Composite extends Scrollable {
+
+
   static final Control[] EMPTY_CONTROL_ARRAY = {};
   Layout layout;
   ArrayList<Control> children = new ArrayList<>();
@@ -97,6 +100,9 @@ public class Composite extends Scrollable {
         children.toArray(new Control[children.size()]);
   }
 
+  ControlType getControlType() {
+    return this instanceof ScrolledComposite ? ControlType.SCROLLED_COMPOSITE : ControlType.COMPOSITE;
+  }
 
   public Control[] getChildren() {
     checkWidget();

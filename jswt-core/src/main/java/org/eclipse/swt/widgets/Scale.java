@@ -20,6 +20,10 @@ public class Scale extends Control {
         addListener(SWT.Selection, new TypedListener(listener));
     }
 
+    ControlType getControlType() {
+        return ControlType.SCALE;
+    }
+
     public boolean getEnabled() {
         return display.getEnabled(this);
     }
