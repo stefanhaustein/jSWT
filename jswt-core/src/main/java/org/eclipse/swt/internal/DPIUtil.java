@@ -81,14 +81,14 @@ public class DPIUtil {
 		}
 	}
 
-/**
+/*
  * Auto-scale down ImageData
- */
+ *
 public static ImageData autoScaleDown (Device device, final ImageData imageData) {
 	if (deviceZoom == 100 || imageData == null) return imageData;
 	float scaleFactor = 1.0f / getScalingFactor ();
 	return autoScaleImageData(device, imageData, scaleFactor);
-}
+}*/
 
 public static int[] autoScaleDown(int[] pointArray) {
 	if (deviceZoom == 100 || pointArray == null) return pointArray;
@@ -157,9 +157,9 @@ public static Rectangle autoScaleDown (Rectangle rect) {
 	return scaledRect;
 }
 
-/**
+/*
  * Auto-scale image with ImageData
- */
+ *
 public static ImageData autoScaleImageData (Device device, final ImageData imageData, int targetZoom, int currentZoom) {
 	if (deviceZoom == 100 || imageData == null || targetZoom == currentZoom) return imageData;
 	float scaleFactor = (float) targetZoom / (float) currentZoom;
@@ -181,7 +181,7 @@ private static ImageData autoScaleImageData (Device device, final ImageData imag
 			}
 		});
 
-		/* Create a 24 bit image data with alpha channel */
+		// Create a 24 bit image data with alpha channel
 		final ImageData resultData = new ImageData (scaledWidth, scaledHeight, 24, new PaletteData (0xFF, 0xFF00, 0xFF0000));
 		resultData.alphaData = new byte [scaledWidth * scaledHeight];
 
@@ -194,9 +194,9 @@ private static ImageData autoScaleImageData (Device device, final ImageData imag
 		GC gc = new GC (resultImage);
 		gc.setAntialias (SWT.ON);
 		gc.drawImage (original, 0, 0, DPIUtil.autoScaleDown (width), DPIUtil.autoScaleDown (height),
-				/* E.g. destWidth here is effectively DPIUtil.autoScaleDown (scaledWidth), but avoiding rounding errors.
-				 * Nevertheless, we still have some rounding errors due to the point-based API GC#drawImage(..).
-				 */
+				// E.g. destWidth here is effectively DPIUtil.autoScaleDown (scaledWidth), but avoiding rounding errors.
+				// Nevertheless, we still have some rounding errors due to the point-based API GC#drawImage(..).
+
 				0, 0, Math.round (DPIUtil.autoScaleDown ((float) width * scaleFactor)), Math.round (DPIUtil.autoScaleDown ((float) height * scaleFactor)));
 		gc.dispose ();
 		original.dispose ();
@@ -208,7 +208,7 @@ private static ImageData autoScaleImageData (Device device, final ImageData imag
 		return imageData.scaledTo (scaledWidth, scaledHeight);
 	}
 }
-
+*/
 /**
  * Returns a new rectangle as per the scaleFactor.
  */
@@ -223,14 +223,14 @@ public static Rectangle autoScaleBounds (Rectangle rect, int targetZoom, int cur
 	return returnRect;
 }
 
-/**
+/*
  * Auto-scale up ImageData
- */
+ *
 public static ImageData autoScaleUp (Device device, final ImageData imageData) {
 	if (deviceZoom == 100 || imageData == null) return imageData;
 	float scaleFactor = getScalingFactor ();
 	return autoScaleImageData(device, imageData, scaleFactor);
-}
+}*/
 
 public static int[] autoScaleUp(int[] pointArray) {
 	if (deviceZoom == 100 || pointArray == null) return pointArray;
@@ -303,35 +303,35 @@ public static int mapDPIToZoom (int dpi) {
 	int roundedZoom = (int) Math.round (zoom);
 	return roundedZoom;
 }
-/**
+/*
  * Gets Image data at specified zoom level, if image is missing then
  * fall-back to 100% image. If provider or fall-back image is not available,
  * throw error.
- */
+ *
 public static ImageData validateAndGetImageDataAtZoom (ImageDataProvider provider, int zoom, boolean[] found) {
 	if (provider == null) SWT.error (SWT.ERROR_NULL_ARGUMENT);
 	ImageData data = provider.getImageData (zoom);
 	found [0] = (data != null);
-	/* If image is null when (zoom != 100%), fall-back to image at 100% zoom */
+	// If image is null when (zoom != 100%), fall-back to image at 100% zoom
 	if (zoom != 100 && !found [0]) data = provider.getImageData (100);
 	if (data == null) SWT.error (SWT.ERROR_INVALID_ARGUMENT);
 	return data;
-}
+}*/
 
-/**
+/*
  * Gets Image file path at specified zoom level, if image is missing then
  * fall-back to 100% image. If provider or fall-back image is not available,
  * throw error.
- */
+ *
 public static String validateAndGetImagePathAtZoom (ImageFileNameProvider provider, int zoom, boolean[] found) {
 	if (provider == null) SWT.error (SWT.ERROR_NULL_ARGUMENT);
 	String filename = provider.getImagePath (zoom);
 	found [0] = (filename != null);
-	/* If image is null when (zoom != 100%), fall-back to image at 100% zoom */
+	// If image is null when (zoom != 100%), fall-back to image at 100% zoom
 	if (zoom != 100 && !found [0]) filename = provider.getImagePath (100);
 	if (filename == null) SWT.error (SWT.ERROR_INVALID_ARGUMENT);
 	return filename;
-}
+}*/
 
 public static int getDeviceZoom() {
 	return deviceZoom;
@@ -371,9 +371,9 @@ public static void setDeviceZoom (int nativeDeviceZoom) {
 	}
 }
 
-/**
+/*
  * AutoScale ImageDataProvider.
- */
+ *
 public static final class AutoScaleImageDataProvider implements ImageDataProvider {
 	Device device;
 	ImageData imageData;
@@ -387,5 +387,5 @@ public static final class AutoScaleImageDataProvider implements ImageDataProvide
 	public ImageData getImageData(int zoom) {
 		return DPIUtil.autoScaleImageData(device, imageData, zoom, currentZoom);
 	}
-}
+} */
 }

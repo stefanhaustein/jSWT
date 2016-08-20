@@ -1,28 +1,51 @@
 package org.eclipse.swt.widgets;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Color;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 
 class SwingGC extends GC {
     final java.awt.Graphics2D graphics;
-    Color foreground;
+    org.eclipse.swt.graphics.Color foreground;
     Color background;
     Color current;
+    Font font;
 
     int lineCap = SWT.CAP_FLAT;
     int lineJoin = SWT.JOIN_BEVEL;
     int lineWidth = 1;
 
-    SwingGC(java.awt.Graphics2D graphics) {
+    SwingGC(PlatformDisplay display, Graphics2D graphics) {
         super(null);
+        this.device = display;
         this.graphics = graphics;
+    }
+
+    public void drawImage(org.eclipse.swt.graphics.Image image, int x, int y) {
+        graphics.drawImage((BufferedImage) image.peer, x, y, null /* observer */);
+    }
+
+    public void drawImage(org.eclipse.swt.graphics.Image image, int srcX, int srcY, int srcWidth, int srcHeight, int dstX, int dstY, int dstWidth, int dstHeight) {
+/*
+        int dx1,
+        int dy1,
+        int dx2,
+        int dy2,
+        int sx1,
+        int sy1,
+        int sx2,
+        int sy2,
+  */
+        graphics.drawImage((BufferedImage) image.peer,
+                dstX, dstY, dstX + dstWidth, dstY + dstHeight,
+                srcX, srcY, srcX + srcWidth, srcY + srcHeight,  null);
     }
 
     @Override
@@ -92,6 +115,10 @@ class SwingGC extends GC {
         return background;
     }
 
+    public Font getFont() {
+        return font;
+    }
+
     @Override
     public Color getForeground() {
         return foreground;
@@ -118,9 +145,12 @@ class SwingGC extends GC {
 
     @Override
     public void setFont(Font font) {
-        FontData fd = font.getFontData()[0];
-        java.awt.Font awtFont = graphics.getFont().deriveFont((float) fd.getHeight());
-        graphics.setFont(awtFont);
+        if (font != this.font) {
+            this.font = font;
+            FontData fd = font.getFontData()[0];
+            java.awt.Font awtFont = graphics.getFont().deriveFont((float) fd.getHeight());
+            graphics.setFont(awtFont);
+        }
     }
 
     @Override

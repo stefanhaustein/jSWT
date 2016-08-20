@@ -2,12 +2,18 @@ package org.eclipse.swt.graphics;
 
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.PlatformDisplay;
 
-public class GC {
+
+public class GC extends Resource {
     int antialias;
     GC delegate;
 
     public GC(Image image) {
+        if (image != null) {
+            this.device = image.device;
+            this.delegate = ((PlatformDisplay) device).creatGCForPlatformImage(image.peer);
+        }
     }
 
 
@@ -18,9 +24,14 @@ public class GC {
         delegate.drawArc(x, y, width, height, startAngle, arcAngle);
     }
 
-    public void drawImage(Image original, int i, int i1, int i2, int i3, int i4, int i5, int round, int round1) {
-        delegate.drawImage(original, i, i1, i2, i3, i4, i5, round, round1);
+    public void drawImage(Image image, int x, int y) {
+        delegate.drawImage(image, x, y);
     }
+
+    public void drawImage(Image image, int srcX, int srcY, int srcWidth, int srcHeight, int destX, int destY, int destWidth, int destHeight) {
+        delegate.drawImage(image, srcX, srcY, srcWidth, srcHeight, destX, destY, destWidth, destHeight);
+    }
+
 
     public void drawLine(int x1, int y1, int x2, int y2) {
         delegate.drawLine(x1, y1, x2, y2);
@@ -108,6 +119,10 @@ public class GC {
 
     public Color getForeground() {
         return delegate.getForeground();
+    }
+
+    public Font getFont() {
+        return delegate.getFont();
     }
 
     public void setBackground(Color color) {

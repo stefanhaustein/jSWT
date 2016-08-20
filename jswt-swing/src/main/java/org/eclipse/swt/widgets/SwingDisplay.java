@@ -2,9 +2,11 @@ package org.eclipse.swt.widgets;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -42,6 +44,9 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 
 public class SwingDisplay extends PlatformDisplay {
@@ -130,6 +135,16 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
+  public Object createImage(int width, int height) {
+    return new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+  }
+
+  @Override
+  public GC creatGCForPlatformImage(Object platformImage) {
+    return new SwingGC(this, ((BufferedImage) platformImage).createGraphics());
+  }
+
+  @Override
   public Point computeSize(Control control, int wHint, int hHint, boolean changed) {
     Dimension d = ((Component) control.peer).getPreferredSize();
     return new Point(wHint == SWT.DEFAULT ? d.width : wHint, hHint == SWT.DEFAULT ? d.height : hHint);
@@ -146,6 +161,12 @@ public class SwingDisplay extends PlatformDisplay {
     ((java.awt.Component) control.peer).getBounds(rect);
 
     return new Rectangle(rect.x, rect.y, rect.width, rect.height);
+  }
+
+  @Override
+  public Rectangle getImageBounds(Object platformImage) {
+    BufferedImage image = (BufferedImage) platformImage;
+    return new Rectangle(0, 0, image.getWidth(), image.getHeight());
   }
 
   @Override
@@ -393,8 +414,10 @@ public class SwingDisplay extends PlatformDisplay {
     ((JFrame) SwingUtilities.getRoot((Component) decorations.peer)).setJMenuBar(awtMenuBar);
   }
 
-
-
+  @Override
+  public Object loadImage(InputStream stream) throws IOException {
+    return ImageIO.read(stream);
+  }
 
   void notifyListeners(Control control, int type, Object awtEvent) {
       Event event = new Event();

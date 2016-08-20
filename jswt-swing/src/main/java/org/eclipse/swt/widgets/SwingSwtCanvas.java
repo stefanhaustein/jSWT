@@ -28,7 +28,7 @@ public class SwingSwtCanvas extends JPanel {
             swtCanvas.drawBackground(new SwingGC((Graphics2D) buffer.getGraphics()), 0, 0, getWidth(), getHeight());
             g.drawImage(buffer, 0, 0, null);
         } else {*/
-            swtCanvas.drawBackground(new SwingGC((Graphics2D) g), 0, 0, getWidth(), getHeight());
+            swtCanvas.drawBackground(new SwingGC(swtCanvas.display, (Graphics2D) g), 0, 0, getWidth(), getHeight());
     //    }
   //      paintChildren(g);
     }

@@ -2,15 +2,16 @@ package org.eclipse.swt.widgets;
 
 
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.internal.SWTEventListener;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 public abstract class PlatformDisplay extends Display {
+
+  public static PlatformDisplay instance;  // For image loading.
 
   public abstract void addChild(Composite parent, Control control);
 
@@ -20,11 +21,17 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract Object createControl(Control control);
 
+  public abstract Object createImage(int width, int height);
+
+  public abstract GC creatGCForPlatformImage(Object platformImage);
+
   public abstract void disposeShell(Shell shell);
 
   public abstract boolean getEnabled(Control control);
 
   public abstract Rectangle getBounds(Control control);
+
+  public abstract Rectangle getImageBounds(Object platformImage);
 
   public abstract Insets getInsets(Scrollable composite);
 
@@ -35,6 +42,8 @@ public abstract class PlatformDisplay extends Display {
   public abstract int getSelection(Control control);
 
   public abstract String getText(Control control);
+
+  public abstract Object loadImage(InputStream stream) throws IOException;
 
   public abstract void openShell(Shell shell);
 
@@ -64,8 +73,7 @@ public abstract class PlatformDisplay extends Display {
 
 
 
-
-  public static class Insets {
+    public static class Insets {
     public int top;
     public int left;
     public int right;
