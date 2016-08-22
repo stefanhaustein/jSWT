@@ -4,10 +4,13 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
 
@@ -115,8 +118,17 @@ class SwingGC extends GC {
         return background;
     }
 
+    @Override
     public Font getFont() {
         return font;
+    }
+
+    @Override
+    public FontMetrics getFontMetrics() {
+        java.awt.FontMetrics awtMetrics = graphics.getFontMetrics();
+        FontMetrics result = new FontMetrics(awtMetrics.getAscent(), awtMetrics.getDescent(), awtMetrics.charWidth(' '), awtMetrics.getLeading(),
+                awtMetrics.getHeight());
+        return result;
     }
 
     @Override
@@ -176,7 +188,7 @@ class SwingGC extends GC {
     }
 
     public Point stringExtent(String string) {
-        FontMetrics metrics = graphics.getFontMetrics();
+        java.awt.FontMetrics metrics = graphics.getFontMetrics();
         return new Point(metrics.stringWidth(string), metrics.getHeight());
     }
 

@@ -5,6 +5,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.PlatformDisplay;
 
 
+
 public class GC extends Resource {
     int antialias;
     GC delegate;
@@ -125,6 +126,10 @@ public class GC extends Resource {
         return delegate.getFont();
     }
 
+    public FontMetrics getFontMetrics() {
+        return delegate.getFontMetrics();
+    }
+
     public void setBackground(Color color) {
         delegate.setBackground(color);
     }
@@ -156,5 +161,6 @@ public class GC extends Resource {
     public Point stringExtent(String text) {
         return delegate.stringExtent(text);
     }
+
 }
 
