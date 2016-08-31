@@ -114,6 +114,10 @@ public class GC extends Resource {
         delegate.fillRoundRectangle(x, y, width, height, arcWidth, arcHeight);
     }
 
+    public int getAlpha() {
+        return delegate.getAlpha();
+    }
+
     public Color getBackground() {
         return delegate.getBackground();
     }
@@ -128,6 +132,10 @@ public class GC extends Resource {
 
     public FontMetrics getFontMetrics() {
         return delegate.getFontMetrics();
+    }
+
+    public void setAlpha(int alpha) {
+        delegate.setAlpha(alpha);
     }
 
     public void setBackground(Color color) {

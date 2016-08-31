@@ -12,8 +12,11 @@ import android.widget.*;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+
+import java.io.InputStream;
 
 
 public class AndroidDisplay extends PlatformDisplay {
@@ -413,4 +416,13 @@ public class AndroidDisplay extends PlatformDisplay {
         break;
     }
   }
+
+  public Image createImage(int width, int height) {
+    throw new RuntimeException("NYI");
+  }
+
+  public Image loadImage(InputStream is) {
+    throw new RuntimeException("NYI");
+  }
+
 }

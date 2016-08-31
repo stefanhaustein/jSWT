@@ -8,6 +8,7 @@ import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -24,6 +25,7 @@ class SwingGC extends GC {
     int lineCap = SWT.CAP_FLAT;
     int lineJoin = SWT.JOIN_BEVEL;
     int lineWidth = 1;
+    int alpha = 255;
 
     SwingGC(PlatformDisplay display, Graphics2D graphics) {
         super(null);
@@ -114,6 +116,11 @@ class SwingGC extends GC {
     }
 
     @Override
+    public int getAlpha() {
+        return alpha;
+    }
+
+    @Override
     public Color getBackground() {
         return background;
     }
@@ -134,6 +141,14 @@ class SwingGC extends GC {
     @Override
     public Color getForeground() {
         return foreground;
+    }
+
+    @Override
+    public void setAlpha(int alpha) {
+        if (alpha != this.alpha) {
+            this.alpha = alpha;
+            graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha/255f));
+        }
     }
 
     @Override
@@ -211,7 +226,7 @@ class SwingGC extends GC {
     private void useForegroundColor() {
         if (foreground != current) {
             graphics.setColor(foreground == null ? java.awt.Color.BLACK
-                    : new java.awt.Color(foreground.getRed(), foreground.getGreen(), foreground.getBlue()));
+                    : new java.awt.Color(foreground.getRed(), foreground.getGreen(), foreground.getBlue(), foreground.getAlpha()));
             current = foreground;
         }
     }
