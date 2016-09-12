@@ -15,6 +15,8 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract void addChild(Composite parent, Control control);
 
+  public abstract void addTab(TabFolder tabFolder, int index, TabItem tabItem);
+
   public abstract void addListener(Control control, int eventType, Listener listener);
 
   public abstract Point computeSize(Control control, int wHint, int hHint, boolean changed);
@@ -71,9 +73,10 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract void updateMenuBar(Decorations decorations);
 
+  public abstract void updateTab(TabFolder tabFolder, int index, TabItem tabItem);
 
 
-    public static class Insets {
+  public static class Insets {
     public int top;
     public int left;
     public int right;

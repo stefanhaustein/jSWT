@@ -7,25 +7,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
 import javax.imageio.ImageIO;
-import javax.swing.AbstractButton;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.JTextField;
-import javax.swing.RootPaneContainer;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.CheckboxGroup;
@@ -58,9 +40,14 @@ public class SwingDisplay extends PlatformDisplay {
   public void addChild(Composite parent, Control control) {
     if (parent instanceof ScrolledComposite) {
       ((javax.swing.JScrollPane) parent.peer).setViewportView((Component) control.peer);
-    } else {
+    } else if (!(parent instanceof TabFolder)) {
       ((java.awt.Container) parent.peer).add((java.awt.Component) control.peer);
     }
+  }
+
+  @Override
+  public void addTab(TabFolder tabFolder, int index, TabItem tabItem) {
+    ((JTabbedPane) tabFolder.peer).add(new JPanel(), index);
   }
 
   @Override
@@ -129,6 +116,8 @@ public class SwingDisplay extends PlatformDisplay {
         });
         return contentPane;
       }
+      case TAB_FOLDER:
+        return new JTabbedPane();
       default:
         throw new RuntimeException("Unrecognized component: " + control);
     }
@@ -159,6 +148,13 @@ public class SwingDisplay extends PlatformDisplay {
   public Rectangle getBounds(Control control) {
     java.awt.Rectangle rect = new java.awt.Rectangle();
     ((java.awt.Component) control.peer).getBounds(rect);
+
+    if (control.getControlType() == Control.ControlType.SHELL_DIALOG
+            || control.getControlType() == Control.ControlType.SHELL_ROOT) {
+      Component root = SwingUtilities.getRoot((java.awt.Component) control.peer);
+      rect.x += root.getX();
+      rect.y += root.getY();
+    }
 
     return new Rectangle(rect.x, rect.y, rect.width, rect.height);
   }
@@ -199,6 +195,30 @@ public class SwingDisplay extends PlatformDisplay {
         System.err.println(control.getControlType() + ".getText()");
         return "";
     }
+  }
+
+  @Override
+  public int getScrollBarSize(ScrolledComposite scrolledComposite, int orientation) {
+    JScrollPane scrollPane = (JScrollPane) ((Composite) scrolledComposite).peer;
+    return orientation == SWT.HORIZONTAL ? scrollPane.getHorizontalScrollBar().getHeight()
+            : scrollPane.getVerticalScrollBar().getWidth();
+  }
+
+  @Override
+  public int getSelection(Control control) {
+    java.awt.Component component = (java.awt.Component) control.peer;
+    if (component instanceof JScrollBar) {
+      JScrollBar scrollbar = (JScrollBar) component;
+      int selection = scrollbar.getValue();
+     /* if (scrollbar.getOrientation() == JScrollBar.VERTICAL && control instanceof Scale) {
+        selection = scrollbar.getMaximum() - 1 - (selection - scrollbar.getMinimum());
+      }*/
+      return selection;
+    } else if (component instanceof JSlider) {
+      JSlider jslider = (JSlider) component;
+      return jslider.getValue();
+    }
+    return 0;
   }
 
   private void menuAddAll(Menu source, JMenu destination) {
@@ -251,10 +271,13 @@ public class SwingDisplay extends PlatformDisplay {
   @Override
   public void setBounds(Control control, int x, int y, int width, int height) {
     Component component = (Component) control.peer;
-  /*  if (control instanceof Decorations) {
-      component = SwingUtilities.getRoot(component);
-    }*/
-    component.setBounds(x, y, width, height);
+    if (control instanceof Decorations) {
+      Component root = SwingUtilities.getRoot(component);
+      root.setLocation(x, y);
+      component.setSize(width, height);
+    } else {
+      component.setBounds(x, y, width, height);
+    }
   /*  if (component.getParent() instanceof JScrollPane) {
       component.getParent().doLayout();
     }*/
@@ -360,30 +383,6 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
-  public int getScrollBarSize(ScrolledComposite scrolledComposite, int orientation) {
-    JScrollPane scrollPane = (JScrollPane) ((Composite) scrolledComposite).peer;
-    return orientation == SWT.HORIZONTAL ? scrollPane.getHorizontalScrollBar().getHeight()
-            : scrollPane.getVerticalScrollBar().getWidth();
-  }
-
-  @Override
-  public int getSelection(Control control) {
-    java.awt.Component component = (java.awt.Component) control.peer;
-    if (component instanceof JScrollBar) {
-      JScrollBar scrollbar = (JScrollBar) component;
-      int selection = scrollbar.getValue();
-     /* if (scrollbar.getOrientation() == JScrollBar.VERTICAL && control instanceof Scale) {
-        selection = scrollbar.getMaximum() - 1 - (selection - scrollbar.getMinimum());
-      }*/
-      return selection;
-    } else if (component instanceof JSlider) {
-      JSlider jslider = (JSlider) component;
-      return jslider.getValue();
-    }
-    return 0;
-  }
-
-  @Override
   public void redraw(Control control, int x, int y, int w, int h, boolean all) {
     ((JComponent) control.peer).repaint(x, y, w, h);
   }
@@ -412,6 +411,17 @@ public class SwingDisplay extends PlatformDisplay {
       }
     }
     ((JFrame) SwingUtilities.getRoot((Component) decorations.peer)).setJMenuBar(awtMenuBar);
+  }
+
+  @Override
+  public void updateTab(TabFolder tabFolder, int index, TabItem tabItem) {
+    JTabbedPane tabbedPane = (JTabbedPane) tabFolder.peer;
+    if (tabItem.control != null) {
+      tabbedPane.setTabComponentAt(index, (JComponent) tabItem.getControl().peer);
+    }
+    if (tabItem.text != null) {
+      tabbedPane.setTitleAt(index, tabItem.text);
+    }
   }
 
   @Override

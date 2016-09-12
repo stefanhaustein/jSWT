@@ -22,7 +22,7 @@ public class Shell extends Decorations {
   }
 
   private Shell(Display display, Shell parent, int style) {
-    super(null, style);
+    super(null, style);  // parent is still set below.
     this.display = (PlatformDisplay) display;
     this.parent = parent;
     this.peer = this.display.createControl(this);

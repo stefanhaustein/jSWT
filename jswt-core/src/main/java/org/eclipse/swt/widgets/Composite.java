@@ -69,6 +69,11 @@ public class Composite extends Scrollable {
   @Override
   public Point computeSize(int wHint, int hHint, boolean changed) {
     checkWidget ();
+
+    if (this instanceof TabFolder) {
+      return super.computeSize(wHint, hHint, changed);
+    }
+
     //display.runSkin();
     if (wHint != SWT.DEFAULT && wHint < 0) wHint = 0;
     if (hHint != SWT.DEFAULT && hHint < 0) hHint = 0;
