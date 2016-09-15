@@ -13,6 +13,8 @@ public abstract class PlatformDisplay extends Display {
 
   public static PlatformDisplay instance;  // For image loading.
 
+  public abstract void addItem(Combo combo, String s, int index);
+
   public abstract void addChild(Composite parent, Control control);
 
   public abstract void addTab(TabFolder tabFolder, int index, TabItem tabItem);
@@ -37,6 +39,8 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract Insets getInsets(Scrollable composite);
 
+  public abstract int getItemCount(Combo combo);
+
   public abstract boolean getSelection(Button button);
 
   public abstract int getScrollBarSize(ScrolledComposite scrolledComposite, int orientation);
@@ -52,6 +56,8 @@ public abstract class PlatformDisplay extends Display {
   public abstract void pack(Shell shell);
 
   public abstract void redraw(Control control, int x, int y, int w, int h, boolean all);
+
+  public abstract void removeItems(Combo combo, int start, int end);
 
   public abstract void removeChild(Composite composite, Control child);
 

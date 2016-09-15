@@ -37,6 +37,11 @@ public class SwingDisplay extends PlatformDisplay {
   HashMap<Widget, CheckboxGroup> checkBoxGroupMap = new HashMap<>();
 
   @Override
+  public void addItem(Combo combo, String s, int index) {
+    ((JComboBox<String>) combo.peer).insertItemAt(s, index);
+  }
+
+  @Override
   public void addChild(Composite parent, Control control) {
     if (parent instanceof ScrolledComposite) {
       ((javax.swing.JScrollPane) parent.peer).setViewportView((Component) control.peer);
@@ -64,6 +69,8 @@ public class SwingDisplay extends PlatformDisplay {
         return new JRadioButton();
       case BUTTON_PUSH:
         return new JButton();
+      case COMBO:
+        return new JComboBox<String>();
       case CANVAS:
         return new SwingSwtCanvas((Canvas) control);
       case COMPOSITE:
@@ -388,6 +395,15 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
+  public void removeItems(Combo combo, int start, int end) {
+    JComboBox<String> jComboBox = (JComboBox<String>) combo.peer;
+    while (end >= start) {
+      jComboBox.removeItemAt(end);
+      end--;
+    }
+  }
+
+  @Override
   public void pack(Shell shell) {
     ((Window) SwingUtilities.getRoot((Component) shell.peer)).pack();
   }
@@ -610,6 +626,11 @@ public class SwingDisplay extends PlatformDisplay {
 
     }
     return result;
+  }
+
+  @Override
+  public int getItemCount(Combo combo) {
+    return 0;
   }
 
 /*
