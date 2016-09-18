@@ -89,6 +89,10 @@ public class Control extends Widget {
     return display.getBounds(this);
   }
 
+  public boolean getEnabled() {
+    return display.isEnabled(this);
+  }
+
   public Point getSize() {
     Rectangle bounds = getBounds();
     return new Point(bounds.width, bounds.height);
@@ -97,6 +101,12 @@ public class Control extends Widget {
   public Object getLayoutData() {
     return layoutData;
   }
+
+
+  public boolean isEnabled() {
+    return display.isEnabled(this);
+  }
+
 
   void markLayout (boolean changed, boolean all) {
 	/* Do nothing */
@@ -119,6 +129,10 @@ public class Control extends Widget {
 
   public void setBounds(Rectangle rect) {
     setBounds(rect.x, rect.y, rect.width, rect.height);
+  }
+
+  public void setEnabled(boolean b) {
+    display.setEnabled(this, b);
   }
 
   public void setLayoutData(Object layoutData) {

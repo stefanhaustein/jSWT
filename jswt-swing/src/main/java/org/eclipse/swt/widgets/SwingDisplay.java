@@ -173,8 +173,29 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
-  public boolean getEnabled(Control control) {
+  public boolean isEnabled(Control control) {
     return ((java.awt.Component) control.peer).isEnabled();
+  }
+
+  @Override
+  public int getScrollBarSize(ScrolledComposite scrolledComposite, int orientation) {
+    JScrollPane scrollPane = (JScrollPane) ((Composite) scrolledComposite).peer;
+    return orientation == SWT.HORIZONTAL ? scrollPane.getHorizontalScrollBar().getHeight()
+            : scrollPane.getVerticalScrollBar().getWidth();
+  }
+
+  @Override
+  public int getSelection(Control control) {
+    switch (control.getControlType()) {
+      case SLIDER:
+        return ((JScrollBar) control.peer).getValue();
+      case SCALE:
+        return ((JSlider) control.peer).getValue();
+      case COMBO:
+        return ((JComboBox<String>) control.peer).getSelectedIndex();
+      default:
+        throw new RuntimeException("getSelection() not applicable to " + control.getControlType());
+    }
   }
 
   @Override
@@ -204,29 +225,6 @@ public class SwingDisplay extends PlatformDisplay {
     }
   }
 
-  @Override
-  public int getScrollBarSize(ScrolledComposite scrolledComposite, int orientation) {
-    JScrollPane scrollPane = (JScrollPane) ((Composite) scrolledComposite).peer;
-    return orientation == SWT.HORIZONTAL ? scrollPane.getHorizontalScrollBar().getHeight()
-            : scrollPane.getVerticalScrollBar().getWidth();
-  }
-
-  @Override
-  public int getSelection(Control control) {
-    java.awt.Component component = (java.awt.Component) control.peer;
-    if (component instanceof JScrollBar) {
-      JScrollBar scrollbar = (JScrollBar) component;
-      int selection = scrollbar.getValue();
-     /* if (scrollbar.getOrientation() == JScrollBar.VERTICAL && control instanceof Scale) {
-        selection = scrollbar.getMaximum() - 1 - (selection - scrollbar.getMinimum());
-      }*/
-      return selection;
-    } else if (component instanceof JSlider) {
-      JSlider jslider = (JSlider) component;
-      return jslider.getValue();
-    }
-    return 0;
-  }
 
   private void menuAddAll(Menu source, JMenu destination) {
     for (int i = 0; i < source.getItemCount(); i++) {
@@ -291,6 +289,11 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
+  public void setEnabled(Control control, boolean b) {
+    ((java.awt.Component) control.peer).setEnabled(b);
+  }
+
+  @Override
   public void setText(Control control, String text) {
     Component peer = (Component) control.peer;
     switch (control.getControlType()) {
@@ -347,8 +350,6 @@ public class SwingDisplay extends PlatformDisplay {
         ((JRadioButton) button.peer).setSelected(selected);
         break;
     }
-    if (button.peer instanceof JCheckBox) {
-    }
   }
 
   @Override
@@ -366,18 +367,19 @@ public class SwingDisplay extends PlatformDisplay {
 
   @Override
   public void setSelection(Control control, int selection) {
-    Component component = (Component) control.peer;
-    if (component instanceof JScrollBar) {
-      JScrollBar scrollbar = (JScrollBar) component;
-   /*   if (scrollbar.getOrientation() == JScrollBar.VERTICAL && control instanceof Scale) {
-        selection = scrollbar.getMaximum() - 1 - (selection - scrollbar.getMinimum());
-      }*/
-      scrollbar.setValue(selection);
-    } else if (component instanceof JSlider) {
-      JSlider jslider = (JSlider) component;
-      jslider.setValue(selection);
+    switch (control.getControlType()) {
+      case SCALE:
+        ((JSlider) control.peer).setValue(selection);
+        break;
+      case SLIDER:
+        ((JScrollBar) control.peer).setValue(selection);
+        break;
+      case COMBO:
+        ((JComboBox<String>) control.peer).setSelectedIndex(selection);
+        break;
+      default:
+        throw new RuntimeException("setSelection() not applicable to " + control.getControlType());
     }
-
   }
 
   @Override
@@ -630,7 +632,7 @@ public class SwingDisplay extends PlatformDisplay {
 
   @Override
   public int getItemCount(Combo combo) {
-    return 0;
+    return ((JComboBox<String>) combo.peer).getItemCount();
   }
 
 /*

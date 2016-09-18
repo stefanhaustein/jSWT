@@ -131,7 +131,7 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
-  public boolean getEnabled(Control control) {
+  public boolean isEnabled(Control control) {
     return true;                                 // FIXME
   }
 

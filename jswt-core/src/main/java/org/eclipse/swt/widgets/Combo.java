@@ -40,7 +40,6 @@ public class Combo extends Control {
 
     public void select(int i) {
         display.setSelection(this, i);
-
     }
 
     public int getItemCount() {
@@ -51,7 +50,7 @@ public class Combo extends Control {
         return display.getText(this);
     }
 
-    public Object getSelectionIndex() {
+    public int getSelectionIndex() {
         return display.getSelection(this);
     }
 }

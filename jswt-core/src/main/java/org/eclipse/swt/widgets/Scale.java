@@ -24,10 +24,6 @@ public class Scale extends Control {
         return ControlType.SCALE;
     }
 
-    public boolean getEnabled() {
-        return display.getEnabled(this);
-    }
-
     public int getMaximum() {
         return maximum;
     }

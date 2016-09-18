@@ -24,10 +24,6 @@ public class Slider extends Control {
         return ControlType.SLIDER;
     }
 
-    public boolean getEnabled() {
-        return display.getEnabled(this);
-    }
-
     public int getMaximum() {
         return maximum;
     }

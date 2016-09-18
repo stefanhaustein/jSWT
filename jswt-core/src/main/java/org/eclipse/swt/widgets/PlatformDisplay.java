@@ -31,7 +31,7 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract void disposeShell(Shell shell);
 
-  public abstract boolean getEnabled(Control control);
+  public abstract boolean isEnabled(Control control);
 
   public abstract Rectangle getBounds(Control control);
 
@@ -62,6 +62,8 @@ public abstract class PlatformDisplay extends Display {
   public abstract void removeChild(Composite composite, Control child);
 
   public abstract void setBounds(Control control, int x, int y, int width, int height);
+
+  public abstract void setEnabled(Control control, boolean b);
 
   public abstract void setMeasuredSize(Control control, int width, int height);
 
