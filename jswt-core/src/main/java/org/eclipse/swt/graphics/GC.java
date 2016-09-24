@@ -103,7 +103,7 @@ public class GC extends Resource {
     }
 
     public void fillRectangle(int x, int y, int width, int height) {
-        delegate.drawRectangle(x, y, width, height);
+        delegate.fillRectangle(x, y, width, height);
     }
 
     public void fillRectangle(Rectangle rect) {
