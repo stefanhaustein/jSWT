@@ -8,6 +8,8 @@ import org.eclipse.swt.graphics.Rectangle;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.CheckboxGroup;
@@ -597,6 +599,16 @@ public class SwingDisplay extends PlatformDisplay {
             scrollbar.addAdjustmentListener(new AdjustmentListener() {
               @Override
               public void adjustmentValueChanged(AdjustmentEvent e) {
+                notifyListeners(control, SWT.Selection, e);
+              }
+            });
+          }
+        } else if (component instanceof JSlider) {
+          JSlider slider = (JSlider) component;
+          if (slider.getChangeListeners().length == 0) {
+            slider.addChangeListener(new ChangeListener() {
+              @Override
+              public void stateChanged(ChangeEvent e) {
                 notifyListeners(control, SWT.Selection, e);
               }
             });
