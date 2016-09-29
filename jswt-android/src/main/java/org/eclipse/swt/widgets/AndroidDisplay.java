@@ -12,6 +12,7 @@ import android.widget.*;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -186,8 +187,20 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
+  public Rectangle getImageBounds(Object platformImage) {
+    throw new RuntimeException("NYI");
+
+  }
+
+  @Override
   public Insets getInsets(Scrollable scrollable) {
     return new Insets();
+  }
+
+  @Override
+  public int getItemCount(Combo combo) {
+    throw new RuntimeException("NYI");
+
   }
 
   @Override
@@ -221,6 +234,12 @@ public class AndroidDisplay extends PlatformDisplay {
     if (view instanceof EditText) {
       ((EditText) view).setMaxWidth(width);
     }
+  }
+
+  @Override
+  public void setEnabled(Control control, boolean b) {
+    throw new RuntimeException("NYI");
+
   }
 
   @Override
@@ -296,6 +315,12 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
+  public void updateTab(TabFolder tabFolder, int index, TabItem tabItem) {
+    throw new RuntimeException("NYI");
+
+  }
+
+  @Override
   public void setMeasuredSize(Control control, int width, int height) {
     if (control.peer instanceof SwtViewGroup) {
       ((SwtViewGroup) control.peer).setMeasuredSize(width, height);
@@ -306,11 +331,13 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public void setRange(Control control, int minimum, int maximum) {
+    throw new RuntimeException("NYI");
 
   }
 
   @Override
   public void setSliderProperties(Control control, int thumb, int increment, int pageIncrement) {
+    throw new RuntimeException("NYI");
 
   }
 
@@ -325,6 +352,7 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public void setSelection(Control control, int selection) {
+    throw new RuntimeException("NYI");
 
   }
 
@@ -345,17 +373,25 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public int getScrollBarSize(ScrolledComposite scrolledComposite, int orientation) {
-    return 0;
+    throw new RuntimeException("NYI");
+
   }
 
   @Override
   public int getSelection(Control control) {
-    return 0;
+    throw new RuntimeException("NYI");
+
   }
 
   @Override
   public void redraw(Control control, int x, int y, int w, int h, boolean all) {
     ((View) control.peer).invalidate(x, y, x+w, y+h);
+  }
+
+  @Override
+  public void removeItems(Combo combo, int start, int end) {
+    throw new RuntimeException("NYI");
+
   }
 
   @Override
@@ -369,8 +405,19 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
+  public void addItem(Combo combo, String s, int index) {
+    throw new RuntimeException("NYI");
+  }
+
+  @Override
   public void addChild(Composite parent, Control control) {
     ((ViewGroup) parent.peer).addView((View) control.peer);
+  }
+
+  @Override
+  public void addTab(TabFolder tabFolder, int index, TabItem tabItem) {
+    throw new RuntimeException("NYI");
+
   }
 
   @Override
@@ -418,6 +465,11 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   public Image createImage(int width, int height) {
+    throw new RuntimeException("NYI");
+  }
+
+  @Override
+  public GC creatGCForPlatformImage(Object platformImage) {
     throw new RuntimeException("NYI");
   }
 

@@ -91,8 +91,8 @@ public class SwingDisplay extends PlatformDisplay {
         return new javax.swing.JScrollPane();
       case SHELL_DIALOG:
       case SHELL_ROOT: {
-        Shell shell = (Shell) control;
-        java.awt.Window window;
+        final Shell shell = (Shell) control;
+        final java.awt.Window window;
         if (shell.parent != null) {
           boolean modal = (shell.style & (SWT.APPLICATION_MODAL | SWT.SYSTEM_MODAL | SWT.PRIMARY_MODAL)) != 0;
           window = new javax.swing.JDialog((javax.swing.JFrame) SwingUtilities.getRoot((Component) ((Shell) shell.parent).peer), modal);
