@@ -2,6 +2,7 @@ package org.eclipse.swt.widgets;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Image;
 
 public class Button extends Control {
   public Button(Composite parent, int style) {
@@ -36,5 +37,13 @@ public class Button extends Control {
 
   public void setText(String text) {
     display.setText(this, text);
+  }
+
+  public void setImage(Image image) {
+    display.setImage(this, image);
+  }
+
+  public void setAlignment(int alignment) {
+    display.setAlignment(this, alignment);
   }
 }

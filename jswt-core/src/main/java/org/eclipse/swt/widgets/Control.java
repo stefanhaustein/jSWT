@@ -19,7 +19,7 @@ public class Control extends Widget {
     SCALE,
     SHELL_ROOT, SHELL_DIALOG,
     SLIDER,
-    TEXT, SCROLLED_COMPOSITE, TAB_FOLDER, COMBO,
+    TEXT, SCROLLED_COMPOSITE, TAB_FOLDER, COMBO, GROUP,
   }
 
 

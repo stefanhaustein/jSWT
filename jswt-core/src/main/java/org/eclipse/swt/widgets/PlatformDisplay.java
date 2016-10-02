@@ -3,6 +3,7 @@ package org.eclipse.swt.widgets;
 
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
@@ -82,6 +83,10 @@ public abstract class PlatformDisplay extends Display {
   public abstract void updateMenuBar(Decorations decorations);
 
   public abstract void updateTab(TabFolder tabFolder, int index, TabItem tabItem);
+
+  public abstract void setImage(Control control, Image image);
+
+  public abstract void setAlignment(Control button, int alignment);
 
 
   public static class Insets {
