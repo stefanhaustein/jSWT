@@ -158,7 +158,7 @@ public class Control extends Widget {
   }
 
   public String toString() {
-    return this.getClass().getName() + "; peer: " + peer;
+    return this.getClass().getName() + "; type: " + getControlType() + "; peer: " + peer;
   }
 
 

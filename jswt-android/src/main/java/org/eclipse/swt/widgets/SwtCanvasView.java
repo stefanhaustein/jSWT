@@ -15,6 +15,6 @@ public class SwtCanvasView extends SwtViewGroup {
 
     @Override
     public void onDraw(android.graphics.Canvas canvas) {
-        swtCanvas.drawBackground(new AndroidGC(canvas), 0, 0, 999999, 99999);
+        swtCanvas.drawBackground(new AndroidGC(swtCanvas.getDisplay(), canvas), 0, 0, 999999, 99999);
     }
 }

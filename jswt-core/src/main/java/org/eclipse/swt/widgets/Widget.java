@@ -78,7 +78,8 @@ public abstract class Widget {
 
     protected void checkWidget() {
         if ((state & DISPOSED) != 0) {
-            SWT.error(SWT.ERROR_WIDGET_DISPOSED);
+            System.err.println("ERROR in checkWidget(): Widget is disposed: " + this);
+            // SWT.error(SWT.ERROR_WIDGET_DISPOSED, null, this.toString());
         }
     }
 
