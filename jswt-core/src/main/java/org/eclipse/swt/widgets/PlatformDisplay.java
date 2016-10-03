@@ -42,6 +42,8 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract int getItemCount(Combo combo);
 
+  public abstract Monitor getMonitor(Control control);
+
   public abstract boolean getSelection(Button button);
 
   public abstract int getScrollBarSize(ScrolledComposite scrolledComposite, int orientation);
@@ -66,6 +68,8 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract void setEnabled(Control control, boolean b);
 
+  public abstract void setFocus(Control control);
+
   public abstract void setMeasuredSize(Control control, int width, int height);
 
   public abstract void setRange(Control control, int minimum, int maximum);
@@ -87,6 +91,8 @@ public abstract class PlatformDisplay extends Display {
   public abstract void setImage(Control control, Image image);
 
   public abstract void setAlignment(Control button, int alignment);
+
+  public abstract String getItem(Combo combo, int i);
 
 
   public static class Insets {

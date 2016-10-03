@@ -12,6 +12,7 @@ import android.widget.*;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -73,52 +74,46 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public Object createControl(final Control control) {
-    if (control instanceof Button) {
-      switch (control.style) {
-        case SWT.RADIO: {
-          RadioButton radioButton = new AppCompatRadioButton(activity);
-          radioButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-              handleRadioGroup((Button) control, b);
-              control.notifyListeners(SWT.Selection, null);
-            }
-          });
-          return radioButton;
+    switch (control.getControlType()) {
+      case BUTTON_PUSH:
+        return new AppCompatButton(activity);
+      case BUTTON_CHECKBOY:
+        return new AppCompatCheckBox(activity);
+      case BUTTON_RADIO: {
+        RadioButton radioButton = new AppCompatRadioButton(activity);
+        radioButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+          @Override
+          public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+            handleRadioGroup((Button) control, b);
+            control.notifyListeners(SWT.Selection, null);
+          }
+        });
+        return radioButton;
+      }
+      case TEXT: {
+        AppCompatEditText editText = new AppCompatEditText(activity);
+        if ((control.style & SWT.MULTI) == 0) {
+          editText.setMaxLines(1);
         }
-        case SWT.CHECK:
-          return new AppCompatCheckBox(activity);
-        default:
-          return new AppCompatButton(activity);
+        return editText;
       }
+      case LABEL:
+        return new AppCompatTextView(activity);
+      case SCROLLED_COMPOSITE:
+        return new android.widget.ScrollView(activity);
+      case SCALE:
+      case SLIDER:
+        return new android.widget.SeekBar(activity);
+      case SHELL_DIALOG:
+      case SHELL_ROOT:
+        return new SwtShellView(activity, (Shell) control);
+      case CANVAS:
+        return new SwtCanvasView(activity, (Canvas) control);
+      case COMPOSITE:
+        return new SwtViewGroup(activity, (Composite) control);
+      default:
+        throw new RuntimeException("Unrecognized control type " + control.getControlType() + " for " + control);
     }
-    if (control instanceof Text) {
-      AppCompatEditText editText = new AppCompatEditText(activity);
-      if ((control.style & SWT.MULTI) == 0) {
-        editText.setMaxLines(1);
-      }
-      return editText;
-    }
-    if (control instanceof Label) {
-      return new AppCompatTextView(activity);
-    }
-    if (control instanceof ScrolledComposite) {
-      return new android.widget.ScrollView(activity);
-    }
-    if (control instanceof Slider) {
-      return new android.widget.SeekBar(activity);
-    }
-    if (control instanceof Shell) {
-      return new SwtShellView(activity, (Shell) control);
-    }
-    // Should be last because some other options are subclasses of Composite / Canvas
-    if (control instanceof Canvas) {
-      return new SwtCanvasView(activity, (Canvas) control);
-    }
-    if (control instanceof Composite) {
-      return new SwtViewGroup(activity, (Composite) control);
-    }
-    throw new RuntimeException("Unrecognized control: " + control);
   }
 
   @Override
@@ -186,8 +181,20 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
+  public Rectangle getImageBounds(Object platformImage) {
+    throw new RuntimeException("NYI");
+
+  }
+
+  @Override
   public Insets getInsets(Scrollable scrollable) {
     return new Insets();
+  }
+
+  @Override
+  public int getItemCount(Combo combo) {
+    throw new RuntimeException("NYI");
+
   }
 
   @Override
@@ -221,6 +228,12 @@ public class AndroidDisplay extends PlatformDisplay {
     if (view instanceof EditText) {
       ((EditText) view).setMaxWidth(width);
     }
+  }
+
+  @Override
+  public void setEnabled(Control control, boolean b) {
+    throw new RuntimeException("NYI");
+
   }
 
   @Override
@@ -296,6 +309,12 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
+  public void updateTab(TabFolder tabFolder, int index, TabItem tabItem) {
+    throw new RuntimeException("NYI");
+
+  }
+
+  @Override
   public void setMeasuredSize(Control control, int width, int height) {
     if (control.peer instanceof SwtViewGroup) {
       ((SwtViewGroup) control.peer).setMeasuredSize(width, height);
@@ -306,11 +325,15 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public void setRange(Control control, int minimum, int maximum) {
-
+    ((android.widget.SeekBar) control.peer).setMax(maximum);
+    if (minimum != 0) {
+      System.err.println("FIXME: setRanger(): Minimum ignored!");   // FIXME
+    }
   }
 
   @Override
   public void setSliderProperties(Control control, int thumb, int increment, int pageIncrement) {
+    System.err.println("FIXME: setSliderProperties()");   // FIXME
 
   }
 
@@ -325,7 +348,14 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public void setSelection(Control control, int selection) {
-
+    switch (control.getControlType()) {
+      case SLIDER:
+      case SCALE:
+        ((android.widget.SeekBar) control.peer).setProgress(selection);
+        break;
+      default:
+        throw new RuntimeException("NYI: setSelection() for " + control.getControlType());
+    }
   }
 
   @Override
@@ -345,17 +375,30 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public int getScrollBarSize(ScrolledComposite scrolledComposite, int orientation) {
-    return 0;
+    System.err.println("getScrollBarSize(): Returning fake value 1");  // FIXME
+    return 1;
   }
 
   @Override
   public int getSelection(Control control) {
-    return 0;
+    switch (control.getControlType()) {
+      case SCALE:
+      case SLIDER:
+        return ((android.widget.SeekBar) control.peer).getProgress();
+      default:
+        throw new RuntimeException("NYI: getSelection() for " + control.getControlType());
+    }
   }
 
   @Override
   public void redraw(Control control, int x, int y, int w, int h, boolean all) {
     ((View) control.peer).invalidate(x, y, x+w, y+h);
+  }
+
+  @Override
+  public void removeItems(Combo combo, int start, int end) {
+    throw new RuntimeException("NYI");
+
   }
 
   @Override
@@ -369,8 +412,19 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
+  public void addItem(Combo combo, String s, int index) {
+    throw new RuntimeException("NYI");
+  }
+
+  @Override
   public void addChild(Composite parent, Control control) {
     ((ViewGroup) parent.peer).addView((View) control.peer);
+  }
+
+  @Override
+  public void addTab(TabFolder tabFolder, int index, TabItem tabItem) {
+    throw new RuntimeException("NYI");
+
   }
 
   @Override
@@ -418,6 +472,11 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   public Image createImage(int width, int height) {
+    throw new RuntimeException("NYI");
+  }
+
+  @Override
+  public GC creatGCForPlatformImage(Object platformImage) {
     throw new RuntimeException("NYI");
   }
 

@@ -1,6 +1,7 @@
 package org.eclipse.swt.widgets;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.internal.SWTEventListener;
 
 import java.util.HashSet;
@@ -55,6 +56,7 @@ public abstract class Widget {
     int state;
     PlatformDisplay display;
     EventTable listeners;
+    Object data;
 
     public Widget(Widget parent, int style) {
         if (parent != null) {
@@ -62,6 +64,11 @@ public abstract class Widget {
         }
         this.parent = parent;
         this.style = style;
+    }
+
+
+    public void addDisposeListener(DisposeListener listener) {
+        addListener(SWT.Dispose, new TypedListener(listener));
     }
 
 
@@ -78,7 +85,8 @@ public abstract class Widget {
 
     protected void checkWidget() {
         if ((state & DISPOSED) != 0) {
-            SWT.error(SWT.ERROR_WIDGET_DISPOSED);
+            System.err.println("ERROR in checkWidget(): Widget is disposed: " + this);
+            // SWT.error(SWT.ERROR_WIDGET_DISPOSED, null, this.toString());
         }
     }
 
@@ -99,6 +107,7 @@ public abstract class Widget {
         if (parent != null) {
             parent.removeChild(this);
         }
+        System.err.println("FIXME: Widget.dispose(): Notify dispose listeners!");
         state |= DISPOSED;
     }
 
@@ -106,6 +115,9 @@ public abstract class Widget {
         SWT.error(code);
     }
 
+    public Object getData() {
+        return data;
+    }
     public Display getDisplay() {
         return display;
     }
@@ -151,5 +163,9 @@ public abstract class Widget {
         if (listeners != null) {
             listeners.unhook(eventType, listener);
         }
+    }
+
+    public void setData(Object data) {
+        this.data = data;
     }
 }

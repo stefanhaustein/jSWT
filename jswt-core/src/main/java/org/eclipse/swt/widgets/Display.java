@@ -3,6 +3,8 @@ package org.eclipse.swt.widgets;
 
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 
 public class Display extends Device {
 
@@ -54,5 +56,19 @@ public class Display extends Device {
     }
 
     public void dispose() {
+    }
+
+    public Point map(Control from, Control to, int x, int y) {
+        System.err.println("FIXME: Display.map(from, to, x, y)");    // FIXME
+        return new Point(x, y);
+    }
+
+    public Point map(Control from, Control to, Point p) {
+        return map(from, to, p.x, p.y);
+    }
+
+    public Rectangle getClientArea() {
+        System.err.println("FIXME: Display.getClientArea()");
+        return new Rectangle(0, 0, 2000, 1000);
     }
 }

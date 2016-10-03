@@ -1,6 +1,10 @@
 package org.eclipse.swt.widgets;
 
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionListener;
+
 public class Combo extends Control {
 
     public Combo(Composite parent, int style) {
@@ -31,7 +35,7 @@ public class Combo extends Control {
         remove(0, getItemCount() - 1);
     }
 
-    public void setItems(String[] items) {
+    public void setItems(String... items) {
         removeAll();
         for (int i = 0; i < items.length; i++) {
             add(items[i], i);
@@ -52,5 +56,21 @@ public class Combo extends Control {
 
     public int getSelectionIndex() {
         return display.getSelection(this);
+    }
+
+    public void addSelectionListener(SelectionListener listener) {
+        addListener(SWT.Selection, new TypedListener(listener));
+    }
+
+    public String getItem(int i) {
+        return display.getItem(this, i);
+    }
+
+    public void setText(String text) {
+        display.setText(this, text);
+    }
+
+    public void setVisibleItemCount(int itemCount) {
+        System.err.println("FIXEM: Combo.setVisibleItemCount: " + itemCount);   // FIXME
     }
 }

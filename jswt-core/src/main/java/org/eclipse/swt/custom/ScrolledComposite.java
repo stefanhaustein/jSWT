@@ -17,6 +17,8 @@ public class ScrolledComposite extends Composite {
     boolean showFocusedContent;
     boolean showNextFocusedControl = true;
     Listener contentListener;
+    int oldWidth;
+    int oldHeight;
 
 
     public ScrolledComposite(Composite parent, int style) {
@@ -26,7 +28,13 @@ public class ScrolledComposite extends Composite {
             @Override
             public void handleEvent(Event e) {
                 if (e.type != SWT.Resize) return;
-                layout(false);
+                Rectangle bounds = getBounds();
+                // FIXME: Should this be caught at a higher level already?
+                if (bounds.width != oldWidth || bounds.height != oldHeight) {
+                    oldHeight = bounds.height;
+                    oldWidth = bounds.width;
+                    layout(false);
+                }
             }
         };
     }

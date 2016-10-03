@@ -6,12 +6,14 @@ import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
 public class Control extends Widget {
 
-  enum ControlType {
+    enum ControlType {
     BUTTON_CHECKBOY, BUTTON_PUSH, BUTTON_RADIO,
     CANVAS,
     COMPOSITE,
@@ -22,7 +24,7 @@ public class Control extends Widget {
     TEXT, SCROLLED_COMPOSITE, TAB_FOLDER, COMBO, GROUP,
   }
 
-
+  Menu menu;
   Object layoutData;
   Object peer;
 
@@ -76,9 +78,6 @@ public class Control extends Widget {
     return size;
   }
 
-  ControlType getControlType() {
-    throw new RuntimeException("Abstract");
-  }
 
   public int getBorderWidth() {
     return 0;
@@ -89,8 +88,40 @@ public class Control extends Widget {
     return display.getBounds(this);
   }
 
+  ControlType getControlType() {
+        throw new RuntimeException("Abstract");
+    }
+
   public boolean getEnabled() {
-    return display.isEnabled(this);
+        return display.isEnabled(this);
+    }
+
+  public Object getLayoutData() {
+        return layoutData;
+    }
+
+  public Point getLocation() {
+    Rectangle bounds = display.getBounds(this);
+    return new Point(bounds.x, bounds.y);
+  }
+
+  public Menu getMenu() {
+      return menu;
+  }
+
+  public Monitor getMonitor() {
+        return display.getMonitor(this);
+    }
+
+  public int getOrientation() {
+      System.err.println("FIXME: Control.getOrientation");
+      return 0;
+  }
+
+
+
+  public Composite getParent() {
+    return (Composite) parent;
   }
 
   public Point getSize() {
@@ -98,15 +129,17 @@ public class Control extends Widget {
     return new Point(bounds.width, bounds.height);
   }
 
-  public Object getLayoutData() {
-    return layoutData;
+  public Shell getShell() {
+    Widget current = this;
+    while (!(current instanceof Shell)) {
+      current = current.parent;
+    }
+    return (Shell) current;
   }
-
 
   public boolean isEnabled() {
     return display.isEnabled(this);
   }
-
 
   void markLayout (boolean changed, boolean all) {
 	/* Do nothing */
@@ -121,6 +154,13 @@ public class Control extends Widget {
     display.redraw(this, x, y, w, h, all);
   }
 
+  public void setBackground(Color color) {
+      System.err.println("FIXME: Control.setBackground()");  // FIXME
+  }
+
+  public void setBackgroundImage(Image image) {
+     System.err.println("FIXME: Control.setBackgroundImage()");  // FIXME
+  }
 
   public void setBounds(int x, int y, int width, int height) {
     System.out.println(this + ".setBounds(" + x + ", " + y + ", " + width + ", " + height);
@@ -137,6 +177,14 @@ public class Control extends Widget {
 
   public void setLayoutData(Object layoutData) {
     this.layoutData = layoutData;
+  }
+
+  public void setMenu(Menu popup) {
+    System.err.println("FIXME: Control.setMenu()");  // FIXME
+  }
+
+  public void setFocus() {
+    display.setFocus(this);
   }
 
   public void setLocation(int x, int y) {
@@ -157,8 +205,17 @@ public class Control extends Widget {
     setSize(p.x, p.y);
   }
 
+  public void setTextDirection(int textDirection) {
+      System.err.println("FIXME: Control.setTextDirection()");
+  }
+
+
+  public void setVisible(boolean selection) {
+      System.err.println("FIXME: Control.setVisible");         // FIXME
+  }
+
   public String toString() {
-    return this.getClass().getName() + "; peer: " + peer;
+    return this.getClass().getName() + "; type: " + getControlType() + "; peer: " + peer;
   }
 
 

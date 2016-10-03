@@ -1,12 +1,13 @@
 package org.eclipse.swt.graphics;
 
-public class Color {
+public class Color extends Resource {
     int red;
     int green;
     int blue;
     int alpha;
 
     public Color(Device device, int red, int green, int blue) {
+        this.device = device;
         this.red = red;
         this.green = green;
         this.blue = blue;
@@ -14,6 +15,7 @@ public class Color {
     }
 
     public Color(Device device, int red, int green, int blue, int alpha) {
+        this.device = device;
         this.red = red;
         this.green = green;
         this.blue = blue;

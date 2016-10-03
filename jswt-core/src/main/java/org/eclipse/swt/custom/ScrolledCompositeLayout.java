@@ -55,6 +55,9 @@ protected void layout(Composite composite, boolean flushCache) {
 	ScrolledComposite sc = (ScrolledComposite)composite;
 	if (sc.content == null) return;
 
+
+	new RuntimeException("ScrolledComposite.layout").printStackTrace();
+
 	/*
 	ScrollBar hBar = sc.getHorizontalBar();
 	ScrollBar vBar = sc.getVerticalBar();

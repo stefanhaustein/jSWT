@@ -3,6 +3,7 @@ package org.eclipse.swt.widgets;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
@@ -127,6 +128,15 @@ public class Composite extends Scrollable {
     layout(changed, false);
   }
 
+  public void layout(Control[] changed) {
+    layout(changed, 0);
+  }
+
+  public void layout(Control[] changed, int flags) {
+    // TODO: Check what SWT does...
+    layout(true, true);
+  }
+
   public void layout (boolean changed, boolean all) {
     checkWidget ();
     if (layout == null && !all) return;
@@ -167,6 +177,12 @@ public class Composite extends Scrollable {
       display.removeChild(this, (Control) widget);
     }
   }
+
+  public void setBackgroundMode(int mode) {
+    System.err.println("FIXME: Composite.setBackgroundMode()");  // FIXME
+  }
+
+
   public void setLayout(Layout layout) {
     this.layout = layout;
   }

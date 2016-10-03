@@ -3,11 +3,14 @@ package org.eclipse.swt.widgets;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.CheckboxGroup;
@@ -89,8 +92,8 @@ public class SwingDisplay extends PlatformDisplay {
         return new javax.swing.JScrollPane();
       case SHELL_DIALOG:
       case SHELL_ROOT: {
-        Shell shell = (Shell) control;
-        java.awt.Window window;
+        final Shell shell = (Shell) control;
+        final java.awt.Window window;
         if (shell.parent != null) {
           boolean modal = (shell.style & (SWT.APPLICATION_MODAL | SWT.SYSTEM_MODAL | SWT.PRIMARY_MODAL)) != 0;
           window = new javax.swing.JDialog((javax.swing.JFrame) SwingUtilities.getRoot((Component) ((Shell) shell.parent).peer), modal);
@@ -294,6 +297,11 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
+  public void setFocus(Control control) {
+    ((JComponent) control.peer).grabFocus();
+  }
+
+  @Override
   public void setText(Control control, String text) {
     Component peer = (Component) control.peer;
     switch (control.getControlType()) {
@@ -440,6 +448,21 @@ public class SwingDisplay extends PlatformDisplay {
     if (tabItem.text != null) {
       tabbedPane.setTitleAt(index, tabItem.text);
     }
+  }
+
+  @Override
+  public void setImage(Control control, Image image) {
+    System.err.println("FIXME: SwingDisplay.setImage()");  // FIXME
+  }
+
+  @Override
+  public void setAlignment(Control button, int alignment) {
+    System.err.println("FIXME: SwingDisplay.setImage()");  // FIXME
+  }
+
+  @Override
+  public String getItem(Combo combo, int i) {
+    return ((JComboBox<String>) combo.peer).getItemAt(i);
   }
 
   @Override
@@ -601,6 +624,16 @@ public class SwingDisplay extends PlatformDisplay {
               }
             });
           }
+        } else if (component instanceof JSlider) {
+          JSlider slider = (JSlider) component;
+          if (slider.getChangeListeners().length == 0) {
+            slider.addChangeListener(new ChangeListener() {
+              @Override
+              public void stateChanged(ChangeEvent e) {
+                notifyListeners(control, SWT.Selection, e);
+              }
+            });
+          }
         }
         break;
     }
@@ -633,6 +666,11 @@ public class SwingDisplay extends PlatformDisplay {
   @Override
   public int getItemCount(Combo combo) {
     return ((JComboBox<String>) combo.peer).getItemCount();
+  }
+
+  @Override
+  public Monitor getMonitor(Control control) {
+    throw new RuntimeException("FIXME: SwingDisplay.getMonitor()");   // FIXME
   }
 
 /*

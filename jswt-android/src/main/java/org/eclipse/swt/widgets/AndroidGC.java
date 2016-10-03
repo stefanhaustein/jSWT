@@ -2,21 +2,29 @@ package org.eclipse.swt.widgets;
 
 import android.graphics.*;
 import android.graphics.Canvas;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Point;
 
 public class AndroidGC extends GC {
     final Paint backgroundPaint = new Paint();
     final Paint foregroundPaint = new Paint();
     Path path;
-    RectF rect = new RectF();
+    RectF rectF = new RectF();
+    Rect rect = new Rect();
     final Canvas canvas;
+    Color foregroundColor;
+    Color backgroundColor;
 
-    public AndroidGC(android.graphics.Canvas canvas) {
+    public AndroidGC(Device device, android.graphics.Canvas canvas) {
         super(null);
+        this.device = device;
         this.canvas = canvas;
         backgroundPaint.setStyle(Paint.Style.FILL);
         foregroundPaint.setStyle(Paint.Style.STROKE);
+        setForeground(getDevice().getSystemColor(SWT.COLOR_BLACK));
+        setBackground(getDevice().getSystemColor(SWT.COLOR_BLACK));
     }
 
     @Override
@@ -26,11 +34,11 @@ public class AndroidGC extends GC {
 
     @Override
     public void drawOval(int x, int y, int width, int height) {
-        rect.left = x;
-        rect.top = y;
-        rect.right = x + width;
-        rect.bottom = y + height;
-        canvas.drawOval(rect, foregroundPaint);
+        rectF.left = x;
+        rectF.top = y;
+        rectF.right = x + width;
+        rectF.bottom = y + height;
+        canvas.drawOval(rectF, foregroundPaint);
     }
 
     @Override
@@ -40,11 +48,11 @@ public class AndroidGC extends GC {
 
     @Override
     public void drawRoundRectangle(int x, int y, int width, int height, int arcWidth, int arcHeight) {
-        rect.left = x;
-        rect.top = y;
-        rect.right = x + width;
-        rect.bottom = y + height;
-        canvas.drawRoundRect(rect, arcWidth, arcHeight, foregroundPaint);
+        rectF.left = x;
+        rectF.top = y;
+        rectF.right = x + width;
+        rectF.bottom = y + height;
+        canvas.drawRoundRect(rectF, arcWidth, arcHeight, foregroundPaint);
     }
 
     @Override
@@ -54,29 +62,29 @@ public class AndroidGC extends GC {
 
     @Override
     public void fillOval(int x, int y, int width, int height) {
-        rect.left = x;
-        rect.top = y;
-        rect.right = x + width;
-        rect.bottom = y + height;
-        canvas.drawOval(rect, backgroundPaint);
+        rectF.left = x;
+        rectF.top = y;
+        rectF.right = x + width;
+        rectF.bottom = y + height;
+        canvas.drawOval(rectF, backgroundPaint);
     }
 
     @Override
     public void fillRectangle(int x, int y, int width, int height) {
-        rect.left = x;
-        rect.top = y;
-        rect.right = x + width;
-        rect.bottom = y + height;
-        canvas.drawRect(rect, backgroundPaint);
+        rectF.left = x;
+        rectF.top = y;
+        rectF.right = x + width;
+        rectF.bottom = y + height;
+        canvas.drawRect(rectF, backgroundPaint);
     }
 
     @Override
     public void fillRoundRectangle(int x, int y, int width, int height, int arcWidth, int arcHeight) {
-        rect.left = x;
-        rect.top = y;
-        rect.right = x + width;
-        rect.bottom = y + height;
-        canvas.drawRoundRect(rect, arcWidth, arcHeight, backgroundPaint);
+        rectF.left = x;
+        rectF.top = y;
+        rectF.right = x + width;
+        rectF.bottom = y + height;
+        canvas.drawRoundRect(rectF, arcWidth, arcHeight, backgroundPaint);
     }
 
     @Override
@@ -97,6 +105,32 @@ public class AndroidGC extends GC {
         canvas.drawPath(path, backgroundPaint);
     }
 
+    @Override
+    public int getAlpha() {
+        return foregroundPaint.getAlpha();
+    }
+
+    @Override
+    public Color getBackground() {
+        return backgroundColor;
+    }
+
+    @Override
+    public Color getForeground() {
+        return foregroundColor;
+    }
+
+    @Override
+    public FontMetrics getFontMetrics() {
+        Paint.FontMetrics androidMetrics = foregroundPaint.getFontMetrics();
+        FontMetrics result = new FontMetrics(
+                Math.round(-androidMetrics.ascent),
+                Math.round(androidMetrics.descent),
+                Math.round(foregroundPaint.measureText(" ")),
+                Math.round(Math.abs(androidMetrics.leading)),
+                Math.round((androidMetrics.bottom - androidMetrics.top)));
+        return result;
+    }
 
     @Override
     public void setFont(Font font) {
@@ -104,18 +138,71 @@ public class AndroidGC extends GC {
         foregroundPaint.setTextSize(fd.getHeight());
     }
 
-
     @Override
     public void setForeground(Color color) {
+        foregroundColor = color;
         foregroundPaint.setColor(0x0ff000000 | (color.getRed() << 16) | (color.getGreen() << 8) | color.getBlue());
     }
 
     @Override
     public void setBackground(Color color) {
+        backgroundColor = color;
         backgroundPaint.setColor(0x0ff000000 | (color.getRed() << 16) | (color.getGreen() << 8) | color.getBlue());
     }
 
+    @Override
+    public void setLineCap(int lineCap) {
+        switch (lineCap) {
+            case SWT.CAP_FLAT:
+                foregroundPaint.setStrokeCap(Paint.Cap.BUTT);
+                break;
+            case SWT.CAP_ROUND:
+                foregroundPaint.setStrokeCap(Paint.Cap.ROUND);
+                break;
+            case SWT.CAP_SQUARE:
+                foregroundPaint.setStrokeCap(Paint.Cap.SQUARE);
+                break;
+            default:
+                System.err.println("setLineCap(): Unrecognized value: " + lineCap);
+        }
+    }
 
+    @Override
+    public void setLineJoin(int lineJoin) {
+        switch (lineJoin) {
+            case SWT.JOIN_BEVEL:
+                foregroundPaint.setStrokeJoin(Paint.Join.BEVEL);
+                break;
+            case SWT.JOIN_MITER:
+                foregroundPaint.setStrokeJoin(Paint.Join.MITER);
+                break;
+            case SWT.JOIN_ROUND:
+                foregroundPaint.setStrokeJoin(Paint.Join.ROUND);
+                break;
+            default:
+                System.err.println("setLineJoin(): Unrecognized value: " + lineJoin);
+        }
+    }
 
+    @Override
+    public void setLineWidth(int lineWidth) {
+        foregroundPaint.setStrokeWidth(lineWidth);
+    }
 
+    @Override
+    public void setAlpha(int alpha) {
+        foregroundPaint.setAlpha(alpha);
+        backgroundPaint.setAlpha(alpha);
+    }
+
+    @Override
+    public void setAntialias(int antialias) {
+        foregroundPaint.setAntiAlias(antialias != 0);
+        backgroundPaint.setAntiAlias(antialias != 0);
+    }
+
+    public Point stringExtent(String text) {
+        foregroundPaint.getTextBounds(text, 0, text.length(), rect);
+        return new Point(rect.width(), rect.height());
+    }
 }

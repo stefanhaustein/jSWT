@@ -1,6 +1,7 @@
 package org.eclipse.swt.widgets;
 
 import com.google.gwt.core.client.JsArrayNumber;
+import org.eclipse.swt.graphics.GC;
 import org.kobjects.dom.Document;
 import org.kobjects.dom.Element;
 
@@ -9,6 +10,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 public class GwtDisplay extends PlatformDisplay {
 
@@ -38,6 +42,12 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
+    public void addItem(Combo combo, String s, int index) {
+        throw new RuntimeException("NYI");
+
+    }
+
+    @Override
     public void addChild(Composite composite, Control control) {
         log("addChild to: ", composite.peer, "; child: ", control);
         ((Element) composite.peer).appendChild((Element) control.peer);
@@ -45,7 +55,14 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
+    public void addTab(TabFolder tabFolder, int index, TabItem tabItem) {
+        throw new RuntimeException("NYI");
+
+    }
+
+    @Override
     public void addListener(Control control, int i, Listener listener) {
+        throw new RuntimeException("NYI");
 
     }
 
@@ -112,13 +129,27 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public void disposeShell(Shell shell) {
+    public Object createImage(int width, int height) {
+        throw new RuntimeException("NYI");
 
     }
 
     @Override
-    public boolean getEnabled(Control control) {
-        return true;
+    public GC creatGCForPlatformImage(Object platformImage) {
+        throw new RuntimeException("NYI");
+
+    }
+
+    @Override
+    public void disposeShell(Shell shell) {
+        throw new RuntimeException("NYI");
+
+    }
+
+    @Override
+    public boolean isEnabled(Control control) {
+        throw new RuntimeException("NYI");
+
     }
 
     @Override
@@ -132,13 +163,26 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
+    public Rectangle getImageBounds(Object platformImage) {
+        throw new RuntimeException("NYI");
+
+    }
+
+    @Override
     public Insets getInsets(Scrollable scrollable) {
         return new Insets();
     }
 
     @Override
+    public int getItemCount(Combo combo) {
+        throw new RuntimeException("NYI");
+
+    }
+
+    @Override
     public boolean getSelection(Button button) {
-        return false;
+        throw new RuntimeException("NYI");
+
     }
 
     @Override
@@ -150,9 +194,17 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
+    public Object loadImage(InputStream stream) throws IOException {
+        throw new RuntimeException("NYI");
+
+    }
+
+    @Override
     public void openShell(Shell shell) {
 
         //Element.getBody().appendChild((Element) shell.peer);
+        throw new RuntimeException("NYI");
+
     }
 
     @Override
@@ -162,6 +214,7 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public void removeChild(Composite composite, Control control) {
+        throw new RuntimeException("NYI");
 
     }
 
@@ -178,6 +231,12 @@ public class GwtDisplay extends PlatformDisplay {
             element.setAttribute("height", String.valueOf(h));
             ((Canvas) control).drawBackground(new GwtGC(element), 0, 0, w, h);
         }
+    }
+
+    @Override
+    public void setEnabled(Control control, boolean b) {
+        throw new RuntimeException("NYI");
+
     }
 
     @Override
@@ -198,51 +257,73 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public void setMeasuredSize(Control control, int i, int i1) {
+        throw new RuntimeException("NYI");
 
     }
 
     @Override
     public void setRange(Control control, int minimum, int maximum) {
+        throw new RuntimeException("NYI");
 
     }
 
     @Override
     public void setSliderProperties(Control control, int thumb, int increment, int pageIncrement) {
+        throw new RuntimeException("NYI");
 
     }
 
     @Override
     public void setSelection(Button button, boolean b) {
+        throw new RuntimeException("NYI");
 
     }
 
     @Override
     public void setSelection(Control control, int selection) {
+        throw new RuntimeException("NYI");
 
     }
 
     @Override
     public void showPopupMenu(Menu menu) {
+        throw new RuntimeException("NYI");
 
     }
 
     @Override
     public void updateMenuBar(Decorations decorations) {
+        throw new RuntimeException("NYI");
+
+    }
+
+    @Override
+    public void updateTab(TabFolder tabFolder, int index, TabItem tabItem) {
+        throw new RuntimeException("NYI");
 
     }
 
     @Override
     public int getScrollBarSize(ScrolledComposite scrolledComposite, int i) {
-        return 0;
+        throw new RuntimeException("NYI");
+
     }
 
     @Override
     public int getSelection(Control control) {
-        return 0;
+        throw new RuntimeException("NYI");
+
     }
 
     @Override
     public void redraw(Control control, int i, int i1, int i2, int i3, boolean b) {
+        throw new RuntimeException("NYI");
+
+    }
+
+    @Override
+    public void removeItems(Combo combo, int start, int end) {
+        throw new RuntimeException("NYI");
 
     }
 }
