@@ -9,15 +9,14 @@ import org.eclipse.swt.graphics.Rectangle;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.AbstractBorder;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import java.awt.CheckboxGroup;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Window;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
@@ -78,6 +77,11 @@ public class SwingDisplay extends PlatformDisplay {
         return new SwingSwtCanvas((Canvas) control);
       case COMPOSITE:
         return new JPanel(new SwingSwtLayoutManager((Composite) control));
+      case GROUP: {
+        JPanel panel = new JPanel(new SwingSwtLayoutManager((Composite) control));
+        panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+        return panel;
+      }
       case LABEL:
         return new javax.swing.JLabel();
       case TEXT:
@@ -322,7 +326,15 @@ public class SwingDisplay extends PlatformDisplay {
       case SHELL_DIALOG:
         ((JDialog) SwingUtilities.getRoot(peer)).setTitle(text);
         break;
+      case GROUP:
+        ((JPanel) peer).setBorder(new TitledBorder(text));
+        break;
     }
+  }
+
+  @Override
+  public void setVisible(Control control, boolean visible) {
+    ((JComponent) control.peer).setVisible(visible);
   }
 
   @Override
@@ -452,7 +464,16 @@ public class SwingDisplay extends PlatformDisplay {
 
   @Override
   public void setImage(Control control, Image image) {
-    System.err.println("FIXME: SwingDisplay.setImage()");  // FIXME
+    switch (control.getControlType()) {
+      case BUTTON_RADIO:
+      case BUTTON_CHECKBOY:
+      case BUTTON_PUSH:
+        ImageIcon imageIcon = new ImageIcon((java.awt.Image) image.peer);
+        ((AbstractButton) control.peer).setIcon(imageIcon);
+        break;
+      default:
+        System.err.println("FIXME: SwingDisplay.setImage() for " + control.getControlType());  // FIXME
+    }
   }
 
   @Override
@@ -604,35 +625,45 @@ public class SwingDisplay extends PlatformDisplay {
         }
         break;
       case SWT.Selection:
-        if (component instanceof JButton) {
-          JButton button = (JButton) component;
-          if (button.getActionListeners().length == 0) {
-            button.addActionListener(new ActionListener() {
-              @Override
-              public void actionPerformed(ActionEvent e) {
-                notifyListeners(control, SWT.Selection, e);
-              }
-            });
+        switch (control.getControlType()) {
+          case BUTTON_PUSH:
+          case BUTTON_CHECKBOY:
+          case BUTTON_RADIO: {
+            AbstractButton button = (AbstractButton) component;
+            if (button.getActionListeners().length == 0) {
+              button.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                  notifyListeners(control, SWT.Selection, e);
+                }
+              });
+            }
+
+            break;
           }
-        } else if (component instanceof JScrollBar) {
-          JScrollBar scrollbar = (JScrollBar) component;
-          if (scrollbar.getAdjustmentListeners().length == 0) {
-            scrollbar.addAdjustmentListener(new AdjustmentListener() {
-              @Override
-              public void adjustmentValueChanged(AdjustmentEvent e) {
-                notifyListeners(control, SWT.Selection, e);
-              }
-            });
+          case SLIDER: {
+            JScrollBar scrollbar = (JScrollBar) component;
+            if (scrollbar.getAdjustmentListeners().length == 0) {
+              scrollbar.addAdjustmentListener(new AdjustmentListener() {
+                @Override
+                public void adjustmentValueChanged(AdjustmentEvent e) {
+                  notifyListeners(control, SWT.Selection, e);
+                }
+              });
+            }
+            break;
           }
-        } else if (component instanceof JSlider) {
-          JSlider slider = (JSlider) component;
-          if (slider.getChangeListeners().length == 0) {
-            slider.addChangeListener(new ChangeListener() {
-              @Override
-              public void stateChanged(ChangeEvent e) {
-                notifyListeners(control, SWT.Selection, e);
-              }
-            });
+          case SCALE: {
+            JSlider slider = (JSlider) component;
+            if (slider.getChangeListeners().length == 0) {
+              slider.addChangeListener(new ChangeListener() {
+                @Override
+                public void stateChanged(ChangeEvent e) {
+                  notifyListeners(control, SWT.Selection, e);
+                }
+              });
+            }
+            break;
           }
         }
         break;
@@ -670,7 +701,8 @@ public class SwingDisplay extends PlatformDisplay {
 
   @Override
   public Monitor getMonitor(Control control) {
-    throw new RuntimeException("FIXME: SwingDisplay.getMonitor()");   // FIXME
+    System.err.println("FIXME: SwingDisplay.getMonitor()");   // FIXME
+    return new Monitor(new Rectangle(0, 0, 2000, 1000), new Rectangle(0, 0, 2000, 1000));
   }
 
 /*

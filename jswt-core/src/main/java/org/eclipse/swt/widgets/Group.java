@@ -7,6 +7,7 @@ public class Group extends Composite {
     }
 
     public void setText(String text) {
+        display.setText(this, text);
     }
 
     public ControlType getControlType() {

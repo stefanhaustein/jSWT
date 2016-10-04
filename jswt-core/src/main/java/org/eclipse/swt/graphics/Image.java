@@ -45,7 +45,7 @@ public class Image extends Resource {
         try {
             peer = ((PlatformDisplay) device).loadImage(new FileInputStream(filename));
         } catch (IOException e) {
-            SWT.error(SWT.ERROR_IO);
+            SWT.error(SWT.ERROR_IO, e);
         }
     }
 

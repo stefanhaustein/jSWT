@@ -210,8 +210,8 @@ public class Control extends Widget {
   }
 
 
-  public void setVisible(boolean selection) {
-      System.err.println("FIXME: Control.setVisible");         // FIXME
+  public void setVisible(boolean visible) {
+    display.setVisible(this, visible);
   }
 
   public String toString() {

@@ -82,6 +82,8 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract void setText(Control control, String text);
 
+  public abstract void setVisible(Control control, boolean visible);
+
   public abstract void showPopupMenu(Menu menu);
 
   public abstract void updateMenuBar(Decorations decorations);
@@ -93,6 +95,7 @@ public abstract class PlatformDisplay extends Display {
   public abstract void setAlignment(Control button, int alignment);
 
   public abstract String getItem(Combo combo, int i);
+
 
 
   public static class Insets {
