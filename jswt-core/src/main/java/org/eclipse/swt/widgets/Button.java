@@ -15,10 +15,16 @@ public class Button extends Control {
 
   ControlType getControlType() {
     if ((style & SWT.CHECK) != 0) {
-      return ControlType.BUTTON_CHECKBOY;
+      return ControlType.BUTTON_CHECKBOX;
     }
     if ((style & SWT.RADIO) != 0) {
       return ControlType.BUTTON_RADIO;
+    }
+    if ((style & SWT.TOGGLE) != 0) {
+      return ControlType.BUTTON_TOGGLE;
+    }
+    if ((style & SWT.ARROW) != 0) {
+      return ControlType.BUTTON_ARROW;
     }
     return ControlType.BUTTON_PUSH;
   }

@@ -14,7 +14,7 @@ public abstract class PlatformDisplay extends Display {
 
   public static PlatformDisplay instance;  // For image loading.
 
-  public abstract void addItem(Combo combo, String s, int index);
+  public abstract void addItem(Control control, String s, int index);
 
   public abstract void addChild(Composite parent, Control control);
 
@@ -40,7 +40,7 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract Insets getInsets(Scrollable composite);
 
-  public abstract int getItemCount(Combo combo);
+  public abstract int getItemCount(Control control);
 
   public abstract Monitor getMonitor(Control control);
 
@@ -94,7 +94,7 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract void setAlignment(Control button, int alignment);
 
-  public abstract String getItem(Combo combo, int i);
+  public abstract String getItem(Control control, int i);
 
 
 

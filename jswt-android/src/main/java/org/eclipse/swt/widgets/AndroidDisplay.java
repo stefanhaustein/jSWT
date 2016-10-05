@@ -77,7 +77,7 @@ public class AndroidDisplay extends PlatformDisplay {
     switch (control.getControlType()) {
       case BUTTON_PUSH:
         return new AppCompatButton(activity);
-      case BUTTON_CHECKBOY:
+      case BUTTON_CHECKBOX:
         return new AppCompatCheckBox(activity);
       case BUTTON_RADIO: {
         RadioButton radioButton = new AppCompatRadioButton(activity);

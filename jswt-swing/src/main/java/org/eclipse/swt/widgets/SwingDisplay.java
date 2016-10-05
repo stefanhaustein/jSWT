@@ -9,7 +9,6 @@ import org.eclipse.swt.graphics.Rectangle;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.border.AbstractBorder;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
@@ -31,16 +30,23 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
+import java.util.EventListener;
 
 public class SwingDisplay extends PlatformDisplay {
   int activeShells = 0;
 
-  HashMap<Widget, CheckboxGroup> checkBoxGroupMap = new HashMap<>();
-
   @Override
-  public void addItem(Combo combo, String s, int index) {
-    ((JComboBox<String>) combo.peer).insertItemAt(s, index);
+  public void addItem(Control control, String s, int index) {
+    switch (control.getControlType()) {
+      case COMBO:
+        ((JComboBox<String>) control.peer).insertItemAt(s, index);
+        break;
+      case LIST:
+        ((DefaultListModel) (((JList<String>) control.peer).getModel())).add(index, s);
+        break;
+      default:
+        throw new UnsupportedOperationException();
+    }
   }
 
   @Override
@@ -65,10 +71,32 @@ public class SwingDisplay extends PlatformDisplay {
   @Override
   public Object createControl(final Control control) {
     switch (control.getControlType()) {
-      case BUTTON_CHECKBOY:
+      case BUTTON_CHECKBOX:
+      case BUTTON_TOGGLE:
         return new JCheckBox();
-      case BUTTON_RADIO:
-        return new JRadioButton();
+      case BUTTON_RADIO: {
+        Composite parent = control.getParent();
+        ButtonGroup group = (ButtonGroup) parent.radioGroup;
+        if (group == null) {
+          parent.radioGroup = group = new ButtonGroup();
+        }
+        JRadioButton result = new JRadioButton();
+        group.add(result);
+        return result;
+      }
+      case BUTTON_ARROW: {
+        String label;
+        if ((control.style & SWT.UP) != 0) {
+          label = "^";
+        } else if ((control.style & SWT.DOWN) != 0) {
+          label = "v";
+        } else if ((control.style & SWT.LEFT) != 0) {
+          label = "<";
+        } else {
+          label = ">";
+        }
+        return new JButton(label);
+      }
       case BUTTON_PUSH:
         return new JButton();
       case COMBO:
@@ -84,6 +112,8 @@ public class SwingDisplay extends PlatformDisplay {
       }
       case LABEL:
         return new javax.swing.JLabel();
+      case LIST:
+        return new javax.swing.JList<String>(new DefaultListModel<String>());
       case TEXT:
         return new javax.swing.JTextField();
       case SLIDER:
@@ -207,14 +237,14 @@ public class SwingDisplay extends PlatformDisplay {
 
   @Override
   public boolean getSelection(Button button) {
-    return (button.peer instanceof JCheckBox) ? ((JCheckBox) button.peer).isSelected() : false;
+    return ((AbstractButton) button.peer).isSelected();
   }
 
   @Override
   public String getText(Control control) {
     Component peer = (Component) control.peer;
     switch (control.getControlType()) {
-      case BUTTON_CHECKBOY:
+      case BUTTON_CHECKBOX:
       case BUTTON_PUSH:
       case BUTTON_RADIO:
         return ((AbstractButton) peer).getText();
@@ -312,7 +342,7 @@ public class SwingDisplay extends PlatformDisplay {
       case TEXT:
         ((JTextField) peer).setText(text);
         break;
-      case BUTTON_CHECKBOY:
+      case BUTTON_CHECKBOX:
       case BUTTON_PUSH:
       case BUTTON_RADIO:
         ((AbstractButton) peer).setText(text);
@@ -363,11 +393,10 @@ public class SwingDisplay extends PlatformDisplay {
   @Override
   public void setSelection(Button button, boolean selected) {
     switch (button.getControlType()) {
-      case BUTTON_CHECKBOY:
-        ((JCheckBox) button.peer).setSelected(selected);
-        break;
+      case BUTTON_TOGGLE:
+      case BUTTON_CHECKBOX:
       case BUTTON_RADIO:
-        ((JRadioButton) button.peer).setSelected(selected);
+        ((AbstractButton) button.peer).setSelected(selected);
         break;
     }
   }
@@ -465,12 +494,14 @@ public class SwingDisplay extends PlatformDisplay {
   @Override
   public void setImage(Control control, Image image) {
     switch (control.getControlType()) {
-      case BUTTON_RADIO:
-      case BUTTON_CHECKBOY:
       case BUTTON_PUSH:
         ImageIcon imageIcon = new ImageIcon((java.awt.Image) image.peer);
         ((AbstractButton) control.peer).setIcon(imageIcon);
         break;
+      case BUTTON_RADIO:
+      case BUTTON_CHECKBOX:
+      case BUTTON_TOGGLE:
+        break;   // Image would overwrite control
       default:
         System.err.println("FIXME: SwingDisplay.setImage() for " + control.getControlType());  // FIXME
     }
@@ -482,8 +513,15 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
-  public String getItem(Combo combo, int i) {
-    return ((JComboBox<String>) combo.peer).getItemAt(i);
+  public String getItem(Control control, int i) {
+    switch (control.getControlType()) {
+      case COMBO:
+        return ((JComboBox<String>) control.peer).getItemAt(i);
+      case LIST:
+        return ((JList<String>) control.peer).getModel().getElementAt(i);
+      default:
+        throw new UnsupportedOperationException();
+    }
   }
 
   @Override
@@ -627,10 +665,10 @@ public class SwingDisplay extends PlatformDisplay {
       case SWT.Selection:
         switch (control.getControlType()) {
           case BUTTON_PUSH:
-          case BUTTON_CHECKBOY:
+          case BUTTON_CHECKBOX:
           case BUTTON_RADIO: {
             AbstractButton button = (AbstractButton) component;
-            if (button.getActionListeners().length == 0) {
+            if (!hasListener(button.getActionListeners())) {
               button.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -638,9 +676,22 @@ public class SwingDisplay extends PlatformDisplay {
                 }
               });
             }
-
             break;
-          }
+          }/*
+          case BUTTON_CHECKBOX:
+          case BUTTON_RADIO: {
+            AbstractButton button = (AbstractButton) component;
+            System.out.println("changeListeners: " + Arrays.toString(button.getChangeListeners()));
+            if (!hasListener(button.getChangeListeners())) {
+              button.addChangeListener(new ChangeListener() {
+                @Override
+                public void stateChanged(ChangeEvent e) {
+                  notifyListeners(control, SWT.Selection, e);
+                }
+              });
+            }
+            break;
+          }*/
           case SLIDER: {
             JScrollBar scrollbar = (JScrollBar) component;
             if (scrollbar.getAdjustmentListeners().length == 0) {
@@ -670,6 +721,15 @@ public class SwingDisplay extends PlatformDisplay {
     }
   }
 
+  private boolean hasListener(EventListener[] listeners) {
+    for (EventListener listener: listeners) {
+      if (!listener.getClass().getName().startsWith("javax.")) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   @Override
   public Insets getInsets(Scrollable scrollable) {
     Insets result = new Insets();
@@ -695,8 +755,15 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
-  public int getItemCount(Combo combo) {
-    return ((JComboBox<String>) combo.peer).getItemCount();
+  public int getItemCount(Control control) {
+    switch (control.getControlType()) {
+      case COMBO:
+        return ((JComboBox<String>) control.peer).getItemCount();
+      case LIST:
+        return ((JList<String>) control.peer).getModel().getSize();
+      default:
+        throw new UnsupportedOperationException();
+    }
   }
 
   @Override

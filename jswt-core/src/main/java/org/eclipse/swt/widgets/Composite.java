@@ -16,6 +16,10 @@ public class Composite extends Scrollable {
   Layout layout;
   ArrayList<Control> children = new ArrayList<>();
 
+  /** Used to store the radio group on platforms where they are separate objects */
+  Object radioGroup;
+
+
   public Composite(Composite parent, int style) {
     super(parent, style);
   }

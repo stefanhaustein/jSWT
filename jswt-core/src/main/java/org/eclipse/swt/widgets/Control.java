@@ -14,15 +14,14 @@ import org.eclipse.swt.graphics.Rectangle;
 public class Control extends Widget {
 
     enum ControlType {
-    BUTTON_CHECKBOY, BUTTON_PUSH, BUTTON_RADIO,
-    CANVAS,
-    COMPOSITE,
-    LABEL,
-    SCALE,
-    SHELL_ROOT, SHELL_DIALOG,
-    SLIDER,
-    TEXT, SCROLLED_COMPOSITE, TAB_FOLDER, COMBO, GROUP,
-  }
+      BUTTON_ARROW, BUTTON_CHECKBOX, BUTTON_PUSH, BUTTON_RADIO, BUTTON_TOGGLE,
+      CANVAS,
+      COMPOSITE,
+      LABEL,
+      SCALE,
+      SHELL_ROOT, SHELL_DIALOG,
+      SLIDER,
+      TEXT, SCROLLED_COMPOSITE, TAB_FOLDER, COMBO, GROUP, LIST};
 
   Menu menu;
   Object layoutData;
