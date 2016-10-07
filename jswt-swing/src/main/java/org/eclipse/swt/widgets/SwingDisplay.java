@@ -161,7 +161,7 @@ public class SwingDisplay extends PlatformDisplay {
         return contentPane;
       }
       case TAB_FOLDER:
-        return new JTabbedPane();
+        return new JTabbedPane(JTabbedPane.TOP, JTabbedPane.WRAP_TAB_LAYOUT);
       default:
         throw new RuntimeException("Unrecognized component: " + control);
     }
@@ -484,7 +484,7 @@ public class SwingDisplay extends PlatformDisplay {
   public void updateTab(TabFolder tabFolder, int index, TabItem tabItem) {
     JTabbedPane tabbedPane = (JTabbedPane) tabFolder.peer;
     if (tabItem.control != null) {
-      tabbedPane.setTabComponentAt(index, (JComponent) tabItem.getControl().peer);
+      tabbedPane.setComponentAt(index, (JComponent) tabItem.getControl().peer);
     }
     if (tabItem.text != null) {
       tabbedPane.setTitleAt(index, tabItem.text);

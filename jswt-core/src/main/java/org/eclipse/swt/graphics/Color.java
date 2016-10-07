@@ -38,6 +38,10 @@ public class Color extends Resource {
         return red;
     }
 
+    public RGB getRGB() {
+        return new RGB(red, green, blue);
+    }
+
     public int getGreen() {
         return green;
     }

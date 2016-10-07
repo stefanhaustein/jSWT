@@ -96,8 +96,6 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract String getItem(Control control, int i);
 
-
-
   public static class Insets {
     public int top;
     public int left;

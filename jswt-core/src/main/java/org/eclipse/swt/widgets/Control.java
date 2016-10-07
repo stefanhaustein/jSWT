@@ -7,13 +7,14 @@ import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
 public class Control extends Widget {
 
-    enum ControlType {
+  enum ControlType {
       BUTTON_ARROW, BUTTON_CHECKBOX, BUTTON_PUSH, BUTTON_RADIO, BUTTON_TOGGLE,
       CANVAS,
       COMPOSITE,
@@ -26,6 +27,11 @@ public class Control extends Widget {
   Menu menu;
   Object layoutData;
   Object peer;
+
+
+  String depth() {
+    return this instanceof Shell ? "" : ("  " + getParent().depth());
+  }
 
   public Control(Composite parent, int style) {
     super(parent, style);
@@ -73,10 +79,14 @@ public class Control extends Widget {
       size = display.computeSize(this, wHint, hHint, changed);
     }
     display.setMeasuredSize(this, size.x, size.y);
-    System.out.println(this + ".computeSize(" + wHint + ", " + hHint + "): " + size);
+    System.out.println(depth() + this.getControlType() + ".computeSize(" + wHint + ", " + hHint + "): " + size);
     return size;
   }
 
+  public Color getBackground() {
+    System.err.println("FIXME: Control.getBackground()");
+    return null;
+  }
 
   public int getBorderWidth() {
     return 0;
@@ -94,6 +104,18 @@ public class Control extends Widget {
   public boolean getEnabled() {
         return display.isEnabled(this);
     }
+
+
+  public Font getFont() {
+    System.err.println("Fixme: Control.getFont()");  // FIXME
+    return null;
+  }
+
+
+  public Color getForeground() {
+    System.err.println("FIXME: Control.getForeground()");
+    return null;
+  }
 
   public Object getLayoutData() {
         return layoutData;
@@ -174,12 +196,20 @@ public class Control extends Widget {
     display.setEnabled(this, b);
   }
 
+  public void setForeground(Color color) {
+    System.err.println("FIXME: Control.setForeground()");
+  }
+
   public void setLayoutData(Object layoutData) {
     this.layoutData = layoutData;
   }
 
   public void setMenu(Menu popup) {
     System.err.println("FIXME: Control.setMenu()");  // FIXME
+  }
+
+  public void setFont(Font font) {
+    System.err.println("FIXME: Control.setFont()");
   }
 
   public void setFocus() {

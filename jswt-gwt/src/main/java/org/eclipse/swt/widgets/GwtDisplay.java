@@ -2,6 +2,7 @@ package org.eclipse.swt.widgets;
 
 import com.google.gwt.core.client.JsArrayNumber;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.kobjects.dom.Document;
 import org.kobjects.dom.Element;
 
@@ -42,9 +43,8 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public void addItem(Combo combo, String s, int index) {
+    public void addItem(Control control, String s, int index) {
         throw new RuntimeException("NYI");
-
     }
 
     @Override
@@ -174,9 +174,13 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public int getItemCount(Combo combo) {
+    public int getItemCount(Control control) {
         throw new RuntimeException("NYI");
+    }
 
+    @Override
+    public Monitor getMonitor(Control control) {
+        throw new RuntimeException("NYI");
     }
 
     @Override
@@ -240,6 +244,11 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
+    public void setFocus(Control control) {
+        throw new RuntimeException("NYI");
+    }
+
+    @Override
     public void setText(Control control, String s) {
         if (control instanceof Shell) {
             Document.get().setTitle(s);
@@ -253,6 +262,11 @@ public class GwtDisplay extends PlatformDisplay {
                 element.setTextContent(s);
             }
         }
+    }
+
+    @Override
+    public void setVisible(Control control, boolean visible) {
+        throw new RuntimeException("NYI");
     }
 
     @Override
@@ -301,6 +315,21 @@ public class GwtDisplay extends PlatformDisplay {
     public void updateTab(TabFolder tabFolder, int index, TabItem tabItem) {
         throw new RuntimeException("NYI");
 
+    }
+
+    @Override
+    public void setImage(Control control, Image image) {
+        throw new RuntimeException("NYI");
+    }
+
+    @Override
+    public void setAlignment(Control button, int alignment) {
+        throw new RuntimeException("NYI");
+    }
+
+    @Override
+    public String getItem(Control control, int i) {
+        throw new RuntimeException("NYI");
     }
 
     @Override

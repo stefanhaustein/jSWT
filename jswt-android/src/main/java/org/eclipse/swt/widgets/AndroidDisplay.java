@@ -191,8 +191,14 @@ public class AndroidDisplay extends PlatformDisplay {
     return new Insets();
   }
 
+
   @Override
-  public int getItemCount(Combo combo) {
+  public Monitor getMonitor(Control control) {
+    throw new RuntimeException("NYI");
+  }
+
+  @Override
+  public int getItemCount(Control control) {
     throw new RuntimeException("NYI");
 
   }
@@ -237,6 +243,11 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
+  public void setFocus(Control control) {
+    throw new RuntimeException("NYI");
+  }
+
+  @Override
   public String getText(Control control) {
     Object peer = control.peer;
     if (peer instanceof TextView) {
@@ -256,6 +267,11 @@ public class AndroidDisplay extends PlatformDisplay {
     } else if (peer instanceof SwtShellView) {
       ((SwtShellView) peer).setText(text);
     }
+  }
+
+  @Override
+  public void setVisible(Control control, boolean visible) {
+    throw new RuntimeException("NYI");
   }
 
 
@@ -312,6 +328,21 @@ public class AndroidDisplay extends PlatformDisplay {
   public void updateTab(TabFolder tabFolder, int index, TabItem tabItem) {
     throw new RuntimeException("NYI");
 
+  }
+
+  @Override
+  public void setImage(Control control, Image image) {
+    throw new RuntimeException("NYI");
+  }
+
+  @Override
+  public void setAlignment(Control button, int alignment) {
+    throw new RuntimeException("NYI");
+  }
+
+  @Override
+  public String getItem(Control control, int i) {
+    throw new RuntimeException("NYI");
   }
 
   @Override
@@ -412,7 +443,7 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
-  public void addItem(Combo combo, String s, int index) {
+  public void addItem(Control control, String s, int index) {
     throw new RuntimeException("NYI");
   }
 
