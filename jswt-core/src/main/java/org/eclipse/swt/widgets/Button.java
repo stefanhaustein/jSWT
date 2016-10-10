@@ -37,6 +37,10 @@ public class Button extends Control {
     return display.getText(this);
   }
 
+  public void removeSelectionListener(SelectionListener listener) {
+    removeListener(SWT.Selection, listener);
+  }
+
   public void setSelection(boolean selected) {
     display.setSelection(this, selected);
   }

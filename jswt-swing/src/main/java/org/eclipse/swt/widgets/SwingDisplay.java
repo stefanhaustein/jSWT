@@ -2,7 +2,8 @@ package org.eclipse.swt.widgets;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -15,7 +16,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
@@ -432,6 +436,16 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
+  public void setSelection(List control, int index, boolean selected) {
+    JList<String> list = (JList<String>) control.peer;
+    if (selected) {
+      list.addSelectionInterval(index, index);
+    } else {
+      list.removeSelectionInterval(index, index);
+    }
+  }
+
+  @Override
   public void showPopupMenu(Menu menu) {
     JPopupMenu popupMenu = new JPopupMenu();
     menuAddAll(menu, popupMenu);
@@ -446,11 +460,21 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
-  public void removeItems(Combo combo, int start, int end) {
-    JComboBox<String> jComboBox = (JComboBox<String>) combo.peer;
-    while (end >= start) {
-      jComboBox.removeItemAt(end);
-      end--;
+  public void removeItems(Control control, int start, int end) {
+    switch (control.getControlType()) {
+      case COMBO: {
+        JComboBox<String> jComboBox = (JComboBox<String>) control.peer;
+        while (end >= start) {
+          jComboBox.removeItemAt(end--);
+        }
+        break;
+      }
+      case LIST:
+        JList<String> list = ((JList<String>) control.peer);
+        while (end >= start) {
+          list.remove(end--);
+        }
+        break;
     }
   }
 
@@ -463,7 +487,6 @@ public class SwingDisplay extends PlatformDisplay {
   public void removeChild(Composite composite, Control child) {
       ((Container) composite.peer).remove((JComponent) child.peer);
   }
-
 
   @Override
   public void updateMenuBar(Decorations decorations) {
@@ -510,6 +533,27 @@ public class SwingDisplay extends PlatformDisplay {
   @Override
   public void setAlignment(Control button, int alignment) {
     System.err.println("FIXME: SwingDisplay.setImage()");  // FIXME
+  }
+
+  @Override
+  public boolean isSelected(List list, int i) {
+    return ((JList<String>) list.peer).isSelectedIndex(i);
+  }
+
+  @Override
+  public void setFont(Control control, Font font) {
+    System.err.println("FIXME: SwingDisplay.setFont()");         // FIXME
+  }
+
+  @Override
+  public void setItem(Control control, int index, String string) {
+    switch (control.getControlType()) {
+      case LIST:
+        ((DefaultListModel<String>) ((JList<String>) control.peer).getModel()).set(index, string);
+        break;
+      default:
+        System.err.println("FIXME: SwingDisplay.setItem()");
+    }
   }
 
   @Override

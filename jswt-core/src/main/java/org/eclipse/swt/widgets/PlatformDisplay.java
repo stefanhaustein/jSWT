@@ -2,10 +2,7 @@ package org.eclipse.swt.widgets;
 
 
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.graphics.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,6 +37,8 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract Insets getInsets(Scrollable composite);
 
+  public abstract String getItem(Control control, int index);
+
   public abstract int getItemCount(Control control);
 
   public abstract Monitor getMonitor(Control control);
@@ -60,7 +59,7 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract void redraw(Control control, int x, int y, int w, int h, boolean all);
 
-  public abstract void removeItems(Combo combo, int start, int end);
+  public abstract void removeItems(Control control, int start, int end);
 
   public abstract void removeChild(Composite composite, Control child);
 
@@ -80,6 +79,8 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract void setSelection(Control control, int selection);
 
+  public abstract void setSelection(List list, int index, boolean selected);
+
   public abstract void setText(Control control, String text);
 
   public abstract void setVisible(Control control, boolean visible);
@@ -94,7 +95,12 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract void setAlignment(Control button, int alignment);
 
-  public abstract String getItem(Control control, int i);
+  public abstract boolean isSelected(List list, int i);
+
+  public abstract void setFont(Control control, Font font);
+
+  public abstract void setItem(Control control, int index, String string);
+
 
   public static class Insets {
     public int top;
