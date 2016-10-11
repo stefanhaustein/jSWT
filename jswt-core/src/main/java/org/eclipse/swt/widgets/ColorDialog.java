@@ -5,6 +5,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.kobjects.jswt.Callback;
@@ -18,22 +19,33 @@ public class ColorDialog extends Dialog implements CallbackDialog<RGB> {
         super(parent);
     }
 
-
     @Override
     public void open(final Callback<RGB> callback) {
         final Shell shell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
         shell.setText("Choose Color");
 
-        shell.setLayout(new GridLayout());
+        GridLayout gridlayout = new GridLayout(2, false);
+        gridlayout.marginHeight = 0;
+        gridlayout.marginWidth = 0;
+        shell.setLayout(gridlayout);
 
+        new Label(shell, SWT.NONE).setText("Red");
         final Scale red = new Scale(shell, SWT.NONE);
         red.setMaximum(255);
+
+        new Label(shell, SWT.NONE).setText("Green");
         final Scale green = new Scale(shell, SWT.NONE);
         green.setMaximum(255);
+
+        new Label(shell, SWT.NONE).setText("Blue");
         final Scale blue = new Scale(shell, SWT.NONE);
         blue.setMaximum(255);
 
         Composite buttonPanel = new Composite(shell, SWT.NONE);
+        GridData panelData = new GridData();
+        panelData.horizontalSpan = 2;
+        panelData.horizontalAlignment = SWT.RIGHT;
+        buttonPanel.setLayoutData(panelData);
         buttonPanel.setLayout(new RowLayout());
 
         final Button cancelButton = new Button(buttonPanel, SWT.PUSH);
@@ -41,6 +53,7 @@ public class ColorDialog extends Dialog implements CallbackDialog<RGB> {
         cancelButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
+                shell.dispose();
                 callback.cancel();
             }
         });
@@ -50,6 +63,7 @@ public class ColorDialog extends Dialog implements CallbackDialog<RGB> {
         okButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
+                shell.dispose();
                 callback.run(new RGB(
                         red.getSelection(),
                         green.getSelection(),
@@ -62,7 +76,7 @@ public class ColorDialog extends Dialog implements CallbackDialog<RGB> {
     }
 
     public RGB open() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Use org.kobjects.jswt.Dialogs.open() instead.");
     }
 
     public void setRGB(RGB rgb) {
