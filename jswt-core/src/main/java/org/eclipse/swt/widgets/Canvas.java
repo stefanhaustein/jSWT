@@ -1,5 +1,6 @@
 package org.eclipse.swt.widgets;
 
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.GC;
 
 public class Canvas extends Composite {

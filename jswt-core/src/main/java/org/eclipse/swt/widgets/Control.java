@@ -2,10 +2,7 @@ package org.eclipse.swt.widgets;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -64,6 +61,11 @@ public class Control extends Widget {
   public void addMouseWheelListener(MouseWheelListener mouseWheelListener) {
     addListener(SWT.MouseWheel, new TypedListener(mouseWheelListener));
   }
+
+  public void addPaintListener(PaintListener listener) {
+    addListener(SWT.Paint, new TypedListener(listener));
+  }
+
 
   public Point computeSize(int wHint, int hHint) {
     return computeSize(wHint, hHint, true);

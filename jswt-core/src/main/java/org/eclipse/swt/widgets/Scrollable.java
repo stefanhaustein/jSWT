@@ -29,4 +29,14 @@ public class Scrollable extends Control {
   }
 
 
+    public ScrollBar getHorizontalBar() {
+      return null;
+    }
+
+  public ScrollBar getVerticalBar() {
+    return null;
+  }
+
+  public void scroll(int x, int cy, int cx, int cy1, int maxX, int maxY, boolean b) {
+  }
 }

@@ -6,6 +6,8 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyListener;
 
 public class Text extends Control {
+  public static final String DELIMITER = "\n";
+
   public Text(Composite parent, int style) {
     super(parent, style);
   }

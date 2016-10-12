@@ -166,9 +166,13 @@ public class GC extends Resource {
         delegate.setLineWidth(width);
     }
 
+
     public Point stringExtent(String text) {
         return delegate.stringExtent(text);
     }
 
+    public Point textExtent(String text) {
+        return delegate.textExtent(text);
+    }
 }
 

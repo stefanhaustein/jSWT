@@ -2,6 +2,7 @@ package org.eclipse.swt.widgets;
 
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 
 public class Shell extends Decorations {
 
@@ -41,5 +42,13 @@ public class Shell extends Decorations {
   }
 
   public void setDefaultButton(Button button) {
+  }
+
+    public void setFullScreen(boolean fullScreen) {
+      System.err.println("FIXME: Shell.setFullScreen()");
+    }
+
+  public void setImage(Image image) {
+    display.setImage(this, image);
   }
 }
