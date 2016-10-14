@@ -1,5 +1,34 @@
 package org.eclipse.swt.widgets;
 
+import java.awt.GraphicsEnvironment;
+import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JProgressBar;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.JSpinner;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.RootPaneContainer;
+import javax.swing.SwingUtilities;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.graphics.*;
@@ -9,7 +38,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
@@ -38,6 +66,7 @@ import java.util.EventListener;
 
 public class SwingDisplay extends PlatformDisplay {
   int activeShells = 0;
+  private Monitor monitor;
 
   @Override
   public void addItem(Control control, String s, int index) {
@@ -120,6 +149,8 @@ public class SwingDisplay extends PlatformDisplay {
         return new javax.swing.JList<String>(new DefaultListModel<String>());
       case TEXT:
         return new javax.swing.JTextField();
+      case PROGRESS_BAR:
+        return new JProgressBar();
       case SLIDER:
         return new javax.swing.JScrollBar((control.style & SWT.VERTICAL) != 0 ?
                 javax.swing.JScrollBar.VERTICAL : javax.swing.JScrollBar.HORIZONTAL);
@@ -164,6 +195,8 @@ public class SwingDisplay extends PlatformDisplay {
         });
         return contentPane;
       }
+      case SPINNER:
+        return new JSpinner();
       case TAB_FOLDER:
         return new JTabbedPane(JTabbedPane.TOP, JTabbedPane.WRAP_TAB_LAYOUT);
       default:
@@ -208,6 +241,12 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
+  public Color getForeground(Control control) {
+    java.awt.Color awtColor = ((Component) control.peer).getForeground();
+    return awtColor == null ? null : new Color(this, awtColor.getRed(), awtColor.getGreen(), awtColor.getBlue(), awtColor.getAlpha());
+  }
+
+  @Override
   public Rectangle getImageBounds(Object platformImage) {
     BufferedImage image = (BufferedImage) platformImage;
     return new Rectangle(0, 0, image.getWidth(), image.getHeight());
@@ -216,6 +255,12 @@ public class SwingDisplay extends PlatformDisplay {
   @Override
   public boolean isEnabled(Control control) {
     return ((java.awt.Component) control.peer).isEnabled();
+  }
+
+  @Override
+  public Color getBackground(Control control) {
+    java.awt.Color awtColor = ((Component) control.peer).getBackground();
+    return awtColor == null ? null : new Color(this, awtColor.getRed(), awtColor.getGreen(), awtColor.getBlue(), awtColor.getAlpha());
   }
 
   @Override
@@ -228,12 +273,16 @@ public class SwingDisplay extends PlatformDisplay {
   @Override
   public int getSelection(Control control) {
     switch (control.getControlType()) {
+      case COMBO:
+        return ((JComboBox<String>) control.peer).getSelectedIndex();
+      case PROGRESS_BAR:
+        return ((JProgressBar) control.peer).getValue();
+      case SPINNER:
+        return (Integer) ((JSpinner) control.peer).getValue();
       case SLIDER:
         return ((JScrollBar) control.peer).getValue();
       case SCALE:
         return ((JSlider) control.peer).getValue();
-      case COMBO:
-        return ((JComboBox<String>) control.peer).getSelectedIndex();
       default:
         throw new RuntimeException("getSelection() not applicable to " + control.getControlType());
     }
@@ -318,9 +367,10 @@ public class SwingDisplay extends PlatformDisplay {
   public void setBounds(Control control, int x, int y, int width, int height) {
     Component component = (Component) control.peer;
     if (control instanceof Decorations) {
-      Component root = SwingUtilities.getRoot(component);
+      Window root = SwingUtilities.getWindowAncestor(component);
       root.setLocation(x, y);
-      component.setSize(width, height);
+      root.setSize(width, height);
+//      component.setSize(width, height);
     } else {
       component.setBounds(x, y, width, height);
     }
@@ -337,6 +387,12 @@ public class SwingDisplay extends PlatformDisplay {
   @Override
   public void setFocus(Control control) {
     ((JComponent) control.peer).grabFocus();
+  }
+
+  @Override
+  public void setForeground(Control control, Color color) {
+    ((Component) control.peer).setForeground(color == null ? null :
+            new java.awt.Color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()));
   }
 
   @Override
@@ -430,6 +486,12 @@ public class SwingDisplay extends PlatformDisplay {
       case COMBO:
         ((JComboBox<String>) control.peer).setSelectedIndex(selection);
         break;
+      case PROGRESS_BAR:
+        ((JProgressBar) control.peer).setValue(selection);
+        break;
+      case SPINNER:
+        ((JSpinner) control.peer).setValue(selection);
+        break;
       default:
         throw new RuntimeException("setSelection() not applicable to " + control.getControlType());
     }
@@ -489,6 +551,17 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
+  public void setBackground(Control control, Color color) {
+    ((Component) control.peer).setBackground(color == null ? null :
+            new java.awt.Color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()));
+  }
+
+  @Override
+  public void setBackgroundImage(Control control, Image image) {
+    // Unsupported
+  }
+
+  @Override
   public void updateMenuBar(Decorations decorations) {
     JMenuBar awtMenuBar = new JMenuBar();
 
@@ -517,14 +590,20 @@ public class SwingDisplay extends PlatformDisplay {
   @Override
   public void setImage(Control control, Image image) {
     switch (control.getControlType()) {
-      case BUTTON_PUSH:
+      case BUTTON_PUSH: {
         ImageIcon imageIcon = new ImageIcon((java.awt.Image) image.peer);
         ((AbstractButton) control.peer).setIcon(imageIcon);
         break;
+      }
       case BUTTON_RADIO:
       case BUTTON_CHECKBOX:
       case BUTTON_TOGGLE:
         break;   // Image would overwrite control
+      case LABEL: {
+        ImageIcon imageIcon = new ImageIcon((java.awt.Image) image.peer);
+        ((JLabel) control.peer).setIcon(imageIcon);
+        break;
+      }
       default:
         System.err.println("FIXME: SwingDisplay.setImage() for " + control.getControlType());  // FIXME
     }
@@ -554,6 +633,13 @@ public class SwingDisplay extends PlatformDisplay {
       default:
         System.err.println("FIXME: SwingDisplay.setItem()");
     }
+  }
+
+  @Override
+  public Font getFont(Control control) {
+    java.awt.Font awtFont = ((Component) control.peer).getFont();
+    return awtFont == null ? null : new Font(this, awtFont.getName(), awtFont.getSize(),
+            (awtFont.isBold() ? SWT.BOLD : 0) + (awtFont.isItalic() ? SWT.ITALIC : 0));
   }
 
   @Override
@@ -598,6 +684,7 @@ public class SwingDisplay extends PlatformDisplay {
       case SWT.Modify:
         if (component instanceof JTextField) {
           JTextField textComponent = (JTextField) component;
+         // FIXME: Listener management
          // if (textComponent.getDocument()..length == 0) {
             textComponent.getDocument().addDocumentListener(new DocumentListener() {
               @Override
@@ -721,21 +808,7 @@ public class SwingDisplay extends PlatformDisplay {
               });
             }
             break;
-          }/*
-          case BUTTON_CHECKBOX:
-          case BUTTON_RADIO: {
-            AbstractButton button = (AbstractButton) component;
-            System.out.println("changeListeners: " + Arrays.toString(button.getChangeListeners()));
-            if (!hasListener(button.getChangeListeners())) {
-              button.addChangeListener(new ChangeListener() {
-                @Override
-                public void stateChanged(ChangeEvent e) {
-                  notifyListeners(control, SWT.Selection, e);
-                }
-              });
-            }
-            break;
-          }*/
+          }
           case SLIDER: {
             JScrollBar scrollbar = (JScrollBar) component;
             if (scrollbar.getAdjustmentListeners().length == 0) {
@@ -812,26 +885,12 @@ public class SwingDisplay extends PlatformDisplay {
 
   @Override
   public Monitor getMonitor(Control control) {
-    System.err.println("FIXME: SwingDisplay.getMonitor()");   // FIXME
-    return new Monitor(new Rectangle(0, 0, 2000, 1000), new Rectangle(0, 0, 2000, 1000));
+    Window window = SwingUtilities.getWindowAncestor(((Component) control.peer));
+    java.awt.Rectangle bounds = window.getGraphicsConfiguration().getBounds();
+    java.awt.Insets insets = window.getToolkit().getScreenInsets(window.getGraphicsConfiguration());
+    return new Monitor(new Rectangle(bounds.x, bounds.y, bounds.width, bounds.height),
+            new Rectangle(bounds.x + insets.left, bounds.y + insets.top,
+                    bounds.width - insets.left - insets.right,
+                    bounds.height - insets.top - insets.bottom));
   }
-
-/*
-  static class RadioButton extends Checkbox {
-    Checkbox other;
-    RadioButton() {
-      super(null, new CheckboxGroup(), false);
-      other = new Checkbox(null, getCheckboxGroup(), false);
-    }
-
-    @Override
-    public void setState(boolean state) {
-      if (!state) {
-        other.setState(true);
-      } else {
-        super.setState(true);
-      }
-    }
-  }
-*/
 }

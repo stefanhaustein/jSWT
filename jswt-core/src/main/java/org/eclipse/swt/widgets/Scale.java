@@ -45,8 +45,8 @@ public class Scale extends Control {
     }
 
     public void setIncrement(int newValue) {
-        if (this.pageIncrement != newValue) {
-            this.pageIncrement = newValue;
+        if (this.increment != newValue) {
+            this.increment = newValue;
             display.setSliderProperties(this, 1, increment, pageIncrement);
         }
     }
@@ -74,5 +74,9 @@ public class Scale extends Control {
 
     public void setSelection(int selection) {
         display.setSelection(this, selection);
+    }
+
+    public int getIncrement() {
+        return increment;
     }
 }

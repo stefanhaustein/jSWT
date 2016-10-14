@@ -31,7 +31,11 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract boolean isEnabled(Control control);
 
+  public abstract Color getBackground(Control control);
+
   public abstract Rectangle getBounds(Control control);
+
+  public abstract Color getForeground(Control control);
 
   public abstract Rectangle getImageBounds(Object platformImage);
 
@@ -63,11 +67,17 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract void removeChild(Composite composite, Control child);
 
+  public abstract void setBackground(Control control, Color color);
+
+  public abstract void setBackgroundImage(Control control, Image image);
+
   public abstract void setBounds(Control control, int x, int y, int width, int height);
 
   public abstract void setEnabled(Control control, boolean b);
 
   public abstract void setFocus(Control control);
+
+  public abstract void setForeground(Control control, Color color);
 
   public abstract void setMeasuredSize(Control control, int width, int height);
 
@@ -100,6 +110,8 @@ public abstract class PlatformDisplay extends Display {
   public abstract void setFont(Control control, Font font);
 
   public abstract void setItem(Control control, int index, String string);
+
+  public abstract Font getFont(Control control);
 
 
   public static class Insets {

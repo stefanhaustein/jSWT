@@ -19,12 +19,15 @@ public class Control extends Widget {
       SCALE,
       SHELL_ROOT, SHELL_DIALOG,
       SLIDER,
-      TEXT, SCROLLED_COMPOSITE, TAB_FOLDER, COMBO, GROUP, LIST};
+      TEXT, SCROLLED_COMPOSITE, TAB_FOLDER, COMBO, GROUP, SPINNER, PROGRESS_BAR, LIST};
 
   Menu menu;
   Object layoutData;
   Object peer;
-
+  Color foreground;
+  Color background;
+  Font font;
+  Image backgroundImage;
 
   String depth() {
     return this instanceof Shell ? "" : ("  " + getParent().depth());
@@ -86,8 +89,10 @@ public class Control extends Widget {
   }
 
   public Color getBackground() {
-    System.err.println("FIXME: Control.getBackground()");
-    return null;
+   if (background == null) {
+     background = display.getBackground(this);
+   }
+   return background;
   }
 
   public int getBorderWidth() {
@@ -109,13 +114,17 @@ public class Control extends Widget {
 
 
   public Font getFont() {
-    System.err.println("Fixme: Control.getFont()");  // FIXME
-    return null;
+    if (font == null) {
+      font = display.getFont(this);
+    }
+    return font;
   }
 
 
   public Color getForeground() {
-    System.err.println("FIXME: Control.getForeground()");
+    if (foreground == null) {
+      foreground = display.getForeground(this);
+    }
     return null;
   }
 
@@ -140,8 +149,6 @@ public class Control extends Widget {
       System.err.println("FIXME: Control.getOrientation");
       return 0;
   }
-
-
 
   public Composite getParent() {
     return (Composite) parent;
@@ -178,11 +185,15 @@ public class Control extends Widget {
   }
 
   public void setBackground(Color color) {
-      System.err.println("FIXME: Control.setBackground()");  // FIXME
+    this.background = color;
+    display.setBackground(this, color);
   }
 
   public void setBackgroundImage(Image image) {
-     System.err.println("FIXME: Control.setBackgroundImage()");  // FIXME
+     if (backgroundImage != image) {
+       backgroundImage = image;
+       display.setBackgroundImage(this, image);
+     }
   }
 
   public void setBounds(int x, int y, int width, int height) {
@@ -199,7 +210,8 @@ public class Control extends Widget {
   }
 
   public void setForeground(Color color) {
-    System.err.println("FIXME: Control.setForeground()");
+    this.foreground = color;
+    display.setForeground(this, color);
   }
 
   public void setLayoutData(Object layoutData) {
@@ -207,11 +219,15 @@ public class Control extends Widget {
   }
 
   public void setMenu(Menu popup) {
+    this.menu = popup;
     System.err.println("FIXME: Control.setMenu()");  // FIXME
   }
 
   public void setFont(Font font) {
-    System.err.println("FIXME: Control.setFont()");
+    if (font != this.font) {
+      this.font = font;
+      display.setFont(this, font);
+    }
   }
 
   public void setFocus() {

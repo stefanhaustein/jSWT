@@ -103,4 +103,8 @@ public class Slider extends Control {
         }
         display.setSelection(this, selection);
     }
+
+    public int getIncrement() {
+        return increment;
+    }
 }
