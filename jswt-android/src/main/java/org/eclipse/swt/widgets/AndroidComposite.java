@@ -7,11 +7,11 @@ import android.view.ViewGroup;
 
 import org.eclipse.swt.SWT;
 
-class SwtViewGroup extends ViewGroup {
+class AndroidComposite extends ViewGroup {
 
     Composite composite;
 
-    SwtViewGroup(Context context, Composite container) {
+    AndroidComposite(Context context, Composite container) {
         super(context);
         this.composite = container;
     }

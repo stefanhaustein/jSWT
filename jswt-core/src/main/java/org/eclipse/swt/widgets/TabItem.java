@@ -3,7 +3,6 @@ package org.eclipse.swt.widgets;
 public class TabItem extends Item {
 
     Control control;
-    String text;
 
     public TabItem(TabFolder parent, int style) {
         this(parent, style, parent.itemList.size());
@@ -24,7 +23,7 @@ public class TabItem extends Item {
     }
 
     public void setText(String text) {
-        this.text = text;
+        super.setText(text);
         update();
     }
 

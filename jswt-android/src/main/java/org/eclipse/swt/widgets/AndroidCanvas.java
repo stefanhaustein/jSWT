@@ -1,13 +1,12 @@
 package org.eclipse.swt.widgets;
 
 import android.content.Context;
-import android.view.View;
 
-public class SwtCanvasView extends SwtViewGroup {
+class AndroidCanvas extends AndroidComposite {
 
     Canvas swtCanvas;
 
-    public SwtCanvasView(Context context, Canvas swtCanvas) {
+    public AndroidCanvas(Context context, Canvas swtCanvas) {
         super(context, swtCanvas);
         this.swtCanvas = swtCanvas;
         this.setWillNotDraw(false);

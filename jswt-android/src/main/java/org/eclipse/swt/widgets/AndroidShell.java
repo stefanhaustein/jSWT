@@ -4,13 +4,13 @@ package org.eclipse.swt.widgets;
 import android.content.Context;
 import android.support.v7.app.AlertDialog;
 
-public class SwtShellView extends SwtViewGroup {
+class AndroidShell extends AndroidComposite {
     AlertDialog.Builder dialogBuilder;
     AlertDialog dialog;
     String text;
     Shell shell;
 
-    SwtShellView(Context context, Shell shell) {
+    AndroidShell(Context context, Shell shell) {
         super(context, shell);
         this.shell = shell;
         if (shell.parent != null) {
