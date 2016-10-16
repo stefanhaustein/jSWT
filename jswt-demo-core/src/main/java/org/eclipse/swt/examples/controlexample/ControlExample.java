@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
+import org.kobjects.jswt.ResourceLoader;
 
 public class ControlExample {
 	private static ResourceBundle resourceBundle =
@@ -186,43 +187,35 @@ public class ControlExample {
 	 */
 	void initResources(Device device) {
 		final Class<ControlExample> clazz = ControlExample.class;
-		if (resourceBundle != null) {
-			try {
-				if (images == null) {
-					images = new Image[imageLocations.length];
-					
-					for (int i = 0; i < imageLocations.length; ++i) {
-						InputStream sourceStream = clazz.getResourceAsStream(imageLocations[i]);
-						if (sourceStream == null) {
-							throw new RuntimeException("Image not found: " + imageLocations[i]);
-						}
-						images[i] = new Image(device, sourceStream);
-/*
-						InputStream sourceStream = clazz.getResourceAsStream(imageLocations[i]);
-						ImageData source = new ImageData(sourceStream);
-						if (imageTypes[i] == SWT.ICON) {
-							ImageData mask = source.getTransparencyMask();
-							images[i] = new Image(null, source, mask);
-						} else {
-							images[i] = new Image(null, source);
-						}
-						try {
-							sourceStream.close();
-						} catch (IOException e) {
-							e.printStackTrace();
-						} */
-					}
-				}
-				return;
-			} catch (Throwable t) {
-				t.printStackTrace();
-			}
+		if (resourceBundle == null) {
+			throw new RuntimeException("Could not load resources -- ResourceBundle is null");
 		}
-		String error = (resourceBundle != null) ?
-			getResourceString("error.CouldNotLoadResources") :
-			"Unable to load resources"; //$NON-NLS-1$
-		freeResources();
-		throw new RuntimeException(error);
+		try {
+			if (images == null) {
+				images = new Image[imageLocations.length];
+					
+				for (int i = 0; i < imageLocations.length; ++i) {
+					images[i] = ResourceLoader.loadImage(device, "/org/eclipse/swt/examples/controlexample/" + imageLocations[i]);
+
+/*
+					InputStream sourceStream = clazz.getResourceAsStream(imageLocations[i]);
+					ImageData source = new ImageData(sourceStream);
+					if (imageTypes[i] == SWT.ICON) {
+						ImageData mask = source.getTransparencyMask();
+						images[i] = new Image(null, source, mask);
+					} else {
+						images[i] = new Image(null, source);
+					}
+					try {
+						sourceStream.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					} */
+				}
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**

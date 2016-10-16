@@ -9,6 +9,7 @@ public final class Elements {
 
     private Elements() {}
 
+
     public static native void setBounds(Element element, int x, int y, int width, int height) /*-{
         var style = element.style;
         style.display = "block";
@@ -19,6 +20,15 @@ public final class Elements {
         style.width = width + "px";
         style.height = height + "px";
     }-*/;
+
+    public static Element getChildElement(Element parent, int index) {
+        Element child = parent.getFirstElementChild();
+        while (index > 0 && child != null) {
+            child = child.getNextElementSibling();
+            index--;
+        }
+        return child;
+    }
 
     public static native JsArrayNumber getBounds(Element element) /*-{
         return [0, 0, element.clientWidth, element.clientHeight];
@@ -50,4 +60,14 @@ public final class Elements {
         style.height = savedHeight;
         return result;
     }-*/;
+
+
+    public static native String getDisplay(Element element) /*-{
+        return element.style.display;
+    }-*/;
+
+    public static native void setDisplay(Element element, String display) /*-{
+        element.style.display = display;
+    }-*/;
+
 }

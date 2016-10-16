@@ -8,5 +8,5 @@
 
     <!-- Specifies the paths for translatable code -->
     <source path='org'/>
-    <source path='java'/>
+    <super-source path='super'/>
 </module>

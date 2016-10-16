@@ -1,6 +1,8 @@
 package org.eclipse.swt.widgets;
 
 import com.google.gwt.core.client.JsArrayNumber;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.kobjects.dom.Document;
@@ -44,26 +46,25 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public void addItem(Control control, String s, int index) {
-        throw new RuntimeException("NYI");
+        log("FIXME: GwtDisplay.addItem");
     }
 
     @Override
     public void addChild(Composite composite, Control control) {
-        log("addChild to: ", composite.peer, "; child: ", control);
-        ((Element) composite.peer).appendChild((Element) control.peer);
-
+        if (composite.getControlType() != Control.ControlType.TAB_FOLDER) {
+            log("addChild to: ", composite.peer, "; child: ", control);
+            ((Element) composite.peer).appendChild((Element) control.peer);
+        }
     }
 
     @Override
     public void addTab(TabFolder tabFolder, int index, TabItem tabItem) {
-        throw new RuntimeException("NYI");
-
+        ((GwtTabFolder) tabFolder.peer).addTab(index, tabItem);
     }
 
     @Override
     public void addListener(Control control, int i, Listener listener) {
-        throw new RuntimeException("NYI");
-
+        log("FIXME: GwtDisplay.addListener");
     }
 
     @Override
@@ -76,11 +77,13 @@ public class GwtDisplay extends PlatformDisplay {
     @Override
     public Object createControl(Control control) {
         log("createControl:", control);
-        if (control instanceof Text) {
-            return Document.get().createElement("input");
-        }
-        if (control instanceof Button) {
-            if ((control.style & (SWT.CHECK|SWT.RADIO)) != 0) {
+        switch (control.getControlType()) {
+            case TEXT:
+                return Document.get().createElement("input");
+            case BUTTON_PUSH:
+                return Document.get().createElement("button");
+            case BUTTON_CHECKBOX:
+            case BUTTON_RADIO: {
                 Element result = Document.get().createElement("label");
                 Element input = Document.get().createElement("input");
                 Element span = Document.get().createElement("span");
@@ -91,65 +94,89 @@ public class GwtDisplay extends PlatformDisplay {
                 input.setAttribute("id", inputId);
                 if ((control.style & SWT.RADIO) != 0) {
                     input.setAttribute("type", "radio");
-                //    result.setAttribute("class", "mdl-radio mdl-js-radio mdl-js-ripple-effect");
-                 //   input.setAttribute("class", "mdl-radio__button");
-                 //   span.setAttribute("class", "mdl-radio__label");
+                    //    result.setAttribute("class", "mdl-radio mdl-js-radio mdl-js-ripple-effect");
+                    //   input.setAttribute("class", "mdl-radio__button");
+                    //   span.setAttribute("class", "mdl-radio__label");
                 } else {
                     input.setAttribute("type", "checkbox");
-                  //  result.setAttribute("class", "mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect");
-                  //  input.setAttribute("class", "mdl-checkbox__input");
-                  //  span.setAttribute("class", "mdl-checkbox__label");
+                    //  result.setAttribute("class", "mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect");
+                    //  input.setAttribute("class", "mdl-checkbox__input");
+                    //  span.setAttribute("class", "mdl-checkbox__label");
                 }
                 return result;
             }
-            Element button = Document.get().createElement("button");
-         //   button.setAttribute("class",
-          //          "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent");
-            return button;
+            case COMBO:
+                return Document.get().createElement("select");
+            case LIST: {
+                Element result = Document.get().createElement("select");
+                result.setAttribute("multiple", "multiple");
+                return result;
+            }
+            case SCALE:
+            case SLIDER: {
+                Element result = Document.get().createElement("input");
+                //    result.setAttribute("class", "mdl-slider mdl-js-slider");
+                result.setAttribute("type", "range");
+                return result;
+            }
+            case SHELL_ROOT: {
+                Element shell = Document.get().createElement("div");
+                shell.setAttribute("style", "width:100%;background-color:#eee;min-height:100vh;margin:auto;position:relative");
+                //   Document.get().getBody().setAttribute("style", "min-height:100%");
+                //   Document.get().getBody().getParentElement().setAttribute("style", "height:100%");
+                Document.get().getBody().appendChild(shell);
+                return shell;
+            }
+            case LABEL:
+                return Document.get().createElement("div");
+            case CANVAS:
+                return Document.get().createElement("canvas");
+            case GROUP:
+            case COMPOSITE:
+                return Document.get().createElement("div");
+            case PROGRESS_BAR:
+                return Document.get().createElement("progress");
+            case TAB_FOLDER:
+                return GwtTabFolder.create(Document.get());
+            case SPINNER: {
+                Element spinner = Document.get().createElement("input");
+                spinner.setAttribute("type", "number");
+                return spinner;
+            }
+            default:
+                throw new RuntimeException("FIXME: GwtDisplay.createControl type " + control.getControlType());
         }
-        if (control instanceof Slider) {
-            Element result = Document.get().createElement("input");
-        //    result.setAttribute("class", "mdl-slider mdl-js-slider");
-            result.setAttribute("type", "range");
-            return result;
-        }
-        if (control instanceof Shell) {
-            Element shell = Document.get().createElement("div");
-            shell.setAttribute("style", "width:100%;background-color:#eee;min-height:100vh;margin:auto;position:relative");
-         //   Document.get().getBody().setAttribute("style", "min-height:100%");
-         //   Document.get().getBody().getParentElement().setAttribute("style", "height:100%");
-            Document.get().getBody().appendChild(shell);
-            return shell;
-        }
-        if (control instanceof Canvas) {
-            return Document.get().createElement("canvas");
-        }
-
-        return Document.get().createElement("div");
     }
 
     @Override
     public Object createImage(int width, int height) {
-        throw new RuntimeException("NYI");
-
+        Element canvas = Document.get().createElement("canvas");
+        canvas.setAttribute("width", String.valueOf(width));
+        canvas.setAttribute("height", String.valueOf(height));
+        return canvas;
     }
 
     @Override
     public GC creatGCForPlatformImage(Object platformImage) {
-        throw new RuntimeException("NYI");
-
+        throw new RuntimeException("FIXME: GwtDisplay.GCForPlatformImage");
     }
 
     @Override
     public void disposeShell(Shell shell) {
-        throw new RuntimeException("NYI");
+        throw new RuntimeException("FIXME: GwtDisplay.disposeShell");
 
     }
 
     @Override
     public boolean isEnabled(Control control) {
-        throw new RuntimeException("NYI");
+        log("FIXME: GwtDisplay.isEnabled");
+        return true;
+    }
 
+    @Override
+    public Color getBackground(Control control) {
+        log("FIXME: GwtDisplay.getBackground()");
+        return null;
     }
 
     @Override
@@ -163,9 +190,14 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public Rectangle getImageBounds(Object platformImage) {
-        throw new RuntimeException("NYI");
+    public Color getForeground(Control control) {
+        log("FIXME: GwtDisplay.getForeground");
+        return null;
+    }
 
+    @Override
+    public Rectangle getImageBounds(Object platformImage) {
+        throw new RuntimeException("FIXME: GwtDisplay.getImageBounds");
     }
 
     @Override
@@ -175,18 +207,20 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public int getItemCount(Control control) {
-        throw new RuntimeException("NYI");
+        log("FIXME: GwtDisplay.getItemCount");
+        return 0;
     }
 
     @Override
     public Monitor getMonitor(Control control) {
-        throw new RuntimeException("NYI");
+        log("FIXME: GwtDisplay.getMonitor");
+        return new Monitor(new Rectangle(0, 0, 2000, 1000), new Rectangle(0, 0, 2000, 1000));
     }
 
     @Override
     public boolean getSelection(Button button) {
-        throw new RuntimeException("NYI");
-
+        log("FIXME: GwtDisplay.getSeletion");
+        return false;
     }
 
     @Override
@@ -199,16 +233,13 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public Object loadImage(InputStream stream) throws IOException {
-        throw new RuntimeException("NYI");
-
+        throw new RuntimeException("FIXME: GwtDisplay.loadImage");
     }
 
     @Override
     public void openShell(Shell shell) {
-
         //Element.getBody().appendChild((Element) shell.peer);
-        throw new RuntimeException("NYI");
-
+        log("FIXME: GwtDisplay.openShell");
     }
 
     @Override
@@ -218,8 +249,18 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public void removeChild(Composite composite, Control control) {
-        throw new RuntimeException("NYI");
+        throw new RuntimeException("FIXME: GwtDisplay.removeChild");
 
+    }
+
+    @Override
+    public void setBackground(Control control, Color color) {
+        log("FIXME: GwtDisplay.setBackground()");
+    }
+
+    @Override
+    public void setBackgroundImage(Control control, Image image) {
+        log("FIXEM: GwtDisplay.setBackgroundImage()");
     }
 
     @Override
@@ -239,13 +280,17 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public void setEnabled(Control control, boolean b) {
-        throw new RuntimeException("NYI");
-
+        log("FIXME: GwtDisplay.setEnabled");
     }
 
     @Override
     public void setFocus(Control control) {
-        throw new RuntimeException("NYI");
+        log("FIXME: GwtDisplay.setFocus");
+    }
+
+    @Override
+    public void setForeground(Control control, Color color) {
+        log("FIXME: GwtDisplay.setForegound");
     }
 
     @Override
@@ -266,93 +311,113 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public void setVisible(Control control, boolean visible) {
-        throw new RuntimeException("NYI");
+        log("FIXME: GwtDisplay.setVisible");
     }
 
     @Override
     public void setMeasuredSize(Control control, int i, int i1) {
-        throw new RuntimeException("NYI");
-
     }
 
     @Override
     public void setRange(Control control, int minimum, int maximum) {
-        throw new RuntimeException("NYI");
-
+        log("FIXME: GwtDisplay.setRange");
     }
 
     @Override
     public void setSliderProperties(Control control, int thumb, int increment, int pageIncrement) {
-        throw new RuntimeException("NYI");
-
+        log("FIXME: GwtDisplay.setSliderProperties");
     }
 
     @Override
     public void setSelection(Button button, boolean b) {
-        throw new RuntimeException("NYI");
-
+        log("FIXME: GwtDisplay.setSelection");
     }
 
     @Override
     public void setSelection(Control control, int selection) {
-        throw new RuntimeException("NYI");
+        log("FIXME: GwtDisplay.setSelection");
+    }
 
+    @Override
+    public void setSelection(List list, int index, boolean selected) {
+        log("FIME: GwtDisplay.setSelection");
     }
 
     @Override
     public void showPopupMenu(Menu menu) {
-        throw new RuntimeException("NYI");
-
+        throw new RuntimeException("FIXME: GwtDisplay.showPopupMenu");
     }
 
     @Override
     public void updateMenuBar(Decorations decorations) {
-        throw new RuntimeException("NYI");
+        throw new RuntimeException("FIXME: GwtDisplay.updateMenuBar");
 
     }
 
     @Override
     public void updateTab(TabFolder tabFolder, int index, TabItem tabItem) {
-        throw new RuntimeException("NYI");
-
+        ((GwtTabFolder) tabFolder.peer).updateTab(index, tabItem);
     }
 
     @Override
     public void setImage(Control control, Image image) {
-        throw new RuntimeException("NYI");
+        log("GwtDisplay.setImage()");
     }
 
     @Override
     public void setAlignment(Control button, int alignment) {
-        throw new RuntimeException("NYI");
+        log("FIXME: GwtDisplay.setAlignment");
+    }
+
+    @Override
+    public boolean isSelected(List list, int i) {
+        log("FIXME: GwtDisplay.isSelected");
+        return false;
+    }
+
+    @Override
+    public void setFont(Control control, Font font) {
+        log("FIXME: GwtDisplay.setFont");
+    }
+
+    @Override
+    public void setItem(Control control, int index, String string) {
+        log("FIXME: GwtDisplay.setItem");
+    }
+
+    @Override
+    public Font getFont(Control control) {
+
+        log("FIXME: GwtDisplay.setFont");
+        return null;
     }
 
     @Override
     public String getItem(Control control, int i) {
-        throw new RuntimeException("NYI");
+        log("FIXME: GwtDisplay.getItem");
+        return "Item " + i;
     }
 
     @Override
     public int getScrollBarSize(ScrolledComposite scrolledComposite, int i) {
-        throw new RuntimeException("NYI");
-
+        log("FIXME: GwtDisplay.getScrollBarSize");
+        return 0;
     }
 
     @Override
     public int getSelection(Control control) {
-        throw new RuntimeException("NYI");
-
+        log("FIXME: GwtDisplay.getSelection");
+        return 0;
     }
 
     @Override
     public void redraw(Control control, int i, int i1, int i2, int i3, boolean b) {
-        throw new RuntimeException("NYI");
-
+        log("FIXME: GwtDisplay.redraw");
     }
 
     @Override
-    public void removeItems(Combo combo, int start, int end) {
-        throw new RuntimeException("NYI");
-
+    public void removeItems(Control control, int start, int end) {
+        log("FIXME: GwtDisplay.removeItems");
     }
+
 }

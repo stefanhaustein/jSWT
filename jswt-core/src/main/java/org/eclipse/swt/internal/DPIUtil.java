@@ -70,6 +70,7 @@ public class DPIUtil {
 	 * <a href="https://bugs.eclipse.org/493455">bug 493455</a>.
 	 */
 	private static final String SWT_AUTOSCALE_METHOD = "swt.autoScale.method";
+		/*
 	static {
 		String value = System.getProperty (SWT_AUTOSCALE_METHOD);
 		if (value != null) {
@@ -80,7 +81,7 @@ public class DPIUtil {
 			}
 		}
 	}
-
+		*/
 /*
  * Auto-scale down ImageData
  *
@@ -339,7 +340,7 @@ public static int getDeviceZoom() {
 
 public static void setDeviceZoom (int nativeDeviceZoom) {
 	int deviceZoom = 0;
-	String value = System.getProperty (SWT_AUTOSCALE);
+	String value = null; // System.getProperty (SWT_AUTOSCALE);
  	if (value != null) {
 		if ("false".equalsIgnoreCase (value)) {
 			deviceZoom = 100;
@@ -361,7 +362,7 @@ public static void setDeviceZoom (int nativeDeviceZoom) {
 	}
 
 	DPIUtil.deviceZoom = deviceZoom;
-	System.setProperty("org.eclipse.swt.internal.deviceZoom", Integer.toString(deviceZoom));
+	//System.setProperty("org.eclipse.swt.internal.deviceZoom", Integer.toString(deviceZoom));
 	if (deviceZoom != 100 && autoScaleMethodSetting == AutoScaleMethod.AUTO) {
 		if (deviceZoom / 100 * 100 == deviceZoom || !"gtk".equals(SWT.getPlatform())) {
 			autoScaleMethod = AutoScaleMethod.NEAREST;

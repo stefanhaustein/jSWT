@@ -34,6 +34,8 @@ gwt {
     minHeapSize = "256M";
     maxHeapSize = "1024M";
 
+    compiler { style = 'PRETTY'}
+
     src += files(project(':jswt-core').sourceSets.main.allJava.srcDirs) + files(project(':jswt-core').sourceSets.main.output.resourcesDir)
     src += files(project(':jswt-gwt').sourceSets.main.allJava.srcDirs) + files(project(':jswt-gwt').sourceSets.main.output.resourcesDir)
     src += files(project(':jswt-demo-core').sourceSets.main.allJava.srcDirs) + files(project(':jswt-demo-core').sourceSets.main.output.resourcesDir)

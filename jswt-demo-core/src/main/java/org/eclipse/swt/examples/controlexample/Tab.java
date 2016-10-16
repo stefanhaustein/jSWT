@@ -365,6 +365,7 @@ abstract class Tab {
 		/*
 		 * Create the button to access set/get API functionality.
 		 */
+		/*
 		final String [] methodNames = getMethodNames ();
 		if (methodNames != null) {
 			final Button setGetButton = new Button (otherGroup, SWT.PUSH);
@@ -385,6 +386,7 @@ abstract class Tab {
 				}
 			});
 		}
+		*/
 	}
 
 	/**
@@ -1136,141 +1138,144 @@ abstract class Tab {
 		return null;
 	}
 
-	Shell createSetGetDialog(String[] methodNames) {
-		final Shell dialog = new Shell(shell, SWT.DIALOG_TRIM | SWT.RESIZE | SWT.MODELESS);
-		dialog.setLayout(new GridLayout(2, false));
-		dialog.setText(getTabText() + " " + ControlExample.getResourceString ("Set_Get"));
-		nameCombo = new Combo(dialog, SWT.READ_ONLY);
-		nameCombo.setItems(methodNames);
-		nameCombo.setText(methodNames[0]);
-		nameCombo.setVisibleItemCount(methodNames.length);
-		nameCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-		nameCombo.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				resetLabels();
-			}
-		});
-		returnTypeLabel = new Label(dialog, SWT.NONE);
-		returnTypeLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
-		setButton = new Button(dialog, SWT.PUSH);
-		setButton.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
-		setButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				setValue();
-				setText.selectAll();
-				setText.setFocus();
-			}
-		});
-		setText = new Text(dialog, SWT.SINGLE | SWT.BORDER);
-		setText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-		getButton = new Button(dialog, SWT.PUSH);
-		getButton.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
-		getButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				getValue();
-			}
-		});
-		getText = new Text(dialog, SWT.MULTI | SWT.BORDER | SWT.READ_ONLY | SWT.H_SCROLL | SWT.V_SCROLL);
-		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-		data.widthHint = 240;
-		data.heightHint = 200;
-		getText.setLayoutData(data);
-		resetLabels();
-		dialog.setDefaultButton(setButton);
-		dialog.pack();
-		dialog.addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(DisposeEvent e) {
-				setGetDialog = null;
-			}
-		});
-		return dialog;
-	}
+	/*
 
-	void resetLabels() {
-		String methodRoot = nameCombo.getText();
-		returnTypeLabel.setText(parameterInfo(methodRoot));
-		setButton.setText(setMethodName(methodRoot));
-		getButton.setText("get" + methodRoot);
-		setText.setText("");
-		getText.setText("");
-		getValue();
-		setText.setFocus();
-	}
+Shell createSetGetDialog(String[] methodNames) {
+    final Shell dialog = new Shell(shell, SWT.DIALOG_TRIM | SWT.RESIZE | SWT.MODELESS);
+    dialog.setLayout(new GridLayout(2, false));
+    dialog.setText(getTabText() + " " + ControlExample.getResourceString ("Set_Get"));
+    nameCombo = new Combo(dialog, SWT.READ_ONLY);
+    nameCombo.setItems(methodNames);
+    nameCombo.setText(methodNames[0]);
+    nameCombo.setVisibleItemCount(methodNames.length);
+    nameCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+    nameCombo.addSelectionListener(new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+            resetLabels();
+        }
+    });
+    returnTypeLabel = new Label(dialog, SWT.NONE);
+    returnTypeLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
+    setButton = new Button(dialog, SWT.PUSH);
+    setButton.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
+    setButton.addSelectionListener(new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+            setValue();
+            setText.selectAll();
+            setText.setFocus();
+        }
+    });
+    setText = new Text(dialog, SWT.SINGLE | SWT.BORDER);
+    setText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+    getButton = new Button(dialog, SWT.PUSH);
+    getButton.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
+    getButton.addSelectionListener(new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+            getValue();
+        }
+    });
+    getText = new Text(dialog, SWT.MULTI | SWT.BORDER | SWT.READ_ONLY | SWT.H_SCROLL | SWT.V_SCROLL);
+    GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+    data.widthHint = 240;
+    data.heightHint = 200;
+    getText.setLayoutData(data);
+    resetLabels();
+    dialog.setDefaultButton(setButton);
+    dialog.pack();
+    dialog.addDisposeListener(new DisposeListener() {
+        @Override
+        public void widgetDisposed(DisposeEvent e) {
+            setGetDialog = null;
+        }
+    });
+    return dialog;
+}
 
-	String setMethodName(String methodRoot) {
-		return "set" + methodRoot;
-	}
+void resetLabels() {
+    String methodRoot = nameCombo.getText();
+    returnTypeLabel.setText(parameterInfo(methodRoot));
+    setButton.setText(setMethodName(methodRoot));
+    getButton.setText("get" + methodRoot);
+    setText.setText("");
+    getText.setText("");
+    getValue();
+    setText.setFocus();
+}
 
-	String parameterInfo(String methodRoot) {
-		String typeName = null;
-		Class<?> returnType = getReturnType(methodRoot);
-		boolean isArray = returnType.isArray();
-		if (isArray) {
-			typeName = returnType.getComponentType().getName();
-		} else {
-			typeName = returnType.getName();
-		}
-		String typeNameString = typeName;
-		int index = typeName.lastIndexOf('.');
-		if (index != -1 && index+1 < typeName.length()) typeNameString = typeName.substring(index+1);
-		String info = ControlExample.getResourceString("Info_" + typeNameString + (isArray ? "A" : ""));
-		if (isArray) {
-			typeNameString += "[]";
-		}
-		return ControlExample.getResourceString("Parameter_Info", new Object[] {typeNameString, info});
-	}
+String setMethodName(String methodRoot) {
+    return "set" + methodRoot;
+}
 
-	void getValue() {
-		String methodName = "get" + nameCombo.getText();
-		getText.setText("");
-		Widget[] widgets = getExampleWidgets();
-		for (int i = 0; i < widgets.length; i++) {
-			try {
-				if (widgets[i] == null) {
-					continue;
-				}
-				Method method = widgets[i].getClass().getMethod(methodName);
-				Object result = method.invoke(widgets[i]);
-				if (result == null) {
-					getText.append("null");
-				} else if (result.getClass().isArray()) {
-					int length = java.lang.reflect.Array.getLength(result);
-					if (length == 0) {
-						getText.append(result.getClass().getComponentType() + "[0]");
-					}
-					for (int j = 0; j < length; j++) {
-						getText.append(java.lang.reflect.Array.get(result,j).toString() + "\n");
-					}
-				} else {
-					getText.append(result.toString());
-				}
-			} catch (Exception e) {
-				getText.append(e.toString());
-			}
-			if (i + 1 < widgets.length) {
-				getText.append("\n\n");
-			}
-		}
-	}
+String parameterInfo(String methodRoot) {
+    String typeName = null;
+    Class<?> returnType = getReturnType(methodRoot);
+    boolean isArray = returnType.isArray();
+    if (isArray) {
+        typeName = returnType.getComponentType().getName();
+    } else {
+        typeName = returnType.getName();
+    }
+    String typeNameString = typeName;
+    int index = typeName.lastIndexOf('.');
+    if (index != -1 && index+1 < typeName.length()) typeNameString = typeName.substring(index+1);
+    String info = ControlExample.getResourceString("Info_" + typeNameString + (isArray ? "A" : ""));
+    if (isArray) {
+        typeNameString += "[]";
+    }
+    return ControlExample.getResourceString("Parameter_Info", new Object[] {typeNameString, info});
+}
 
-	Class<?> getReturnType(String methodRoot) {
-		Class<?> returnType = null;
-		String methodName = "get" + methodRoot;
-		Widget[] widgets = getExampleWidgets();
-		try {
-			Method method = widgets[0].getClass().getMethod(methodName);
-			returnType = method.getReturnType();
-		} catch (Exception e) {
-		}
-		return returnType;
-	}
+void getValue() {
+    String methodName = "get" + nameCombo.getText();
+    getText.setText("");
+    Widget[] widgets = getExampleWidgets();
+    for (int i = 0; i < widgets.length; i++) {
+        try {
+            if (widgets[i] == null) {
+                continue;
+            }
+            Method method = widgets[i].getClass().getMethod(methodName);
+            Object result = method.invoke(widgets[i]);
+            if (result == null) {
+                getText.append("null");
+            } else if (result.getClass().isArray()) {
+                int length = java.lang.reflect.Array.getLength(result);
+                if (length == 0) {
+                    getText.append(result.getClass().getComponentType() + "[0]");
+                }
+                for (int j = 0; j < length; j++) {
+                    getText.append(java.lang.reflect.Array.get(result,j).toString() + "\n");
+                }
+            } else {
+                getText.append(result.toString());
+            }
+        } catch (Exception e) {
+            getText.append(e.toString());
+        }
+        if (i + 1 < widgets.length) {
+            getText.append("\n\n");
+        }
+    }
+}
 
-	void setValue() {
-		/* The parameter type must be the same as the get method's return type */
+Class<?> getReturnType(String methodRoot) {
+    Class<?> returnType = null;
+    String methodName = "get" + methodRoot;
+    Widget[] widgets = getExampleWidgets();
+    try {
+        Method method = widgets[0].getClass().getMethod(methodName);
+        returnType = method.getReturnType();
+    } catch (Exception e) {
+    }
+    return returnType;
+}
+
+void setValue() {
+    // The parameter type must be the same as the get method's return type
+
 		String methodRoot = nameCombo.getText();
 		Class<?> returnType = getReturnType(methodRoot);
 		String methodName = setMethodName(methodRoot);
@@ -1335,6 +1340,7 @@ abstract class Tab {
 	Object[] parameterForType(String typeName, String value, Widget widget) {
 		return new Object[] {value};
 	}
+*/
 
 	void createOrientationGroup () {
 		/* Create Orientation group*/
