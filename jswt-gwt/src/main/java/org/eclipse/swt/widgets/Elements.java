@@ -1,8 +1,10 @@
 package org.eclipse.swt.widgets;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayInteger;
 import com.google.gwt.core.client.JsArrayNumber;
+import org.kobjects.dom.Document;
 import org.kobjects.dom.Element;
 
 public final class Elements {
@@ -70,4 +72,32 @@ public final class Elements {
         element.style.display = display;
     }-*/;
 
+
+    public static native Element upgradeElement(Element element) /*-{
+        $wnd.componentHandler.upgradeElement(element);
+    }-*/;
+
+    public static native Element downgradeElement(Element element) /*-{
+        $wnd.componentHandler.downgradeElement(element);
+    }-*/;
+
+    public static native Element createMdlElement(Document document, String name, String className) /*-{
+        var element = document.createElement(name);
+        element.className = className;
+        $wnd.componentHandler.upgradeElement(element);
+        return element;
+    }-*/;
+
+
+    public static native void createMaterialTab(Element newTab, Element container) /*-{
+        $wnd.console.log("create new tab; tab: ", newTab, " container: ", container, " MT ", container.MaterialTabs);
+        new $wnd.MaterialTab(newTab, container.MaterialTabs);
+    }-*/;
+
+
+    public static native void initTabs(Element container) /*-{
+        var ihtml = container.firstElementChild.innerHTML;
+        container.firstElementChild.innerHTML = ihtml;
+        container.MaterialTabs.initTabs_();
+    }-*/;
 }

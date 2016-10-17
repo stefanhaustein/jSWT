@@ -1,6 +1,7 @@
 package org.eclipse.swt.widgets;
 
 import com.google.gwt.core.client.JsArrayNumber;
+import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
@@ -81,7 +82,8 @@ public class GwtDisplay extends PlatformDisplay {
             case TEXT:
                 return Document.get().createElement("input");
             case BUTTON_PUSH:
-                return Document.get().createElement("button");
+                return Elements.createMdlElement(Document.get(), "button",
+                        "mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised");
             case BUTTON_CHECKBOX:
             case BUTTON_RADIO: {
                 Element result = Document.get().createElement("label");
@@ -137,7 +139,7 @@ public class GwtDisplay extends PlatformDisplay {
             case PROGRESS_BAR:
                 return Document.get().createElement("progress");
             case TAB_FOLDER:
-                return GwtTabFolder.create(Document.get());
+                return GwtTabFolder.create(((TabFolder) control), Document.get());
             case SPINNER: {
                 Element spinner = Document.get().createElement("input");
                 spinner.setAttribute("type", "number");
@@ -202,7 +204,12 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public Insets getInsets(Scrollable scrollable) {
-        return new Insets();
+        switch (scrollable.getControlType()) {
+            case TAB_FOLDER:
+                return ((GwtTabFolder) scrollable.peer).getInsets();
+            default:
+                return new Insets();
+        }
     }
 
     @Override
@@ -311,7 +318,7 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public void setVisible(Control control, boolean visible) {
-        log("FIXME: GwtDisplay.setVisible");
+        Elements.setDisplay((Element) control.peer, visible ? "" : "none");
     }
 
     @Override
@@ -357,6 +364,11 @@ public class GwtDisplay extends PlatformDisplay {
     @Override
     public void updateTab(TabFolder tabFolder, int index, TabItem tabItem) {
         ((GwtTabFolder) tabFolder.peer).updateTab(index, tabItem);
+
+        StackLayout stackLayout = (StackLayout) tabFolder.getLayout();
+        if (stackLayout.topControl == null && tabItem.control != null) {
+            stackLayout.topControl = tabItem.control;
+        }
     }
 
     @Override

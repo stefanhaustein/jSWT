@@ -31,6 +31,14 @@ public class Element extends JavaScriptObject {
         return this.nextElementSibling;
     }-*/;
 
+    public native final String getAttribute(String name) /*-{
+        return this.getAttribute(name);
+    }-*/;
+
+    public native final String getClassName() /*-{
+        return this.className;
+    }-*/;
+
     public native final Element getParentElement() /*-{
         return this.parentElement;
     }-*/;
@@ -59,4 +67,7 @@ public class Element extends JavaScriptObject {
         return this.localName;
     }-*/;
 
+    public native final void setClassName(String s) /*-{
+        this.className = s;
+    }-*/;
 }

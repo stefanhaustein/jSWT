@@ -243,6 +243,10 @@ public class ControlExample {
 		ControlExample instance = new ControlExample(shell);
 		setShellSize(instance, shell);
 		shell.open();
+
+		// FIXME
+
+		shell.layout(true, true);
 	}
 
 	/**
