@@ -14,7 +14,9 @@ public final class Elements {
 
     public static native void setBounds(Element element, int x, int y, int width, int height) /*-{
         var style = element.style;
-        style.display = "block";
+        if (element.localName != "div") {
+            style.display = "block";
+        }
         style.position = "absolute";
         style.boxSizing = "border-box";
         style.top = y + "px";
@@ -39,6 +41,7 @@ public final class Elements {
 
     public static native int getMinWidth(Element element) /*-{
         var style = element.style;
+        var savedDisplay = style.display;
         style.display = "block";
         style.position = "absolute";
         style.boxSizing = "border-box";
@@ -47,11 +50,13 @@ public final class Elements {
         style.width = "";
         var result = element.offsetWidth;
         style.width = savedWidth;
+        style.display = savedDisplay;
         return result;
     }-*/;
 
     public static native int getMinHeight(Element element) /*-{
         var style = element.style;
+        var savedDisplay = style.display;
         style.display = "block";
         style.position = "absolute";
         style.boxSizing = "border-box";
@@ -60,6 +65,7 @@ public final class Elements {
         var result = element.offsetHeight;
         //$wnd.console.log("ScrollHeight: " + result + " clientHeight: " + this.clientHeight + " offsetHeight" + this.offsetHeight, this);
         style.height = savedHeight;
+        style.display = savedDisplay;
         return result;
     }-*/;
 
@@ -87,13 +93,6 @@ public final class Elements {
         $wnd.componentHandler.upgradeElement(element);
         return element;
     }-*/;
-
-
-    public static native void createMaterialTab(Element newTab, Element container) /*-{
-        $wnd.console.log("create new tab; tab: ", newTab, " container: ", container, " MT ", container.MaterialTabs);
-        new $wnd.MaterialTab(newTab, container.MaterialTabs);
-    }-*/;
-
 
     public static native void initTabs(Element container) /*-{
         var ihtml = container.firstElementChild.innerHTML;

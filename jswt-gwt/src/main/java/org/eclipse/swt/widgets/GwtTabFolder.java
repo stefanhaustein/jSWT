@@ -1,6 +1,5 @@
 package org.eclipse.swt.widgets;
 
-import org.eclipse.swt.custom.StackLayout;
 import org.kobjects.dom.Document;
 import org.kobjects.dom.Element;
 
@@ -21,7 +20,7 @@ class GwtTabFolder extends Element {
 
 
     public static GwtTabFolder create(TabFolder tabFolder, Document document) {
-        tabFolder.setLayout(new StackLayout());
+        tabFolder.setLayout(new GwtTabLayout());
         GwtTabFolder gwtTabFolder = (GwtTabFolder) Elements.createMdlElement(document, "div", "mdl-tabs mdl-js-tabs mdl-js-ripple-effect");
         Element tabBar = Elements.createMdlElement(document, "div", "mdl-tabs__tab-bar"); gwtTabFolder.appendChild(tabBar);
 
@@ -42,8 +41,6 @@ class GwtTabFolder extends Element {
         Element newContent = Elements.createMdlElement(getOwnerDocument(), "div", "mdl-tabs__panel" + activeSuffix);
         newContent.setAttribute("id", tabId);
         insertBefore(newContent, Elements.getChildElement(this, index + 1));
-
-        Elements.createMaterialTab(newTab, this);
     }
 
 

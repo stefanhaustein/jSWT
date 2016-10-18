@@ -358,17 +358,11 @@ public class GwtDisplay extends PlatformDisplay {
     @Override
     public void updateMenuBar(Decorations decorations) {
         throw new RuntimeException("FIXME: GwtDisplay.updateMenuBar");
-
     }
 
     @Override
     public void updateTab(TabFolder tabFolder, int index, TabItem tabItem) {
         ((GwtTabFolder) tabFolder.peer).updateTab(index, tabItem);
-
-        StackLayout stackLayout = (StackLayout) tabFolder.getLayout();
-        if (stackLayout.topControl == null && tabItem.control != null) {
-            stackLayout.topControl = tabItem.control;
-        }
     }
 
     @Override
