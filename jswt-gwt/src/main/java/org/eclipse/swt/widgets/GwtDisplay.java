@@ -75,20 +75,24 @@ public class GwtDisplay extends PlatformDisplay {
                 hHint == SWT.DEFAULT ? Elements.getMinHeight((Element) control.peer) : hHint);
     }
 
+    private Element createElement(String name) {
+        return Document.get().createElement(name);
+    }
+
     @Override
     public Object createControl(Control control) {
         log("createControl:", control);
         switch (control.getControlType()) {
             case TEXT:
-                return Document.get().createElement("input");
+                return createElement("input");
             case BUTTON_PUSH:
-                return Elements.createMdlElement(Document.get(), "button",
-                        "mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised");
+                return createElement("button");
+//                        "mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised");
             case BUTTON_CHECKBOX:
             case BUTTON_RADIO: {
-                Element result = Document.get().createElement("label");
-                Element input = Document.get().createElement("input");
-                Element span = Document.get().createElement("span");
+                Element result = createElement("label");
+                Element input = createElement("input");
+                Element span = createElement("span");
                 result.appendChild(input);
                 result.appendChild(span);
                 String inputId = "i" + GwtDisplay.id++;
@@ -96,33 +100,35 @@ public class GwtDisplay extends PlatformDisplay {
                 input.setAttribute("id", inputId);
                 if ((control.style & SWT.RADIO) != 0) {
                     input.setAttribute("type", "radio");
-                    //    result.setAttribute("class", "mdl-radio mdl-js-radio mdl-js-ripple-effect");
-                    //   input.setAttribute("class", "mdl-radio__button");
-                    //   span.setAttribute("class", "mdl-radio__label");
+                   /* result.setAttribute("class", "mdl-radio mdl-js-radio mdl-js-ripple-effect");
+                    input.setAttribute("class", "mdl-radio__button");
+                    span.setAttribute("class", "mdl-radio__label"); */
                 } else {
                     input.setAttribute("type", "checkbox");
-                    //  result.setAttribute("class", "mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect");
-                    //  input.setAttribute("class", "mdl-checkbox__input");
-                    //  span.setAttribute("class", "mdl-checkbox__label");
+/*                    result.setAttribute("class", "mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect");
+                    input.setAttribute("class", "mdl-checkbox__input");
+                    span.setAttribute("class", "mdl-checkbox__label"); */
                 }
+//                result.setAttribute("style", "block");
+                //              Elements.upgradeElement(result);
                 return result;
             }
             case COMBO:
-                return Document.get().createElement("select");
+                return createElement("select");
             case LIST: {
-                Element result = Document.get().createElement("select");
+                Element result = createElement("select");
                 result.setAttribute("multiple", "multiple");
                 return result;
             }
             case SCALE:
             case SLIDER: {
-                Element result = Document.get().createElement("input");
+                Element result = createElement("input");
                 //    result.setAttribute("class", "mdl-slider mdl-js-slider");
                 result.setAttribute("type", "range");
                 return result;
             }
             case SHELL_ROOT: {
-                Element shell = Document.get().createElement("div");
+                Element shell = createElement("div");
                 shell.setAttribute("style", "width:100%;background-color:#eee;min-height:100vh;margin:auto;position:relative");
                 //   Document.get().getBody().setAttribute("style", "min-height:100%");
                 //   Document.get().getBody().getParentElement().setAttribute("style", "height:100%");
@@ -130,18 +136,18 @@ public class GwtDisplay extends PlatformDisplay {
                 return shell;
             }
             case LABEL:
-                return Document.get().createElement("div");
+                return createElement("div");
             case CANVAS:
-                return Document.get().createElement("canvas");
+                return createElement("canvas");
             case GROUP:
             case COMPOSITE:
-                return Document.get().createElement("div");
+                return createElement("div");
             case PROGRESS_BAR:
-                return Document.get().createElement("progress");
+                return createElement("progress");
             case TAB_FOLDER:
-                return GwtTabFolder.create(((TabFolder) control), Document.get());
+                return GwtTabFolder.create(((TabFolder) control));
             case SPINNER: {
-                Element spinner = Document.get().createElement("input");
+                Element spinner = createElement("input");
                 spinner.setAttribute("type", "number");
                 return spinner;
             }

@@ -1,10 +1,12 @@
 package org.eclipse.swt.widgets;
 
-import org.kobjects.dom.Document;
-import org.kobjects.dom.Element;
+import javax.print.Doc;
+import org.eclipse.swt.custom.StackLayout;
+import org.kobjects.dom.*;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
+import org.kobjects.dom.Event;
 
 class GwtTabFolder extends Element {
 
@@ -19,28 +21,56 @@ class GwtTabFolder extends Element {
     }
 
 
-    public static GwtTabFolder create(TabFolder tabFolder, Document document) {
+    public static GwtTabFolder create(TabFolder tabFolder) {
         tabFolder.setLayout(new GwtTabLayout());
-        GwtTabFolder gwtTabFolder = (GwtTabFolder) Elements.createMdlElement(document, "div", "mdl-tabs mdl-js-tabs mdl-js-ripple-effect");
-        Element tabBar = Elements.createMdlElement(document, "div", "mdl-tabs__tab-bar"); gwtTabFolder.appendChild(tabBar);
-
+        GwtTabFolder gwtTabFolder = (GwtTabFolder) Document.get().createElement("jswt-tabfolder");
+        gwtTabFolder.setAttribute("style", "display: block");
+        Element tabBar = Document.get().createElement("div");
+        gwtTabFolder.appendChild(tabBar);
         return gwtTabFolder;
     }
 
 
-    final void addTab(int index, TabItem tabItem) {
-        String activeSuffix = getFirstElementChild() == getLastElementChild() ? " is-active" : "";
+    final void addTab(int index, final TabItem tabItem) {
+        boolean isFirst = getFirstElementChild() == getLastElementChild();
 
         Element tabBar = getTabBar();
-        Element newTab = Elements.createMdlElement(getOwnerDocument(), "a", "mdl-tabs__tab" + activeSuffix);
+        final Element newTab = Document.get().createElement("a");
+        newTab.setAttribute("style", "display: inline-block");
         newTab.setTextContent("Tab " + index);
         String tabId = "tab-" + tabIdCounter++;
         newTab.setAttribute("href", "#" + tabId);
+        newTab.addEventListener("click", new EventListener() {
+            @Override
+            public void onEvent(Event event) {
+                setSelectionImpl(tabItem, newTab);
+            }
+        });
         tabBar.insertBefore(newTab, Elements.getChildElement(tabBar, index));
 
-        Element newContent = Elements.createMdlElement(getOwnerDocument(), "div", "mdl-tabs__panel" + activeSuffix);
+        Element newContent = Document.get().createElement("div");
         newContent.setAttribute("id", tabId);
         insertBefore(newContent, Elements.getChildElement(this, index + 1));
+
+        if (isFirst) {
+            newTab.setClassName("selected");
+        } else {
+            newContent.setAttribute("style", "visibility: hidden");
+        }
+    }
+
+
+    final int getSelection() {
+        int i = 0;
+        Element tab = getTabBar().getFirstElementChild();
+        while (tab != null) {
+            if ("selected".equals(tab.getClassName())) {
+                return i;
+            }
+            i++;
+            tab = tab.getNextElementSibling();
+        }
+        return -1;
     }
 
 
@@ -56,13 +86,26 @@ class GwtTabFolder extends Element {
 
             if (oldContent != newContent) {
                 newContent.setAttribute("id", oldContent.getAttribute("id"));
-                newContent.setClassName(oldContent.getClassName());
+                newContent.setAttribute("style", oldContent.getAttribute("style"));
                 replaceChild(newContent, oldContent);
             }
         }
-
-        Elements.initTabs(this);
     }
+
+    private final void setSelectionImpl(TabItem selectedTabItem, Element selectedTab) {
+        Element tab = getTabBar().getFirstElementChild();
+        while (tab != null) {
+            tab.setClassName(tab == selectedTab ? "selected" : "");
+            tab = tab.getNextElementSibling();
+        }
+
+        Element panel = getTabBar().getNextElementSibling();
+        while (panel != null) {
+            panel.setAttribute("style", "visibility: " + (panel == selectedTabItem.control.peer ? "visible" : "hidden"));
+            panel = panel.getNextElementSibling();
+        }
+    }
+
 
     public final PlatformDisplay.Insets getInsets() {
         PlatformDisplay.Insets insets = new PlatformDisplay.Insets();

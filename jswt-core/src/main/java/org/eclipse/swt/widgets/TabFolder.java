@@ -15,6 +15,11 @@ public class TabFolder extends Composite {
     }
 
     public void setSelection(int i) {
+        display.setSelection(this, i);
+    }
+
+    public int getSelectionIndex() {
+        return display.getSelection(this);
     }
 
     public TabItem[] getItems() {
