@@ -10,7 +10,6 @@ import org.kobjects.dom.Event;
 
 class GwtTabFolder extends Element {
 
-    private static int tabIdCounter = 0;
 
     protected GwtTabFolder() {
 
@@ -24,22 +23,17 @@ class GwtTabFolder extends Element {
     public static GwtTabFolder create(TabFolder tabFolder) {
         tabFolder.setLayout(new GwtTabLayout());
         GwtTabFolder gwtTabFolder = (GwtTabFolder) Document.get().createElement("jswt-tabfolder");
-        gwtTabFolder.setAttribute("style", "display: block");
-        Element tabBar = Document.get().createElement("div");
+        Element tabBar = Document.get().createElement("jswt-tabbar");
         gwtTabFolder.appendChild(tabBar);
         return gwtTabFolder;
     }
-
 
     final void addTab(int index, final TabItem tabItem) {
         boolean isFirst = getFirstElementChild() == getLastElementChild();
 
         Element tabBar = getTabBar();
-        final Element newTab = Document.get().createElement("a");
-        newTab.setAttribute("style", "display: inline-block");
+        final Element newTab = Document.get().createElement("jswt-tab");
         newTab.setTextContent("Tab " + index);
-        String tabId = "tab-" + tabIdCounter++;
-        newTab.setAttribute("href", "#" + tabId);
         newTab.addEventListener("click", new EventListener() {
             @Override
             public void onEvent(Event event) {
@@ -49,7 +43,6 @@ class GwtTabFolder extends Element {
         tabBar.insertBefore(newTab, Elements.getChildElement(tabBar, index));
 
         Element newContent = Document.get().createElement("div");
-        newContent.setAttribute("id", tabId);
         insertBefore(newContent, Elements.getChildElement(this, index + 1));
 
         if (isFirst) {
@@ -58,7 +51,6 @@ class GwtTabFolder extends Element {
             newContent.setAttribute("style", "visibility: hidden");
         }
     }
-
 
     final int getSelection() {
         int i = 0;
@@ -73,7 +65,6 @@ class GwtTabFolder extends Element {
         return -1;
     }
 
-
     final void updateTab(int index, TabItem tabItem) {
         if (tabItem.getText() != null && !tabItem.getText().isEmpty()){
             Element tabContainer = getTabBar();
@@ -85,7 +76,6 @@ class GwtTabFolder extends Element {
             Element oldContent = Elements.getChildElement(this, index + 1);
 
             if (oldContent != newContent) {
-                newContent.setAttribute("id", oldContent.getAttribute("id"));
                 newContent.setAttribute("style", oldContent.getAttribute("style"));
                 replaceChild(newContent, oldContent);
             }

@@ -78,26 +78,30 @@ public class GwtDisplay extends PlatformDisplay {
     private Element createElement(String name) {
         return Document.get().createElement(name);
     }
+    private Element createControl(String name) {
+        Element result = Document.get().createElement(name);
+        result.setClassName("control");
+        return result;
+    }
 
     @Override
     public Object createControl(Control control) {
-        log("createControl:", control);
         switch (control.getControlType()) {
             case TEXT:
-                return createElement("input");
+                return createControl("input");
             case BUTTON_PUSH:
-                return createElement("button");
+                return createControl("button");
 //                        "mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised");
             case BUTTON_CHECKBOX:
             case BUTTON_RADIO: {
-                Element result = createElement("label");
+                Element result = createControl("label");
                 Element input = createElement("input");
                 Element span = createElement("span");
                 result.appendChild(input);
                 result.appendChild(span);
-                String inputId = "i" + GwtDisplay.id++;
-                result.setAttribute("for", inputId);
-                input.setAttribute("id", inputId);
+              //  String inputId = "i" + GwtDisplay.id++;
+              //  result.setAttribute("for", inputId);
+              // input.setAttribute("id", inputId);
                 if ((control.style & SWT.RADIO) != 0) {
                     input.setAttribute("type", "radio");
                    /* result.setAttribute("class", "mdl-radio mdl-js-radio mdl-js-ripple-effect");
@@ -114,40 +118,68 @@ public class GwtDisplay extends PlatformDisplay {
                 return result;
             }
             case COMBO:
-                return createElement("select");
+                return createControl("select");
             case LIST: {
-                Element result = createElement("select");
+                Element result = createControl("select");
                 result.setAttribute("multiple", "multiple");
                 return result;
             }
             case SCALE:
             case SLIDER: {
-                Element result = createElement("input");
+                Element result = createControl("input");
                 //    result.setAttribute("class", "mdl-slider mdl-js-slider");
                 result.setAttribute("type", "range");
                 return result;
             }
             case SHELL_ROOT: {
                 Element shell = createElement("div");
-                shell.setAttribute("style", "width:100%;background-color:#eee;min-height:100vh;margin:auto;position:relative");
+                shell.setAttribute("style", "width:100%;min-height:100vh;margin:auto;position:relative");
                 //   Document.get().getBody().setAttribute("style", "min-height:100%");
                 //   Document.get().getBody().getParentElement().setAttribute("style", "height:100%");
                 Document.get().getBody().appendChild(shell);
                 return shell;
             }
             case LABEL:
-                return createElement("div");
+                return createControl("jswt-label");
             case CANVAS:
-                return createElement("canvas");
-            case GROUP:
+                return createControl("canvas");
+            case GROUP: {
+                Element result = createControl("jswt-group");
+                int style = control.style;
+                log("**************createGroup; style: ", style);
+                String outlineStyle;
+                if ((style & SWT.SHADOW_ETCHED_IN) != 0) {
+                    outlineStyle = "groove 2px #888";
+                } else if ((style & SWT.SHADOW_ETCHED_OUT) != 0) {
+                    outlineStyle = "ridge 2px #888";
+                } else if ((style & SWT.SHADOW_IN) != 0) {
+                    outlineStyle = "inset 2px #888";
+                } else if ((style & SWT.SHADOW_OUT) != 0) {
+                    outlineStyle = "outset 2px #888";
+                } else if ((style & SWT.BORDER) != 0) {
+                    outlineStyle = "solid 1px #888";
+                } else if ((style & SWT.SHADOW_NONE) != 0) {
+                    outlineStyle = null;
+                } else {
+                    outlineStyle = "solid 1px #ccc";
+                }
+                if (outlineStyle != null) {
+                    result.setAttribute("style", "outline: " + outlineStyle + "; outline-offset: -8px;");
+                    log("outline: " + result.getAttribute("style"));
+                }
+                Element title = createElement("jswt-group-label");
+                title.setAttribute("style", "display:none");
+                result.appendChild(title);
+                return result;
+            }
             case COMPOSITE:
-                return createElement("div");
+                return createControl("jswt-composite");
             case PROGRESS_BAR:
-                return createElement("progress");
+                return createControl("progress");
             case TAB_FOLDER:
                 return GwtTabFolder.create(((TabFolder) control));
             case SPINNER: {
-                Element spinner = createElement("input");
+                Element spinner = createControl("input");
                 spinner.setAttribute("type", "number");
                 return spinner;
             }
@@ -213,6 +245,11 @@ public class GwtDisplay extends PlatformDisplay {
         switch (scrollable.getControlType()) {
             case TAB_FOLDER:
                 return ((GwtTabFolder) scrollable.peer).getInsets();
+            case GROUP: {
+                Insets result = new Insets();
+                result.bottom = result.top = result.left = result.right = 16;
+                return result;
+            }
             default:
                 return new Insets();
         }
@@ -308,16 +345,25 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public void setText(Control control, String s) {
-        if (control instanceof Shell) {
-            Document.get().setTitle(s);
-        } else {
-            Element element = (Element) control.peer;
-            if (element.getLocalName().equals("input")) {
-                element.setAttribute("value", s);
-            } else if (element.getLocalName().equals("label")) {
-                element.getLastElementChild().setTextContent(s);
-            } else {
-                element.setTextContent(s);
+        Element element = (Element) control.peer;
+        switch (control.getControlType()) {
+            case SHELL_ROOT:
+                Document.get().setTitle(s);
+                break;
+            case GROUP: {
+                Element title = element.getFirstElementChild();
+                title.setTextContent(s);
+                title.setAttribute("style", s.isEmpty() ? "display:none" : "");
+                break;
+            }
+            default: {
+                if (element.getLocalName().equals("input")) {
+                    element.setAttribute("value", s);
+                } else if (element.getLocalName().equals("label")) {
+                    element.getLastElementChild().setTextContent(s);
+                } else {
+                    element.setTextContent(s);
+                }
             }
         }
     }
