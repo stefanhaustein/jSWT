@@ -1,8 +1,16 @@
 apply plugin: 'java'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':jswt-core')
     compile project(':jswt-swing')
     compile project(':jswt-demo-core')
+}
+
+
+shadowJar {
+    manifest {
+        attributes 'Main-Class': 'org.kobjects.jswt.demo.swing.SwingDemo'
+    }
 }

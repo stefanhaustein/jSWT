@@ -734,7 +734,7 @@ public class SwingDisplay extends PlatformDisplay {
             public void mouseClicked(MouseEvent e) {
               if (e.getClickCount() == 2) {
                 if (eventType == SWT.MouseDoubleClick) {
-                  control.notifyListeners(SWT.MouseDoubleClick, e);
+                  notifyListeners(control, SWT.MouseDoubleClick, e);
                 }
               }
             }
@@ -763,7 +763,7 @@ public class SwingDisplay extends PlatformDisplay {
             @Override
             public void mouseExited(MouseEvent e) {
               if (eventType == SWT.MouseExit) {
-                notifyListeners(control, SWT.MouseExit, eventType, e);
+                notifyListeners(control, SWT.MouseExit, e);
               }
             }
           });
