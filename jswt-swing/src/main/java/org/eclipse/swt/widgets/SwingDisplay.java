@@ -684,9 +684,7 @@ public class SwingDisplay extends PlatformDisplay {
       case SWT.Modify:
         if (component instanceof JTextField) {
           JTextField textComponent = (JTextField) component;
-         // FIXME: Listener management
-         // if (textComponent.getDocument()..length == 0) {
-            textComponent.getDocument().addDocumentListener(new DocumentListener() {
+          textComponent.getDocument().addDocumentListener(new DocumentListener() {
               @Override
               public void insertUpdate(DocumentEvent e) {
                 notifyListeners(control, SWT.Modify, e);
@@ -706,92 +704,103 @@ public class SwingDisplay extends PlatformDisplay {
         //  }
         }
       case SWT.MouseWheel:
-        if (component.getMouseWheelListeners().length == 0) {
-          component.addMouseWheelListener(new java.awt.event.MouseWheelListener() {
+        component.addMouseWheelListener(new java.awt.event.MouseWheelListener() {
             @Override
             public void mouseWheelMoved(java.awt.event.MouseWheelEvent e) {
               notifyListeners(control, SWT.MouseWheel, e);
             }
           });
-        }
         break;
       case SWT.MouseMove:
-        if (component.getMouseMotionListeners().length == 0) {
-          component.addMouseMotionListener(new MouseMotionListener() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
+        component.addMouseMotionListener(new MouseMotionListener() {
+          @Override
+          public void mouseDragged(MouseEvent e) {
               notifyListeners(control, SWT.MouseMove, e);
             }
 
-            @Override
-            public void mouseMoved(MouseEvent e) {
+          @Override
+          public void mouseMoved(MouseEvent e) {
               notifyListeners(control, SWT.MouseMove, e);
             }
-          });
-        }
+        });
         break;
       case SWT.MouseDoubleClick:
       case SWT.MouseDown:
       case SWT.MouseUp:
       case SWT.MouseEnter:
       case SWT.MouseExit:
-        if (component.getMouseListeners().length == 0) {
           component.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
               if (e.getClickCount() == 2) {
-                control.notifyListeners(SWT.MouseDoubleClick, null);
+                if (eventType == SWT.MouseDoubleClick) {
+                  control.notifyListeners(SWT.MouseDoubleClick, e);
+                }
               }
             }
 
             @Override
             public void mousePressed(MouseEvent e) {
-              notifyListeners(control, SWT.MouseDown, e);
+                if (eventType == SWT.MouseDown) {
+                  notifyListeners(control, SWT.MouseDown, e);
+                }
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
-              notifyListeners(control, SWT.MouseUp, e);
+              if (eventType == SWT.MouseDown) {
+                notifyListeners(control, SWT.MouseUp, e);
+              }
             }
 
             @Override
             public void mouseEntered(MouseEvent e) {
-              notifyListeners(control, SWT.MouseEnter, e);
+              if (eventType == SWT.MouseEnter) {
+                notifyListeners(control, SWT.MouseEnter, e);
+              }
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-              notifyListeners(control, SWT.MouseExit, e);
+              if (eventType == SWT.MouseExit) {
+                notifyListeners(control, SWT.MouseExit, eventType, e);
+              }
             }
           });
-        }
+          break;
       case SWT.Move:
       case SWT.Resize:
       case SWT.Show:
       case SWT.Hide:
-        if (component.getComponentListeners().length == 0) {
-          component.addComponentListener(new ComponentListener() {
+        component.addComponentListener(new ComponentListener() {
             @Override
             public void componentResized(ComponentEvent e) {
-              notifyListeners(control, SWT.Resize, e);
+              if (eventType == SWT.Resize) {
+                notifyListeners(control, SWT.Resize, e);
+              }
             }
 
             @Override
             public void componentMoved(ComponentEvent e) {
-              notifyListeners(control, SWT.Move, e);
+              if (eventType == SWT.Move) {
+                notifyListeners(control, SWT.Move, e);
+              }
             }
 
             @Override
             public void componentShown(ComponentEvent e) {
-              notifyListeners(control, SWT.Show, e);
+              if (eventType == SWT.Show) {
+                notifyListeners(control, SWT.Show, e);
+              }
             }
 
             @Override
             public void componentHidden(ComponentEvent e) {
-              notifyListeners(control, SWT.Hide, e);
+              if (eventType == SWT.Hide) {
+                notifyListeners(control, SWT.Hide, e);
+              }
             }
           });
-        }
         break;
       case SWT.Selection:
         switch (control.getControlType()) {
@@ -799,52 +808,37 @@ public class SwingDisplay extends PlatformDisplay {
           case BUTTON_CHECKBOX:
           case BUTTON_RADIO: {
             AbstractButton button = (AbstractButton) component;
-            if (!hasListener(button.getActionListeners())) {
-              button.addActionListener(new ActionListener() {
+            button.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                   notifyListeners(control, SWT.Selection, e);
                 }
               });
-            }
             break;
           }
           case SLIDER: {
             JScrollBar scrollbar = (JScrollBar) component;
-            if (scrollbar.getAdjustmentListeners().length == 0) {
-              scrollbar.addAdjustmentListener(new AdjustmentListener() {
+            scrollbar.addAdjustmentListener(new AdjustmentListener() {
                 @Override
                 public void adjustmentValueChanged(AdjustmentEvent e) {
                   notifyListeners(control, SWT.Selection, e);
                 }
               });
-            }
             break;
           }
           case SCALE: {
             JSlider slider = (JSlider) component;
-            if (slider.getChangeListeners().length == 0) {
-              slider.addChangeListener(new ChangeListener() {
+            slider.addChangeListener(new ChangeListener() {
                 @Override
                 public void stateChanged(ChangeEvent e) {
                   notifyListeners(control, SWT.Selection, e);
                 }
               });
-            }
             break;
           }
         }
         break;
     }
-  }
-
-  private boolean hasListener(EventListener[] listeners) {
-    for (EventListener listener: listeners) {
-      if (!listener.getClass().getName().startsWith("javax.")) {
-        return true;
-      }
-    }
-    return false;
   }
 
   @Override

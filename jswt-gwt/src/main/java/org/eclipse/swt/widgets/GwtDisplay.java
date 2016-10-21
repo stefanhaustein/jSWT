@@ -6,8 +6,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
-import org.kobjects.dom.Document;
-import org.kobjects.dom.Element;
+import org.kobjects.dom.*;
 
 
 import org.eclipse.swt.SWT;
@@ -17,6 +16,7 @@ import org.eclipse.swt.graphics.Rectangle;
 
 import java.io.IOException;
 import java.io.InputStream;
+import org.kobjects.dom.Event;
 
 public class GwtDisplay extends PlatformDisplay {
 
@@ -64,8 +64,26 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public void addListener(Control control, int i, Listener listener) {
-        log("FIXME: GwtDisplay.addListener");
+    public void addListener(final Control control, int i, Listener listener) {
+        final Element element = (Element) control.peer;
+        switch (i) {
+            case SWT.Selection:
+                element.addEventListener("click", new EventListener() {
+                    @Override
+                    public void onEvent(Event event) {
+                        log("clicked: ", control, element);
+                        org.eclipse.swt.widgets.Event swtEvent = new org.eclipse.swt.widgets.Event();
+                        swtEvent.widget = control;
+                        swtEvent.display = GwtDisplay.this;
+                        swtEvent.type = SWT.Selection;
+                        control.notifyListeners(SWT.Selection, swtEvent);
+                    }
+                });
+                break;
+            default:
+                log("FIXME: GwtDisplay.addListener ", i);
+        }
+
     }
 
     @Override
@@ -104,6 +122,7 @@ public class GwtDisplay extends PlatformDisplay {
               // input.setAttribute("id", inputId);
                 if ((control.style & SWT.RADIO) != 0) {
                     input.setAttribute("type", "radio");
+                    input.setAttribute("name", "" + control.getParent().hashCode());
                    /* result.setAttribute("class", "mdl-radio mdl-js-radio mdl-js-ripple-effect");
                     input.setAttribute("class", "mdl-radio__button");
                     span.setAttribute("class", "mdl-radio__label"); */
@@ -269,8 +288,9 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public boolean getSelection(Button button) {
-        log("FIXME: GwtDisplay.getSeletion");
-        return false;
+        Element element = (Element) button.peer;
+        Element input = element.getFirstElementChild();
+        return input != null && input.getAttribute("checked") != null;
     }
 
     @Override
@@ -290,6 +310,7 @@ public class GwtDisplay extends PlatformDisplay {
     public void openShell(Shell shell) {
         //Element.getBody().appendChild((Element) shell.peer);
         log("FIXME: GwtDisplay.openShell");
+        shell.layout(true, true);
     }
 
     @Override
@@ -299,8 +320,7 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public void removeChild(Composite composite, Control control) {
-        throw new RuntimeException("FIXME: GwtDisplay.removeChild");
-
+        ((Element) composite.peer).removeChild((Element) control.peer);
     }
 
     @Override
@@ -389,7 +409,17 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public void setSelection(Button button, boolean b) {
-        log("FIXME: GwtDisplay.setSelection");
+        Element element = ((Element) button.peer);
+        switch (button.getControlType()) {
+            case BUTTON_RADIO:
+            case BUTTON_CHECKBOX:
+                if (b) {
+                    element.getFirstElementChild().setAttribute("checked", "checked");
+                } else {
+                    element.getFirstElementChild().removeAttribute("checked");
+                }
+        }
+
     }
 
     @Override

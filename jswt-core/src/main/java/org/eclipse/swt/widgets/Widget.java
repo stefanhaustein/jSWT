@@ -72,14 +72,14 @@ public abstract class Widget {
     }
 
 
+    /**
+     * Overriden in Control, adding a platform listener registration.
+     */
     public void addListener(int eventType, Listener listener) {
         if (listeners == null) {
             listeners = new EventTable();
         }
         listeners.hook(eventType, listener);
-        if (this instanceof Control) {
-            display.addListener((Control) this, eventType, listener);
-        }
     }
 
 

@@ -28,6 +28,8 @@ public class Control extends Widget {
   Color background;
   Font font;
   Image backgroundImage;
+  private long registeredListenerTypes;
+
 
   String depth() {
     return this instanceof Shell ? "" : ("  " + getParent().depth());
@@ -48,6 +50,14 @@ public class Control extends Widget {
     TypedListener typedListener = new TypedListener(controlListener);
     addListener(SWT.Resize, typedListener);
     addListener(SWT.Move, typedListener);
+  }
+
+  public void addListener(int eventType, Listener listener) {
+    super.addListener(eventType, listener);
+    if ((registeredListenerTypes & (1L << eventType)) == 0) {
+      registeredListenerTypes |= 1L << eventType;
+      display.addListener(this, eventType, listener);
+    }
   }
 
   public void addMouseListener(MouseListener mouseListener) {

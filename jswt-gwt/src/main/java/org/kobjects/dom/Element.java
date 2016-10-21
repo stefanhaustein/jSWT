@@ -76,4 +76,12 @@ public class Element extends JavaScriptObject {
     public native final void setClassName(String s) /*-{
         this.className = s;
     }-*/;
+
+    public native final void removeAttribute(String name) /*-{
+        this.removeAttribute(name);
+    }-*/;
+
+    public native final void removeChild(Element child) /*-{
+        this.removeChild(child);
+    }-*/;
 }
