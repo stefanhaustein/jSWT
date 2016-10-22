@@ -33,7 +33,6 @@ public final class Elements {
         return [0, 0, element.clientWidth, element.clientHeight];
     }-*/;
 
-
     public static native int getMinWidth(Element element) /*-{
         var style = element.style;
         var savedWidth = style.width;
@@ -53,34 +52,4 @@ public final class Elements {
         return result;
     }-*/;
 
-
-    public static native String getDisplay(Element element) /*-{
-        return element.style.display;
-    }-*/;
-
-    public static native void setDisplay(Element element, String display) /*-{
-        element.style.display = display;
-    }-*/;
-
-
-    public static native Element upgradeElement(Element element) /*-{
-        $wnd.componentHandler.upgradeElement(element);
-    }-*/;
-
-    public static native Element downgradeElement(Element element) /*-{
-        $wnd.componentHandler.downgradeElement(element);
-    }-*/;
-
-    public static native Element createMdlElement(Document document, String name, String className) /*-{
-        var element = document.createElement(name);
-        element.className = className;
-        $wnd.componentHandler.upgradeElement(element);
-        return element;
-    }-*/;
-
-    public static native void initTabs(Element container) /*-{
-        var ihtml = container.firstElementChild.innerHTML;
-        container.firstElementChild.innerHTML = ihtml;
-        container.MaterialTabs.initTabs_();
-    }-*/;
 }

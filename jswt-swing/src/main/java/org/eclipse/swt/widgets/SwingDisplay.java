@@ -221,7 +221,7 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
-  public void disposeShell(Shell shell) {
+  public void disposeRootShell(Shell shell) {
     SwingUtilities.getRoot((Component) shell.peer).setVisible(false);
   }
 
@@ -540,10 +540,12 @@ public class SwingDisplay extends PlatformDisplay {
     }
   }
 
+  /*
   @Override
   public void pack(Shell shell) {
     ((Window) SwingUtilities.getRoot((Component) shell.peer)).pack();
   }
+*/
 
   @Override
   public void removeChild(Composite composite, Control child) {

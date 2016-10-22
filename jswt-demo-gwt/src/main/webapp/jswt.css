@@ -1,0 +1,57 @@
+jswt-tabfolder,
+jswt-composite,
+jswt-group,
+jswt-shell-dialog,
+.jswt-control {
+    box-sizing: border-box;
+    position: absolute;
+    white-space: nowrap;
+    display: block;
+    visibility: inherit;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    font-size: 16px;
+    background-color: #fff;
+    color: black;
+}
+
+/* Group */
+
+jswt-group-label {
+    display: inline-block;
+    position: relative;
+    left: 12px;
+    padding: 0 4px;
+    background-color: #fff;   /* Set to group color programmatically if changed */
+}
+
+/* TabFolder */
+
+jswt-tabfolder {
+    display: block;
+}
+jswt-tabbar {
+    display: block;
+    background-color: #7baaf7;
+    color: white;
+}
+
+jswt-tab {
+    padding: 12px;
+    display: inline-block;
+    cursor: pointer;
+}
+
+jswt-tab.selected {
+    color: black;
+    background-color: white;
+}
+
+jswt-group {
+    outline: darkgray solid 1px;
+    outline-offset: -8px;
+}

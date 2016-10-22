@@ -37,10 +37,6 @@ public class Shell extends Decorations {
     display.openShell(this);
   }
 
-  public void pack() {
-    display.pack(this);
-  }
-
   public void setDefaultButton(Button button) {
   }
 

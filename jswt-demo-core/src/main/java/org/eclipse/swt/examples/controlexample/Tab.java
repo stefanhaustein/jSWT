@@ -1038,9 +1038,13 @@ abstract class Tab {
 		}
 		dialog.setLocation(bounds.x, clientArea.y);
 		dialog.open ();
-		while (! dialog.isDisposed()) {
+
+		//  FIXME
+
+/*		while (! dialog.isDisposed()) {
 			if (! display.readAndDispatch()) display.sleep();
 		}
+		*/
 	}
 
 	/**

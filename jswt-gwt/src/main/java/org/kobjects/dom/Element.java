@@ -17,8 +17,16 @@ public class Element extends JavaScriptObject {
         this.appendChild(child);
     }-*/;
 
+    public native final int getChildElementCount() /*-{
+        return this.childElementCount;
+    }-*/;
+
     public native final CanvasRenderingContext2D getContext2d() /*-{
         return this.getContext('2d');
+    }-*/;
+
+    public native final boolean getChecked() /*-{
+        return this.checked;
     }-*/;
 
     public native final Document getOwnerDocument() /*-{
@@ -49,6 +57,10 @@ public class Element extends JavaScriptObject {
         return this.parentElement;
     }-*/;
 
+    public native final Style getStyle() /*-{
+        return this.style;
+    }-*/;
+
     public native final String getTextContent() /*-{
         return this.textContent;
     }-*/;
@@ -64,6 +76,11 @@ public class Element extends JavaScriptObject {
     public native final void setAttribute(String name, String value) /*-{
         this.setAttribute(name, value);
     }-*/;
+
+    public native final void setChecked(boolean b) /*-{
+        return this.checked = b;
+    }-*/;
+
 
     public native final void setTextContent(String content) /*-{
         this.textContent = content;

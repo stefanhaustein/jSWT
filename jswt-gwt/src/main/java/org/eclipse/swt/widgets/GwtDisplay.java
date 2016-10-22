@@ -47,14 +47,24 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public void addItem(Control control, String s, int index) {
-        log("FIXME: GwtDisplay.addItem");
+        if (control.getControlType() == Control.ControlType.COMBO) {
+            log("#### Adding to combo: ", control, s, index);
+        }
+
+        Element element = (Element) control.peer;
+        Element before = Elements.getChildElement(element, index);
+        Element newItem = createElement("option");
+        newItem.setTextContent(s);
+        element.insertBefore(newItem, before);
     }
 
     @Override
     public void addChild(Composite composite, Control control) {
+        Element parentElement = (Element) composite.peer;
+        Element childElement = (Element) control.peer;
         if (composite.getControlType() != Control.ControlType.TAB_FOLDER) {
             log("addChild to: ", composite.peer, "; child: ", control);
-            ((Element) composite.peer).appendChild((Element) control.peer);
+            parentElement.appendChild(childElement);
         }
     }
 
@@ -64,24 +74,44 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public void addListener(final Control control, int i, Listener listener) {
+    public void addListener(final Control control, int eventType, Listener listener) {
         final Element element = (Element) control.peer;
-        switch (i) {
+        switch (eventType) {
             case SWT.Selection:
-                element.addEventListener("click", new EventListener() {
-                    @Override
-                    public void onEvent(Event event) {
-                        log("clicked: ", control, element);
-                        org.eclipse.swt.widgets.Event swtEvent = new org.eclipse.swt.widgets.Event();
-                        swtEvent.widget = control;
-                        swtEvent.display = GwtDisplay.this;
-                        swtEvent.type = SWT.Selection;
-                        control.notifyListeners(SWT.Selection, swtEvent);
-                    }
-                });
-                break;
+                switch (control.getControlType()) {
+                    case BUTTON_PUSH:
+                        element.addEventListener("click", new EventListener() {
+                            @Override
+                            public void onEvent(Event event) {
+                                log("clicked: ", control, element);
+                                org.eclipse.swt.widgets.Event swtEvent = new org.eclipse.swt.widgets.Event();
+                                swtEvent.widget = control;
+                                swtEvent.display = GwtDisplay.this;
+                                swtEvent.type = SWT.Selection;
+                                control.notifyListeners(SWT.Selection, swtEvent);
+                            }
+                        });
+                        break;
+                    case BUTTON_CHECKBOX:
+                    case BUTTON_RADIO:
+                        Element input = element.getFirstElementChild();
+                        input.addEventListener("change", new EventListener() {
+                            @Override
+                            public void onEvent(Event event) {
+                                log("changed: ", control, element);
+                                org.eclipse.swt.widgets.Event swtEvent = new org.eclipse.swt.widgets.Event();
+                                swtEvent.widget = control;
+                                swtEvent.display = GwtDisplay.this;
+                                swtEvent.type = SWT.Selection;
+                                control.notifyListeners(SWT.Selection, swtEvent);
+                            }
+                        });
+                        break;
+                    default:
+                        log("FIXME GwtDisplay.addListener SWT.Selection", control.getControlType().name());
+                }
             default:
-                log("FIXME: GwtDisplay.addListener ", i);
+                log("FIXME: GwtDisplay.addListener ", eventType);
         }
 
     }
@@ -98,7 +128,9 @@ public class GwtDisplay extends PlatformDisplay {
     }
     private Element createControl(String name) {
         Element result = Document.get().createElement(name);
-        result.setClassName("control");
+        if (!name.startsWith("jswt-")) {
+            result.setClassName("jswt-control");
+        }
         return result;
     }
 
@@ -140,7 +172,7 @@ public class GwtDisplay extends PlatformDisplay {
                 return createControl("select");
             case LIST: {
                 Element result = createControl("select");
-                result.setAttribute("multiple", "multiple");
+                result.setAttribute("size", "4");
                 return result;
             }
             case SCALE:
@@ -151,12 +183,29 @@ public class GwtDisplay extends PlatformDisplay {
                 return result;
             }
             case SHELL_ROOT: {
-                Element shell = createElement("div");
-                shell.setAttribute("style", "width:100%;min-height:100vh;margin:auto;position:relative");
+                Element shell = createElement("jswt-shell-root");
+                shell.setAttribute("style", "display:block;width:100%;min-height:100vh;margin:auto;position:relative");
                 //   Document.get().getBody().setAttribute("style", "min-height:100%");
                 //   Document.get().getBody().getParentElement().setAttribute("style", "height:100%");
                 Document.get().getBody().appendChild(shell);
                 return shell;
+            }
+            case SHELL_DIALOG: {
+                Element background = createElement("jswt-shell-dialog-background");
+                background.setAttribute("style", "visibility:hidden;display:block;width:100%;min-height:100vh;margin:auto;position:absolute;left:0;top:0;background-color:rgba(0,0,0,0.3)");
+                Element dialogShell = createControl("jswt-shell-dialog");
+                dialogShell.setAttribute("style", "background-color: white;margin:auto");
+                background.appendChild(dialogShell);
+                //   Document.get().getBody().setAttribute("style", "min-height:100%");
+                //   Document.get().getBody().getParentElement().setAttribute("style", "height:100%");
+                //Document.get().getBody().appendChild(background);
+
+                // FIXME: the dialog is inserted here because addChidl is not symmetrical: 
+                // FIXME: addChild is not called for dialogs, but removeChild is called.
+
+                ((Element) control.getParent().peer).appendChild(background);
+                return dialogShell;
+
             }
             case LABEL:
                 return createControl("jswt-label");
@@ -166,28 +215,30 @@ public class GwtDisplay extends PlatformDisplay {
                 Element result = createControl("jswt-group");
                 int style = control.style;
                 log("**************createGroup; style: ", style);
-                String outlineStyle;
+                String className;
                 if ((style & SWT.SHADOW_ETCHED_IN) != 0) {
-                    outlineStyle = "groove 2px #888";
+                    className = "jswt-shadow-etched-in";
                 } else if ((style & SWT.SHADOW_ETCHED_OUT) != 0) {
-                    outlineStyle = "ridge 2px #888";
+                    className = "jswt-shadow-etched-out";
                 } else if ((style & SWT.SHADOW_IN) != 0) {
-                    outlineStyle = "inset 2px #888";
+                    className = "jswt-shadow-in";
                 } else if ((style & SWT.SHADOW_OUT) != 0) {
-                    outlineStyle = "outset 2px #888";
-                } else if ((style & SWT.BORDER) != 0) {
-                    outlineStyle = "solid 1px #888";
+                    className = "jswt-shadow-out";
                 } else if ((style & SWT.SHADOW_NONE) != 0) {
-                    outlineStyle = null;
+                    className = "jswt-shadow-none";
                 } else {
-                    outlineStyle = "solid 1px #ccc";
+                    className = null;
                 }
-                if (outlineStyle != null) {
-                    result.setAttribute("style", "outline: " + outlineStyle + "; outline-offset: -8px;");
-                    log("outline: " + result.getAttribute("style"));
+
+                if ((style & SWT.BORDER) != 0) {
+                    className = "jswt-border" + (className == null ? "" : (" " + className));
+                }
+
+                if (className != null) {
+                    result.setAttribute("className", className);
                 }
                 Element title = createElement("jswt-group-label");
-                title.setAttribute("style", "display:none");
+                title.getStyle().setDisplay("none");
                 result.appendChild(title);
                 return result;
             }
@@ -221,9 +272,8 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public void disposeShell(Shell shell) {
-        throw new RuntimeException("FIXME: GwtDisplay.disposeShell");
-
+    public void disposeRootShell(Shell shell) {
+        throw new RuntimeException("FIXME: GwtDisplay.disposeRootShell");
     }
 
     @Override
@@ -276,8 +326,7 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public int getItemCount(Control control) {
-        log("FIXME: GwtDisplay.getItemCount");
-        return 0;
+        return ((Element) control.peer).getChildElementCount();
     }
 
     @Override
@@ -290,7 +339,9 @@ public class GwtDisplay extends PlatformDisplay {
     public boolean getSelection(Button button) {
         Element element = (Element) button.peer;
         Element input = element.getFirstElementChild();
-        return input != null && input.getAttribute("checked") != null;
+        boolean result = input != null && input.getChecked();
+        log("getSelection", button, result);
+        return result;
     }
 
     @Override
@@ -309,18 +360,27 @@ public class GwtDisplay extends PlatformDisplay {
     @Override
     public void openShell(Shell shell) {
         //Element.getBody().appendChild((Element) shell.peer);
-        log("FIXME: GwtDisplay.openShell");
-        shell.layout(true, true);
-    }
-
-    @Override
-    public void pack(Shell shell) {
-        shell.layout(true, true);
+    //
+        if (shell.getControlType() == Control.ControlType.SHELL_DIALOG) {
+            Point dialogSize = shell.getSize();
+            Point parentSize = shell.getParent().getSize();
+            shell.setLocation((parentSize.x - dialogSize.x) / 2, (parentSize.y - dialogSize.y) / 3);
+            ((Element) shell.peer).getParentElement().getStyle().setVisibility("visible");
+        } else {
+            shell.layout(true, true);   // FIXME
+            shell.setVisible(true);
+        }
     }
 
     @Override
     public void removeChild(Composite composite, Control control) {
-        ((Element) composite.peer).removeChild((Element) control.peer);
+        Element parentElement = (Element) composite.peer;
+        Element childElement = (Element) control.peer;
+        if (control.getControlType() == Control.ControlType.SHELL_DIALOG) {
+            parentElement.removeChild(childElement.getParentElement());
+        } else {
+            parentElement.removeChild(childElement);
+        }
     }
 
     @Override
@@ -335,7 +395,7 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public void setBounds(Control control, int x, int y, int w, int h) {
-        if (control instanceof Shell) {
+        if (control.getControlType() == Control.ControlType.SHELL_ROOT) {
             return;
         }
         Element element = (Element) control.peer;
@@ -376,6 +436,12 @@ public class GwtDisplay extends PlatformDisplay {
                 title.setAttribute("style", s.isEmpty() ? "display:none" : "");
                 break;
             }
+            case COMBO:
+                log("FIXME: GwtDisplay.setText for COMBO");
+                break;
+            case SHELL_DIALOG:
+                log("FIXME: GwtDisplay.setText for SHELL_DIALOG");
+                break;
             default: {
                 if (element.getLocalName().equals("input")) {
                     element.setAttribute("value", s);
@@ -390,7 +456,7 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public void setVisible(Control control, boolean visible) {
-        Elements.setDisplay((Element) control.peer, visible ? "" : "none");
+        ((Element) control.peer).getStyle().setVisibility(visible ? "" : "hidden");
     }
 
     @Override
@@ -413,11 +479,7 @@ public class GwtDisplay extends PlatformDisplay {
         switch (button.getControlType()) {
             case BUTTON_RADIO:
             case BUTTON_CHECKBOX:
-                if (b) {
-                    element.getFirstElementChild().setAttribute("checked", "checked");
-                } else {
-                    element.getFirstElementChild().removeAttribute("checked");
-                }
+                element.getFirstElementChild().setChecked(b);
         }
 
     }
@@ -470,20 +532,20 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public void setItem(Control control, int index, String string) {
-        log("FIXME: GwtDisplay.setItem");
+        Element element = (Element) control.peer;
+        Elements.getChildElement(element, index).setTextContent(string);
     }
 
     @Override
     public Font getFont(Control control) {
-
         log("FIXME: GwtDisplay.setFont");
         return null;
     }
 
     @Override
-    public String getItem(Control control, int i) {
-        log("FIXME: GwtDisplay.getItem");
-        return "Item " + i;
+    public String getItem(Control control, int index) {
+        Element element = (Element) control.peer;
+        return Elements.getChildElement(element, index).getTextContent();
     }
 
     @Override

@@ -76,7 +76,7 @@ class GwtTabFolder extends Element {
             Element oldContent = Elements.getChildElement(this, index + 1);
 
             if (oldContent != newContent) {
-                newContent.setAttribute("style", oldContent.getAttribute("style"));
+                newContent.getStyle().setVisibility(oldContent.getStyle().getVisibility());
                 replaceChild(newContent, oldContent);
             }
         }
@@ -91,7 +91,7 @@ class GwtTabFolder extends Element {
 
         Element panel = getTabBar().getNextElementSibling();
         while (panel != null) {
-            panel.setAttribute("style", "visibility: " + (panel == selectedTabItem.control.peer ? "visible" : "hidden"));
+            panel.getStyle().setVisibility(panel == selectedTabItem.control.peer ? "visible" : "hidden");
             panel = panel.getNextElementSibling();
         }
     }

@@ -4,8 +4,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.internal.SWTEventListener;
 
-import java.util.HashSet;
-
 public abstract class Widget {
 
       	/* Global state flags */
@@ -102,10 +100,11 @@ public abstract class Widget {
             return;
         }
         if (this instanceof Shell) {
-            display.disposeShell((Shell) this);
         }
         if (parent != null) {
             parent.removeChild(this);
+        } else if (this instanceof Shell) {
+            display.disposeRootShell((Shell) this);
         }
         System.err.println("FIXME: Widget.dispose(): Notify dispose listeners!");
         state |= DISPOSED;

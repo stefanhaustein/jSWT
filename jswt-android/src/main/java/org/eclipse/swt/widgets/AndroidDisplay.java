@@ -169,7 +169,7 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
-  public void disposeShell(Shell shell) {
+  public void disposeRootShell(Shell shell) {
     AndroidShell shellView = (AndroidShell) shell.peer;
     if (shellView.dialog != null) {
       shellView.dialog.hide();

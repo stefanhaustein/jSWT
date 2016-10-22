@@ -44,11 +44,11 @@ public class Display extends Device {
 */
 
     public boolean readAndDispatch() {
-        throw new RuntimeException("N/A on android.");
+        throw new RuntimeException("Display.readAndDispatch not supported in jSWT.");
     }
 
     public void sleep() {
-        throw new RuntimeException("N/A on android.");
+        System.out.println("Display.sleep ignored.");
     }
 
     public void asyncExec(Runnable runnable) {

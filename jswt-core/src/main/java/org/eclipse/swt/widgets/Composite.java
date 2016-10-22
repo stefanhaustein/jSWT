@@ -163,6 +163,9 @@ public class Composite extends Scrollable {
   }
 
 
+  /** 
+   * Used if no layout is set in computeSize().
+   */
   Point minimumSize (int wHint, int hHint, boolean changed) {
     Control [] children = _getChildren ();
     Rectangle clientArea = getClientArea ();
@@ -174,12 +177,23 @@ public class Composite extends Scrollable {
     }
     return new Point (width, height);
   }
+
   // Called from dispose
   void removeChild(Widget widget) {
     children.remove(widget);
     if (widget instanceof Control) {
       display.removeChild(this, (Control) widget);
     }
+  }
+
+  public void pack() {
+    pack(true);
+  }
+
+  public void pack(boolean changed) {
+      Point minSize = computeSize(SWT.DEFAULT, SWT.DEFAULT, changed);
+      setSize(minSize.x, minSize.y);
+      layout(changed, true);
   }
 
   public void setBackgroundMode(int mode) {

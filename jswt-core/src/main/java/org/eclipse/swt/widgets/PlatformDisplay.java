@@ -27,7 +27,7 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract GC creatGCForPlatformImage(Object platformImage);
 
-  public abstract void disposeShell(Shell shell);
+  public abstract void disposeRootShell(Shell shell);
 
   public abstract boolean isEnabled(Control control);
 
@@ -58,8 +58,6 @@ public abstract class PlatformDisplay extends Display {
   public abstract Object loadImage(InputStream stream) throws IOException;
 
   public abstract void openShell(Shell shell);
-
-  public abstract void pack(Shell shell);
 
   public abstract void redraw(Control control, int x, int y, int w, int h, boolean all);
 
