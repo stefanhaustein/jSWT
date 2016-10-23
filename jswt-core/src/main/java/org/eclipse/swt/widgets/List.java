@@ -29,18 +29,18 @@ public class List extends Scrollable {
     }
 
     public void deselect(int index) {
-        display.setSelection(this, index, false);
+        display.setIndexSelected(this, index, false);
     }
 
     public void deselect(int[] indices) {
         for (int i : indices) {
-            display.setSelection(this, i, false);
+            display.setIndexSelected(this, i, false);
         }
     }
 
     public void deselect(int start, int end) {
         for (int i = start; i <= end; i++) {
-            display.setSelection(this, i, false);
+            display.setIndexSelected(this, i, false);
         }
     }
 
@@ -161,17 +161,17 @@ public class List extends Scrollable {
 
     public void select(int[] indices) {
         for (int i : indices) {
-            display.setSelection(this, i, true);
+            display.setIndexSelected(this, i, true);
         }
     }
 
     public void select(int i) {
-        display.setSelection(this, i, true);
+        display.setIndexSelected(this, i, true);
     }
 
     public void select(int start, int end) {
         for (int i = start; i <= end; i++) {
-            display.setSelection(this, i, true);
+            display.setIndexSelected(this, i, true);
         }
     }
 
@@ -215,7 +215,7 @@ public class List extends Scrollable {
 
     public void setSelection(int start, int end) {
         for (int i = 0; i < getItemCount(); i++) {
-            display.setSelection(this, i, i >= start && i <= end);
+            display.setIndexSelected(this, i, i >= start && i <= end);
         }
     }
 }

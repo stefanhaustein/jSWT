@@ -1,5 +1,6 @@
 jswt-tabfolder,
 jswt-composite,
+jswt-label,
 jswt-group,
 jswt-shell-dialog,
 .jswt-control {
@@ -8,6 +9,7 @@ jswt-shell-dialog,
     white-space: nowrap;
     display: block;
     visibility: inherit;
+    overflow: hidden;
 }
 
 body {
@@ -17,9 +19,22 @@ body {
     font-size: 16px;
     background-color: #fff;
     color: black;
+    overflow: hidden;
 }
 
 /* Group */
+
+jswt-group-border {
+    display: block;
+    height: auto;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    position: absolute;
+    margin: 8px 4px;
+    border: 1px solid darkgray;
+}
 
 jswt-group-label {
     display: inline-block;
@@ -35,6 +50,7 @@ jswt-tabfolder {
     display: block;
 }
 jswt-tabbar {
+    white-space: normal;
     display: block;
     background-color: #7baaf7;
     color: white;
@@ -51,7 +67,3 @@ jswt-tab.selected {
     background-color: white;
 }
 
-jswt-group {
-    outline: darkgray solid 1px;
-    outline-offset: -8px;
-}

@@ -40,10 +40,10 @@ class GwtTabFolder extends Element {
                 setSelectionImpl(tabItem, newTab);
             }
         });
-        tabBar.insertBefore(newTab, Elements.getChildElement(tabBar, index));
+        tabBar.insertBefore(newTab, tabBar.getChildren().get(index));
 
         Element newContent = Document.get().createElement("div");
-        insertBefore(newContent, Elements.getChildElement(this, index + 1));
+        insertBefore(newContent, this.getChildren().get(index + 1));
 
         if (isFirst) {
             newTab.setClassName("selected");
@@ -68,12 +68,12 @@ class GwtTabFolder extends Element {
     final void updateTab(int index, TabItem tabItem) {
         if (tabItem.getText() != null && !tabItem.getText().isEmpty()){
             Element tabContainer = getTabBar();
-            Element tab = Elements.getChildElement(tabContainer, index);
+            Element tab = tabContainer.getChildren().get(index);
             tab.setTextContent(tabItem.getText());
         }
         if (tabItem.getControl() != null) {
             Element newContent = (Element) tabItem.getControl().peer;
-            Element oldContent = Elements.getChildElement(this, index + 1);
+            Element oldContent = this.getChildren().get(index + 1);
 
             if (oldContent != newContent) {
                 newContent.getStyle().setVisibility(oldContent.getStyle().getVisibility());
@@ -99,7 +99,7 @@ class GwtTabFolder extends Element {
 
     public final PlatformDisplay.Insets getInsets() {
         PlatformDisplay.Insets insets = new PlatformDisplay.Insets();
-        insets.top = Elements.getMinHeight(getTabBar());
+        insets.top = GwtDisplay.getMinHeight(getTabBar());
         return insets;
     }
 }

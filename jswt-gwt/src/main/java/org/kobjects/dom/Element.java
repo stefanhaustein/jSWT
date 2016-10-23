@@ -1,6 +1,7 @@
 package org.kobjects.dom;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArray;
 
 public class Element extends JavaScriptObject {
 
@@ -17,6 +18,18 @@ public class Element extends JavaScriptObject {
         this.appendChild(child);
     }-*/;
 
+    public native final void focus() /*-{
+        this.focus();
+    }-*/;
+
+    public native final String getAttribute(String name) /*-{
+        return this.getAttribute(name);
+    }-*/;
+
+    public native final String getClassName() /*-{
+        return this.className;
+    }-*/;
+
     public native final int getChildElementCount() /*-{
         return this.childElementCount;
     }-*/;
@@ -25,12 +38,24 @@ public class Element extends JavaScriptObject {
         return this.getContext('2d');
     }-*/;
 
+    public native final JsArray<Element> getChildren() /*-{
+        return this.children;
+    }-*/;
+
     public native final boolean getChecked() /*-{
         return this.checked;
     }-*/;
 
-    public native final Document getOwnerDocument() /*-{
-        return this.ownerDocument;
+    public native final int getClientHeight() /*-{
+        return this.clientHeight;
+    }-*/;
+
+    public native final int getClientWidth() /*-{
+        return this.clientWidth;
+    }-*/;
+
+    public native final boolean getDisabled() /*-{
+        return this.disabled;
     }-*/;
 
     public native final Element getFirstElementChild() /*-{
@@ -45,12 +70,28 @@ public class Element extends JavaScriptObject {
         return this.nextElementSibling;
     }-*/;
 
-    public native final String getAttribute(String name) /*-{
-        return this.getAttribute(name);
+    public native final int getOffsetLeft() /*-{
+        return this.offsetTop;
     }-*/;
 
-    public native final String getClassName() /*-{
-        return this.className;
+    public native final int getOffsetTop() /*-{
+        return this.offsetTop;
+    }-*/;
+
+    public native final int getOffsetHeight() /*-{
+        return this.offsetHeight;
+    }-*/;
+
+    public native final int getOffsetWidth() /*-{
+        return this.offsetWidth;
+    }-*/;
+
+    public native final Document getOwnerDocument() /*-{
+        return this.ownerDocument;
+    }-*/;
+
+    public native final int getSelectedIndex() /*-{
+        return this.selectedIndex;
     }-*/;
 
     public native final Element getParentElement() /*-{
@@ -61,8 +102,16 @@ public class Element extends JavaScriptObject {
         return this.style;
     }-*/;
 
+    public native final boolean getSelected() /*-{
+        return this.selected;
+    }-*/;
+
     public native final String getTextContent() /*-{
         return this.textContent;
+    }-*/;
+
+    public native final String getValue() /*-{
+        return this.value;
     }-*/;
 
     public native final void insertBefore(Element newItem, Element before) /*-{
@@ -78,9 +127,16 @@ public class Element extends JavaScriptObject {
     }-*/;
 
     public native final void setChecked(boolean b) /*-{
-        return this.checked = b;
+        this.checked = b;
     }-*/;
 
+    public native final void setDisabled(boolean b) /*-{
+        this.disabled = b;
+    }-*/;
+
+    public native final void setSelected(boolean b) /*-{
+        this.selected = b;
+    }-*/;
 
     public native final void setTextContent(String content) /*-{
         this.textContent = content;
@@ -94,11 +150,31 @@ public class Element extends JavaScriptObject {
         this.className = s;
     }-*/;
 
+    public native final int setSelectedIndex(int index) /*-{
+        this.selectedIndex = index;
+    }-*/;
+
     public native final void removeAttribute(String name) /*-{
         this.removeAttribute(name);
     }-*/;
 
     public native final void removeChild(Element child) /*-{
         this.removeChild(child);
+    }-*/;
+
+    public native final void setMax(String maximum) /*-{
+        this.max = maximum;
+    }-*/;
+
+    public native final void setMin(String minimum) /*-{
+        this.min = minimum;
+    }-*/;
+
+    public native final void setValue(String value) /*-{
+        this.value = value;
+    }-*/;
+
+    public native final void setStep(String value) /*-{
+        this.step = value;
     }-*/;
 }

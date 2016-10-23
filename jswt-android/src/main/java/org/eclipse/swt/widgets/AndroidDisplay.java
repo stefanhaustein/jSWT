@@ -83,8 +83,8 @@ public class AndroidDisplay extends PlatformDisplay {
     activity.runOnUiThread(runnable);
   }
 
-  public void handleRadioGroup(Button button, boolean selected) {
-    if (button.style != SWT.RADIO || !selected) {
+  private void handleRadioGroup(Button button, boolean selected) {
+    if (!selected) {
       return;
     }
     CompoundButton androidButton = (CompoundButton) button.peer;
@@ -273,11 +273,6 @@ public class AndroidDisplay extends PlatformDisplay {
   @Override
   public int getItemCount(Control control) {
     return getArrayAdapter(control).getCount();
-  }
-
-  @Override
-  public boolean getSelection(Button button) {
-    return (button.peer instanceof CompoundButton) ? ((CompoundButton) button.peer).isChecked() : false;
   }
 
   @Override
@@ -479,21 +474,21 @@ public class AndroidDisplay extends PlatformDisplay {
   @Override
   public void setSliderProperties(Control control, int thumb, int increment, int pageIncrement) {
     System.err.println("FIXME: setSliderProperties()");   // FIXME
-
-  }
-
-  @Override
-  public void setSelection(Button button, boolean selected) {
-    if (!(button.peer instanceof CompoundButton)) {
-      return;
-    }
-    handleRadioGroup(button, selected);
-    ((CompoundButton) button.peer).setChecked(selected);
   }
 
   @Override
   public void setSelection(Control control, int selection) {
     switch (control.getControlType()) {
+      case BUTTON_ARROW:
+      case BUTTON_PUSH:
+        break;
+      case BUTTON_RADIO:
+        handleRadioGroup((Button) control, selection != 0);
+        // Fallthrough intended
+      case BUTTON_CHECKBOX:
+      case BUTTON_TOGGLE:
+        ((CompoundButton) control.peer).setChecked(selection != 0);
+        break;
       case SLIDER:
       case SCALE:
       case PROGRESS_BAR:
@@ -508,7 +503,7 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
-  public void setSelection(List list, int index, boolean selected) {
+  public void setIndexSelected(List list, int index, boolean selected) {
 
   }
 
@@ -536,6 +531,13 @@ public class AndroidDisplay extends PlatformDisplay {
   @Override
   public int getSelection(Control control) {
     switch (control.getControlType()) {
+      case BUTTON_ARROW:
+      case BUTTON_PUSH:
+        return 0;
+      case BUTTON_CHECKBOX:
+      case BUTTON_RADIO:
+      case BUTTON_TOGGLE:
+        return ((CompoundButton) control.peer).isChecked() ? 1 : 0;
       case SCALE:
       case SLIDER:
       case PROGRESS_BAR:
@@ -562,12 +564,6 @@ public class AndroidDisplay extends PlatformDisplay {
     for (int i = end; i >= start; i--) {
       adapter.remove(adapter.getItem(i));
     }
-  }
-
-
-  @Override
-  public void pack(Shell shell) {
-    ((View) shell.peer).invalidate();
   }
 
   @Override

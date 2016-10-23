@@ -273,6 +273,13 @@ public class SwingDisplay extends PlatformDisplay {
   @Override
   public int getSelection(Control control) {
     switch (control.getControlType()) {
+      case BUTTON_ARROW:
+      case BUTTON_PUSH:
+        return 0;
+      case BUTTON_CHECKBOX:
+      case BUTTON_RADIO:
+      case BUTTON_TOGGLE:
+        return ((AbstractButton) control.peer).isSelected() ? 1 : 0;
       case COMBO:
         return ((JComboBox<String>) control.peer).getSelectedIndex();
       case PROGRESS_BAR:
@@ -286,11 +293,6 @@ public class SwingDisplay extends PlatformDisplay {
       default:
         throw new RuntimeException("getSelection() not applicable to " + control.getControlType());
     }
-  }
-
-  @Override
-  public boolean getSelection(Button button) {
-    return ((AbstractButton) button.peer).isSelected();
   }
 
   @Override
@@ -451,17 +453,6 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
-  public void setSelection(Button button, boolean selected) {
-    switch (button.getControlType()) {
-      case BUTTON_TOGGLE:
-      case BUTTON_CHECKBOX:
-      case BUTTON_RADIO:
-        ((AbstractButton) button.peer).setSelected(selected);
-        break;
-    }
-  }
-
-  @Override
   public void setSliderProperties(Control slider, int thumb, int increment, int pageIncrement) {
     if (slider.peer instanceof JScrollBar) {
       JScrollBar scrollbar = (JScrollBar) slider.peer;
@@ -477,6 +468,14 @@ public class SwingDisplay extends PlatformDisplay {
   @Override
   public void setSelection(Control control, int selection) {
     switch (control.getControlType()) {
+      case BUTTON_ARROW:
+      case BUTTON_PUSH:
+        return;
+      case BUTTON_TOGGLE:
+      case BUTTON_CHECKBOX:
+      case BUTTON_RADIO:
+        ((AbstractButton) control.peer).setSelected(selection != 0);
+        break;
       case SCALE:
         ((JSlider) control.peer).setValue(selection);
         break;
@@ -498,7 +497,7 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
-  public void setSelection(List control, int index, boolean selected) {
+  public void setIndexSelected(List control, int index, boolean selected) {
     JList<String> list = (JList<String>) control.peer;
     if (selected) {
       list.addSelectionInterval(index, index);

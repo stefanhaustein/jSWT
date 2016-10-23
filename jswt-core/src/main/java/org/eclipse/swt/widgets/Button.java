@@ -30,7 +30,7 @@ public class Button extends Control {
   }
 
   public boolean getSelection() {
-    return display.getSelection(this);
+    return display.getSelection(this) != 0;
   }
 
   public String getText() {
@@ -42,7 +42,7 @@ public class Button extends Control {
   }
 
   public void setSelection(boolean selected) {
-    display.setSelection(this, selected);
+    display.setSelection(this, selected ? 1 : 0);
   }
 
   public void setText(String text) {

@@ -2,7 +2,6 @@ package org.eclipse.swt.widgets;
 
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionListener;
 
 public class Combo extends Control {

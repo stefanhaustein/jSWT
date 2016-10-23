@@ -20,7 +20,19 @@ import org.kobjects.dom.Event;
 
 public class GwtDisplay extends PlatformDisplay {
 
-    static int id = 0;
+    static String colorToCss(Color color) {
+        return color == null ? null
+                : "rgba(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + "," + (color.getAlpha() / 255f) + ")";
+    }
+
+    static int getMinHeight(Element element) {
+        Style style = element.getStyle();
+        String savedHeight = style.getHeight();
+        style.setHeight("");
+        int minHeight = element.getOffsetHeight();
+        style.setHeight(savedHeight);
+        return minHeight;
+    }
 
     public static native void log(Object... args) /*-{
         switch (args.length) {
@@ -52,7 +64,7 @@ public class GwtDisplay extends PlatformDisplay {
         }
 
         Element element = (Element) control.peer;
-        Element before = Elements.getChildElement(element, index);
+        Element before = element.getChildren().get(index);
         Element newItem = createElement("option");
         newItem.setTextContent(s);
         element.insertBefore(newItem, before);
@@ -63,7 +75,7 @@ public class GwtDisplay extends PlatformDisplay {
         Element parentElement = (Element) composite.peer;
         Element childElement = (Element) control.peer;
         if (composite.getControlType() != Control.ControlType.TAB_FOLDER) {
-            log("addChild to: ", composite.peer, "; child: ", control);
+            // log("addChild to: ", composite.peer, "; child: ", control);
             parentElement.appendChild(childElement);
         }
     }
@@ -83,7 +95,6 @@ public class GwtDisplay extends PlatformDisplay {
                         element.addEventListener("click", new EventListener() {
                             @Override
                             public void onEvent(Event event) {
-                                log("clicked: ", control, element);
                                 org.eclipse.swt.widgets.Event swtEvent = new org.eclipse.swt.widgets.Event();
                                 swtEvent.widget = control;
                                 swtEvent.display = GwtDisplay.this;
@@ -98,7 +109,6 @@ public class GwtDisplay extends PlatformDisplay {
                         input.addEventListener("change", new EventListener() {
                             @Override
                             public void onEvent(Event event) {
-                                log("changed: ", control, element);
                                 org.eclipse.swt.widgets.Event swtEvent = new org.eclipse.swt.widgets.Event();
                                 swtEvent.widget = control;
                                 swtEvent.display = GwtDisplay.this;
@@ -118,10 +128,59 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public Point computeSize(Control control, int wHint, int hHint, boolean b) {
-        return new Point(
-                wHint == SWT.DEFAULT ? Elements.getMinWidth((Element) control.peer) : wHint,
-                hHint == SWT.DEFAULT ? Elements.getMinHeight((Element) control.peer) : hHint);
+        Element element = ((Element) control.peer);
+        Style style = element.getStyle();
+        Point result;
+        if (wHint == SWT.DEFAULT && hHint == SWT.DEFAULT) {
+            String savedWidth = style.getWidth();
+            String savedHeight = style.getHeight();
+            style.setWidth("");
+            style.setHeight("");
+            result = new Point(element.getOffsetWidth(), element.getOffsetHeight());
+            style.setWidth(savedWidth);
+            style.setHeight(savedHeight);
+        } else if (wHint == SWT.DEFAULT) {
+            String savedWidth = style.getWidth();
+            style.setWidth("");
+            result = new Point(element.getOffsetWidth(), hHint);
+            style.setWidth(savedWidth);
+        } else if (hHint == SWT.DEFAULT) {
+            result = new Point(wHint, getMinHeight(element));
+        } else {
+            result = new Point(wHint, hHint);
+        }
+        return result;
     }
+
+    private Color cssToColor(String css) {
+        if (css == null) {
+            return null;
+        }
+        css = css.trim();
+        if (css.isEmpty()) {
+            return null;
+        }
+        int start = css.indexOf('(');
+        if (start != -1) {
+            int end = css.indexOf(')');
+            if (end != -1) {
+                String[] parts = css.substring(start + 1, end).split(",");
+                if (parts.length >= 3) {
+                    int red = Integer.parseInt(parts[0].trim());
+                    int green = Integer.parseInt(parts[1].trim());
+                    int blue = Integer.parseInt(parts[2].trim());
+                    if (parts.length >= 4) {
+                        float alpha = Float.parseFloat(parts[3].trim());
+                        return new Color(this, red, green, blue, Math.round(alpha * 255));
+                    }
+                    return new Color(this, red, green, blue);
+                }
+            }
+        }
+        log("FIXME: GwtDisplay.cssToColor can't convert " + css);
+        return null;
+    }
+
 
     private Element createElement(String name) {
         return Document.get().createElement(name);
@@ -135,7 +194,7 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public Object createControl(Control control) {
+    public Object createControl(final Control control) {
         switch (control.getControlType()) {
             case TEXT:
                 return createControl("input");
@@ -188,6 +247,16 @@ public class GwtDisplay extends PlatformDisplay {
                 //   Document.get().getBody().setAttribute("style", "min-height:100%");
                 //   Document.get().getBody().getParentElement().setAttribute("style", "height:100%");
                 Document.get().getBody().appendChild(shell);
+
+                // FIXME
+                Window.get().addEventListener("resize", new EventListener() {
+                    @Override
+                    public void onEvent(Event event) {
+                        // FIXME: Use cached sizes!
+                        ((Shell) control).layout(true, true);
+                    }
+                });
+
                 return shell;
             }
             case SHELL_DIALOG: {
@@ -213,8 +282,10 @@ public class GwtDisplay extends PlatformDisplay {
                 return createControl("canvas");
             case GROUP: {
                 Element result = createControl("jswt-group");
+                Element border = createElement("jswt-group-border");
+                result.appendChild(border);
+
                 int style = control.style;
-                log("**************createGroup; style: ", style);
                 String className;
                 if ((style & SWT.SHADOW_ETCHED_IN) != 0) {
                     className = "jswt-shadow-etched-in";
@@ -235,8 +306,9 @@ public class GwtDisplay extends PlatformDisplay {
                 }
 
                 if (className != null) {
-                    result.setAttribute("className", className);
+                    border.setAttribute("className", className);
                 }
+
                 Element title = createElement("jswt-group-label");
                 title.getStyle().setDisplay("none");
                 result.appendChild(title);
@@ -278,30 +350,27 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public boolean isEnabled(Control control) {
-        log("FIXME: GwtDisplay.isEnabled");
-        return true;
+        return ((Element) control.peer).getDisabled();
     }
 
     @Override
     public Color getBackground(Control control) {
-        log("FIXME: GwtDisplay.getBackground()");
-        return null;
+        return cssToColor(((Element) control.peer).getStyle().getBackgroundColor());
     }
 
     @Override
     public Rectangle getBounds(Control control) {
-        JsArrayNumber bounds = Elements.getBounds((Element) control.peer);
+        Element element = ((Element) control.peer);
         return new Rectangle(
-                Math.round((float) bounds.get(0)),
-                Math.round((float) bounds.get(1)),
-                Math.round((float) bounds.get(2)),
-                Math.round((float) bounds.get(3)));
+                element.getOffsetLeft(),
+                element.getOffsetTop(),
+                element.getOffsetWidth(),
+                element.getOffsetHeight());
     }
 
     @Override
     public Color getForeground(Control control) {
-        log("FIXME: GwtDisplay.getForeground");
-        return null;
+        return cssToColor(((Element) control.peer).getStyle().getColor());
     }
 
     @Override
@@ -316,7 +385,8 @@ public class GwtDisplay extends PlatformDisplay {
                 return ((GwtTabFolder) scrollable.peer).getInsets();
             case GROUP: {
                 Insets result = new Insets();
-                result.bottom = result.top = result.left = result.right = 16;
+                result.bottom = result.top = 16;
+                result.left = result.right = 8;
                 return result;
             }
             default:
@@ -333,15 +403,6 @@ public class GwtDisplay extends PlatformDisplay {
     public Monitor getMonitor(Control control) {
         log("FIXME: GwtDisplay.getMonitor");
         return new Monitor(new Rectangle(0, 0, 2000, 1000), new Rectangle(0, 0, 2000, 1000));
-    }
-
-    @Override
-    public boolean getSelection(Button button) {
-        Element element = (Element) button.peer;
-        Element input = element.getFirstElementChild();
-        boolean result = input != null && input.getChecked();
-        log("getSelection", button, result);
-        return result;
     }
 
     @Override
@@ -385,12 +446,12 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public void setBackground(Control control, Color color) {
-        log("FIXME: GwtDisplay.setBackground()");
+        ((Element) control.peer).getStyle().setBackgroundColor(colorToCss(color));
     }
 
     @Override
     public void setBackgroundImage(Control control, Image image) {
-        log("FIXEM: GwtDisplay.setBackgroundImage()");
+        log("FIXME: GwtDisplay.setBackgroundImage");
     }
 
     @Override
@@ -399,7 +460,11 @@ public class GwtDisplay extends PlatformDisplay {
             return;
         }
         Element element = (Element) control.peer;
-        Elements.setBounds(element, x, y, w, h);
+        Style style = element.getStyle();
+        style.setLeft(x + "px");
+        style.setTop(y + "px");
+        style.setWidth(w + "px");
+        style.setHeight(h + "px");
         if (element.getLocalName().equals("canvas")) {
             // FIXME: Invalidate instead
             element.setAttribute("width", String.valueOf(w));
@@ -410,7 +475,7 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public void setEnabled(Control control, boolean b) {
-        log("FIXME: GwtDisplay.setEnabled");
+        ((Element) control.peer).setDisabled(!b);
     }
 
     @Override
@@ -420,7 +485,7 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public void setForeground(Control control, Color color) {
-        log("FIXME: GwtDisplay.setForegound");
+        ((Element) control.peer).getStyle().setColor(colorToCss(color));
     }
 
     @Override
@@ -431,7 +496,7 @@ public class GwtDisplay extends PlatformDisplay {
                 Document.get().setTitle(s);
                 break;
             case GROUP: {
-                Element title = element.getFirstElementChild();
+                Element title = element.getFirstElementChild().getNextElementSibling();
                 title.setTextContent(s);
                 title.setAttribute("style", s.isEmpty() ? "display:none" : "");
                 break;
@@ -465,38 +530,63 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public void setRange(Control control, int minimum, int maximum) {
-        log("FIXME: GwtDisplay.setRange");
+        Element element = (Element) control.peer;
+        element.setMax(String.valueOf(maximum));
+        element.setMin(String.valueOf(minimum));
     }
 
     @Override
     public void setSliderProperties(Control control, int thumb, int increment, int pageIncrement) {
-        log("FIXME: GwtDisplay.setSliderProperties");
-    }
-
-    @Override
-    public void setSelection(Button button, boolean b) {
-        Element element = ((Element) button.peer);
-        switch (button.getControlType()) {
-            case BUTTON_RADIO:
-            case BUTTON_CHECKBOX:
-                element.getFirstElementChild().setChecked(b);
+        Element element = (Element) control.peer;
+        switch (control.getControlType()) {
+            case SPINNER:
+            case SCALE:
+            case SLIDER:
+                element.setStep(String.valueOf(increment));
+                break;
+            default:
+                unsupported(control, "setSliderProperties");
         }
-
     }
 
     @Override
     public void setSelection(Control control, int selection) {
-        log("FIXME: GwtDisplay.setSelection");
+        Element element = ((Element) control.peer);
+        switch (control.getControlType()) {
+            case BUTTON_RADIO:
+            case BUTTON_TOGGLE:
+            case BUTTON_CHECKBOX:
+                element.getFirstElementChild().setChecked(selection != 0);
+                break;
+            case LIST:
+            case COMBO:
+                element.setSelectedIndex(selection);
+                break;
+            case SLIDER:
+            case SCALE:
+                element.setValue(String.valueOf(selection));
+                break;
+            case BUTTON_PUSH:
+            case BUTTON_ARROW:
+                break;
+            default:
+                unsupported(control, "setSelection");
+        }
     }
 
     @Override
-    public void setSelection(List list, int index, boolean selected) {
-        log("FIME: GwtDisplay.setSelection");
+    public void setIndexSelected(List control, int index, boolean selected) {
+        ((Element) control.peer).getChildren().get(index).setSelected(selected);
+
     }
 
     @Override
     public void showPopupMenu(Menu menu) {
         throw new RuntimeException("FIXME: GwtDisplay.showPopupMenu");
+    }
+
+    void unsupported(Control control, String method) {
+        log("GwtDisplay." + method + "() unsupported for type " + control.getControlType().name());
     }
 
     @Override
@@ -521,8 +611,7 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public boolean isSelected(List list, int i) {
-        log("FIXME: GwtDisplay.isSelected");
-        return false;
+        return ((Element) list.peer).getChildren().get(i).getSelected();
     }
 
     @Override
@@ -533,7 +622,7 @@ public class GwtDisplay extends PlatformDisplay {
     @Override
     public void setItem(Control control, int index, String string) {
         Element element = (Element) control.peer;
-        Elements.getChildElement(element, index).setTextContent(string);
+        element.getChildren().get(index).setTextContent(string);
     }
 
     @Override
@@ -545,7 +634,7 @@ public class GwtDisplay extends PlatformDisplay {
     @Override
     public String getItem(Control control, int index) {
         Element element = (Element) control.peer;
-        return Elements.getChildElement(element, index).getTextContent();
+        return element.getChildren().get(index).getTextContent();
     }
 
     @Override
@@ -556,8 +645,36 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public int getSelection(Control control) {
-        log("FIXME: GwtDisplay.getSelection");
-        return 0;
+        Element element = (Element) control.peer;
+        switch (control.getControlType()) {
+            case BUTTON_ARROW:
+            case BUTTON_PUSH:
+                return 0;
+            case BUTTON_CHECKBOX:
+            case BUTTON_RADIO:
+            case BUTTON_TOGGLE:
+                Element input = element.getFirstElementChild();
+                return input != null && input.getChecked() ? 1 : 0;
+            case LIST:
+            case COMBO:
+                return element.getSelectedIndex();
+            case SPINNER:
+            case SCALE:
+            case SLIDER: {
+                String value = element.getValue();
+                if (value == null) {
+                    return 0;
+                }
+                value = value.trim();
+                if (value.isEmpty()) {
+                    return 0;
+                }
+                return Integer.parseInt(element.getValue());
+            }
+            default:
+                unsupported(control, "getSelection");
+                return -1;
+        }
     }
 
     @Override

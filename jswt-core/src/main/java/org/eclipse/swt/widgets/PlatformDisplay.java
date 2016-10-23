@@ -47,8 +47,6 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract Monitor getMonitor(Control control);
 
-  public abstract boolean getSelection(Button button);
-
   public abstract int getScrollBarSize(ScrolledComposite scrolledComposite, int orientation);
 
   public abstract int getSelection(Control control);
@@ -83,11 +81,9 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract void setSliderProperties(Control control, int thumb, int increment, int pageIncrement);
 
-  public abstract void setSelection(Button button, boolean selected);
-
   public abstract void setSelection(Control control, int selection);
 
-  public abstract void setSelection(List list, int index, boolean selected);
+  public abstract void setIndexSelected(List list, int index, boolean selected);
 
   public abstract void setText(Control control, String text);
 
