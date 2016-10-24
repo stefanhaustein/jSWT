@@ -201,6 +201,7 @@ public class GwtDisplay extends PlatformDisplay {
             case BUTTON_PUSH:
                 return createControl("button");
 //                        "mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised");
+            case BUTTON_TOGGLE:
             case BUTTON_CHECKBOX:
             case BUTTON_RADIO: {
                 Element result = createControl("label");
@@ -211,7 +212,7 @@ public class GwtDisplay extends PlatformDisplay {
               //  String inputId = "i" + GwtDisplay.id++;
               //  result.setAttribute("for", inputId);
               // input.setAttribute("id", inputId);
-                if ((control.style & SWT.RADIO) != 0) {
+                if (control.getControlType() == Control.ControlType.BUTTON_RADIO) {
                     input.setAttribute("type", "radio");
                     input.setAttribute("name", "" + control.getParent().hashCode());
                    /* result.setAttribute("class", "mdl-radio mdl-js-radio mdl-js-ripple-effect");
@@ -273,6 +274,10 @@ public class GwtDisplay extends PlatformDisplay {
                 // FIXME: addChild is not called for dialogs, but removeChild is called.
 
                 ((Element) control.getParent().peer).appendChild(background);
+
+                Element label = createElement("jswt-shell-dialog-label");
+                label.getStyle().setDisplay("none");
+                dialogShell.appendChild(label);
                 return dialogShell;
 
             }
@@ -389,6 +394,15 @@ public class GwtDisplay extends PlatformDisplay {
                 result.left = result.right = 8;
                 return result;
             }
+            case SHELL_DIALOG: {
+                Insets result = new Insets();
+                result.left = result.right = result.bottom = result.top = 12;
+                Element label = ((Element) scrollable.peer).getFirstElementChild();
+                if (!"none".equals(label.getStyle().getDisplay())) {
+                    result.top += getMinHeight(label);
+                }
+                return result;
+            }
             default:
                 return new Insets();
         }
@@ -495,27 +509,29 @@ public class GwtDisplay extends PlatformDisplay {
             case SHELL_ROOT:
                 Document.get().setTitle(s);
                 break;
+            case SHELL_DIALOG: {
+                Element title = element.getFirstElementChild();
+                title.setTextContent(s);
+                title.setAttribute("style", s.isEmpty() ? "display:none" : "");
+                break;
+            }
             case GROUP: {
                 Element title = element.getFirstElementChild().getNextElementSibling();
                 title.setTextContent(s);
                 title.setAttribute("style", s.isEmpty() ? "display:none" : "");
                 break;
             }
-            case COMBO:
-                log("FIXME: GwtDisplay.setText for COMBO");
+            case BUTTON_CHECKBOX:
+            case BUTTON_RADIO:
+            case BUTTON_TOGGLE:
+                element.getLastElementChild().setTextContent(s);
                 break;
-            case SHELL_DIALOG:
-                log("FIXME: GwtDisplay.setText for SHELL_DIALOG");
+            case LABEL:
+            case BUTTON_PUSH:
+                 element.setTextContent(s);
                 break;
-            default: {
-                if (element.getLocalName().equals("input")) {
-                    element.setAttribute("value", s);
-                } else if (element.getLocalName().equals("label")) {
-                    element.getLastElementChild().setTextContent(s);
-                } else {
-                    element.setTextContent(s);
-                }
-            }
+            default:
+                unsupported(control, "setText");
         }
     }
 

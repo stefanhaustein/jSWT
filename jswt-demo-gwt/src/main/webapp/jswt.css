@@ -34,6 +34,7 @@ jswt-group-border {
     position: absolute;
     margin: 8px 4px;
     border: 1px solid darkgray;
+    visibility: inherit;
 }
 
 jswt-group-label {
@@ -42,24 +43,38 @@ jswt-group-label {
     left: 12px;
     padding: 0 4px;
     background-color: #fff;   /* Set to group color programmatically if changed */
+    visibility: inherit;
+}
+
+/* shell-dialog */
+
+jswt-shell-dialog {
+    box-shadow: 4px 4px 16px;
+}
+
+jswt-shell-dialog-label {
+    display: block;
+    visibility: inherit;
+    background-color: #7baaf7;
+    color: white;
+    padding: 12px;
 }
 
 /* TabFolder */
 
-jswt-tabfolder {
-    display: block;
-}
 jswt-tabbar {
     white-space: normal;
     display: block;
     background-color: #7baaf7;
     color: white;
+    visibility: inherit;
 }
 
 jswt-tab {
     padding: 12px;
     display: inline-block;
     cursor: pointer;
+    visibility: inherit;
 }
 
 jswt-tab.selected {
