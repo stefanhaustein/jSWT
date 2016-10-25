@@ -14,6 +14,7 @@ class AndroidCanvas extends AndroidComposite {
 
     @Override
     public void onDraw(android.graphics.Canvas canvas) {
-        swtCanvas.drawBackground(new AndroidGC(swtCanvas.getDisplay(), canvas), 0, 0, 999999, 99999);
+        AndroidGC gc = new AndroidGC(swtCanvas.getDisplay(), canvas);
+        swtCanvas.drawBackground(gc, 0, 0, 999999, 99999);
     }
 }

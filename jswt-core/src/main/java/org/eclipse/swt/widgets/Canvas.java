@@ -9,6 +9,7 @@ public class Canvas extends Composite {
   }
 
   public void drawBackground(GC gc, int x, int y, int width, int height) {
+
   }
 
   ControlType getControlType() {

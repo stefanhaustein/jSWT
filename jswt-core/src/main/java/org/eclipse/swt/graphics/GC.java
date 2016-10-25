@@ -168,11 +168,15 @@ public class GC extends Resource {
 
 
     public Point stringExtent(String text) {
-        return delegate.stringExtent(text);
+        return textExtent(text, 0);
     }
 
     public Point textExtent(String text) {
-        return delegate.textExtent(text);
+        return textExtent(text, SWT.DRAW_DELIMITER | SWT.DRAW_TAB);
+    }
+
+    public Point textExtent(String text, int flags) {
+        return delegate.textExtent(text, flags);
     }
 }
 

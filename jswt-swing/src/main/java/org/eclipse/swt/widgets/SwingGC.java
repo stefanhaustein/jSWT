@@ -33,6 +33,11 @@ class SwingGC extends GC {
         this.graphics = graphics;
     }
 
+    public void drawArc(int x, int y, int width, int height, int startAngle, int arcAngle) {
+        useForegroundColor();
+        graphics.drawArc(x, y, width, height, startAngle, arcAngle);
+    }
+
     public void drawImage(org.eclipse.swt.graphics.Image image, int x, int y) {
         graphics.drawImage((BufferedImage) image.peer, x, y, null /* observer */);
     }
@@ -81,6 +86,11 @@ class SwingGC extends GC {
     public void drawText(String string, int x, int y, int flags) {
         useForegroundColor();
         graphics.drawString(string, x, y + graphics.getFontMetrics().getAscent());
+    }
+
+    public void fillArc(int x, int y, int width, int height, int startAngle, int arcAngle) {
+        useBackgroundColor();
+        graphics.drawArc(x, y, width, height, startAngle, arcAngle);
     }
 
     @Override
@@ -202,10 +212,11 @@ class SwingGC extends GC {
         }
     }
 
-    public Point stringExtent(String string) {
+    public Point textExtent(String string, int flags) {
         java.awt.FontMetrics metrics = graphics.getFontMetrics();
         return new Point(metrics.stringWidth(string), metrics.getHeight());
     }
+
 
     private void updateStroke() {
         graphics.setStroke(new BasicStroke(lineWidth,

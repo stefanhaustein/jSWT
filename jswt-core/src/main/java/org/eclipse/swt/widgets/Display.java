@@ -47,8 +47,9 @@ public class Display extends Device {
         throw new RuntimeException("Display.readAndDispatch not supported in jSWT.");
     }
 
-    public void sleep() {
+    public boolean sleep() {
         System.out.println("Display.sleep ignored.");
+        return false;
     }
 
     public void asyncExec(Runnable runnable) {
