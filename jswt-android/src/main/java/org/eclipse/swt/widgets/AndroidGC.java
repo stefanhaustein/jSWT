@@ -32,6 +32,14 @@ public class AndroidGC extends GC {
         canvas.drawLine(x1, y1, x2, y2, foregroundPaint);
     }
 
+    public void drawArc(int x, int y, int width, int height, int startAngle, int arcAngle) {
+        rectF.left = x;
+        rectF.top = y;
+        rectF.right = x + width;
+        rectF.bottom = y + height;
+        canvas.drawArc(rectF, startAngle, arcAngle, false, foregroundPaint);
+    }
+
     @Override
     public void drawOval(int x, int y, int width, int height) {
         rectF.left = x;
@@ -58,6 +66,14 @@ public class AndroidGC extends GC {
     @Override
     public void drawText(String string, int x, int y, int flags) {
         canvas.drawText(string, x, y - foregroundPaint.ascent(), foregroundPaint);
+    }
+
+    public void fillArc(int x, int y, int width, int height, int startAngle, int arcAngle) {
+        rectF.left = x;
+        rectF.top = y;
+        rectF.right = x + width;
+        rectF.bottom = y + height;
+        canvas.drawArc(rectF, startAngle, arcAngle, true, backgroundPaint);
     }
 
     @Override
@@ -201,7 +217,7 @@ public class AndroidGC extends GC {
         backgroundPaint.setAntiAlias(antialias != 0);
     }
 
-    public Point stringExtent(String text) {
+    public Point textExtent(String text, int flags) {
         foregroundPaint.getTextBounds(text, 0, text.length(), rect);
         return new Point(rect.width(), rect.height());
     }

@@ -430,11 +430,6 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
-  public void setMeasuredSize(Control control, int width, int height) {
-    // Relevant for Android.
-  }
-
-  @Override
   public void setRange(Control control, int minimum, int maximum) {
     switch (control.getControlType()) {
       case SLIDER: {

@@ -75,8 +75,6 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract void setForeground(Control control, Color color);
 
-  public abstract void setMeasuredSize(Control control, int width, int height);
-
   public abstract void setRange(Control control, int minimum, int maximum);
 
   public abstract void setSliderProperties(Control control, int thumb, int increment, int pageIncrement);

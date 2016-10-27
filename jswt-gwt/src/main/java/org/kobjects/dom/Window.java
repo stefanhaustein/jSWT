@@ -19,4 +19,8 @@ public final class Window extends JavaScriptObject {
             listener.@org.kobjects.dom.EventListener::onEvent(Lorg/kobjects/dom/Event;)(event);
         });
     }-*/;
+
+    public native final Style getComputedStyle(Element element, String pseudoElement) /*-{
+        return this.getComputedStyle(element, pseudoElement);
+    }-*/;
 }

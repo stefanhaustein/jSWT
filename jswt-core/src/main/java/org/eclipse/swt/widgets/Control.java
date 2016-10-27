@@ -11,6 +11,8 @@ import org.eclipse.swt.graphics.Rectangle;
 
 public class Control extends Widget {
 
+  static final boolean DEBUG_LAYOUT = false;
+
   enum ControlType {
       BUTTON_ARROW, BUTTON_CHECKBOX, BUTTON_PUSH, BUTTON_RADIO, BUTTON_TOGGLE,
       CANVAS,
@@ -93,8 +95,9 @@ public class Control extends Widget {
     } else {
       size = display.computeSize(this, wHint, hHint, changed);
     }
-    display.setMeasuredSize(this, size.x, size.y);
-    System.out.println(depth() + this.getControlType() + ".computeSize(" + wHint + ", " + hHint + "): " + size);
+    if (DEBUG_LAYOUT) {
+      System.err.println(depth() + "computeSize(" + wHint + ", " + hHint + "): " + size + " for " + this);
+    }
     return size;
   }
 
@@ -207,7 +210,9 @@ public class Control extends Widget {
   }
 
   public void setBounds(int x, int y, int width, int height) {
-    System.out.println(this + ".setBounds(" + x + ", " + y + ", " + width + ", " + height);
+    if (DEBUG_LAYOUT) {
+      System.err.println(depth() + "setBounds(" + x + ", " + y + ", " + width + ", " + height + ") for " + this);
+    }
     display.setBounds(this, x, y, width, height);
   }
 
@@ -272,7 +277,7 @@ public class Control extends Widget {
   }
 
   public String toString() {
-    return this.getClass().getName() + "; type: " + getControlType() + "; peer: " + peer;
+    return getControlType().name();
   }
 
 

@@ -63,4 +63,7 @@ public class Style extends JavaScriptObject {
         this.width = width;
     }-*/;
 
+    public native final String get(String propertyName) /*-{
+        return this[propertyName];
+    }-*/;
 }

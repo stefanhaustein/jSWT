@@ -56,4 +56,8 @@ public class Button extends Control {
   public void setAlignment(int alignment) {
     display.setAlignment(this, alignment);
   }
+
+  public String toString() {
+    return super.toString() + ":" + getText();
+  }
 }

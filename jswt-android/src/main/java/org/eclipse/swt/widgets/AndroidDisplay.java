@@ -6,7 +6,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.TabLayout;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.*;
@@ -17,9 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 
-import android.widget.ProgressBar;
 import android.widget.Spinner;
-import java.lang.reflect.Array;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.graphics.Color;
@@ -234,8 +231,8 @@ public class AndroidDisplay extends PlatformDisplay {
     ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
     if (layoutParams instanceof AndroidComposite.LayoutParams) {
       AndroidComposite.LayoutParams lmlParams = (AndroidComposite.LayoutParams) layoutParams;
-      return new Rectangle(lmlParams.assignedX, lmlParams.assignedY,
-          lmlParams.assignedWidth, lmlParams.assignedHeight);
+      return new Rectangle(lmlParams.marginLeft, lmlParams.marginTop,
+          lmlParams.width, lmlParams.height);
     }
 
     return new Rectangle(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
@@ -290,13 +287,22 @@ public class AndroidDisplay extends PlatformDisplay {
   @Override
   public void setBounds(Control control, int x, int y, int width, int height) {
     View view = (View) control.peer;
+
+    view.measure(View.MeasureSpec.EXACTLY | width, View.MeasureSpec.EXACTLY | height);
+
     ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
-    if (layoutParams instanceof AndroidComposite.LayoutParams) {
-      AndroidComposite.LayoutParams lmlParams = (AndroidComposite.LayoutParams) layoutParams;
-      lmlParams.assignedX = x;
-      lmlParams.assignedY = y;
-      lmlParams.assignedWidth = width;
-      lmlParams.assignedHeight = height;
+    if (layoutParams != null) {
+      layoutParams.width = width;
+      layoutParams.height = height;
+      if (layoutParams instanceof AndroidComposite.LayoutParams) {
+        AndroidComposite.LayoutParams lmlParams = (AndroidComposite.LayoutParams) layoutParams;
+        lmlParams.marginLeft = x;
+        lmlParams.marginTop = y;
+      } else {
+        System.err.println("setBounds for " + control + ": LayoutParams are not an instance of AndroidComposite.LayoutParams");
+      }
+    } else {
+      System.err.println("setBounds for " + control + ": LayoutParams are null");
     }
     if (view instanceof EditText) {
       ((EditText) view).setMaxWidth(width);
@@ -333,6 +339,9 @@ public class AndroidDisplay extends PlatformDisplay {
     if (peer instanceof Spinner) {
       return (String) (((Spinner) peer).getSelectedItem());
     }
+    if (peer instanceof AndroidComposite) {
+      return ((AndroidComposite) peer).getText();
+    }
     return null;
   }
 
@@ -343,6 +352,8 @@ public class AndroidDisplay extends PlatformDisplay {
       ((TextView) peer).setText(text);
     } else if (peer instanceof AndroidShell) {
       ((AndroidShell) peer).setText(text);
+    } else if (peer instanceof AndroidComposite) {
+      ((AndroidComposite) peer).setText(text);
     }
   }
 
@@ -450,6 +461,7 @@ public class AndroidDisplay extends PlatformDisplay {
     return getArrayAdapter(control).getItem(i);
   }
 
+  /*
   @Override
   public void setMeasuredSize(Control control, int width, int height) {
     if (control.peer instanceof AndroidComposite) {
@@ -458,6 +470,7 @@ public class AndroidDisplay extends PlatformDisplay {
       ((View) control.peer).measure(View.MeasureSpec.EXACTLY | width, View.MeasureSpec.EXACTLY | height);
     }
   }
+*/
 
   @Override
   public void setRange(Control control, int minimum, int maximum) {

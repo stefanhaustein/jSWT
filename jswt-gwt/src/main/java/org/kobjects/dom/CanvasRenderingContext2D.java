@@ -6,6 +6,11 @@ public final class CanvasRenderingContext2D extends JavaScriptObject {
     protected CanvasRenderingContext2D() {
     }
 
+    public native void arc(double x, double y, double r, double start, double end, boolean antiClockwise) /*-{
+        $wnd.console.log("arc ", x, y, r, start, end, antiClockwise);
+        this.arc(x, y, r, start, end, antiClockwise);
+    }-*/;
+
     public native void beginPath() /*-{
         this.beginPath();
     }-*/;

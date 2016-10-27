@@ -383,20 +383,39 @@ public class GwtDisplay extends PlatformDisplay {
         throw new RuntimeException("FIXME: GwtDisplay.getImageBounds");
     }
 
+    private static float getPx(Style style, String propertyName) {
+        String value = style.get(propertyName);
+        if (value.endsWith("px")) {
+            return Float.parseFloat(value.substring(0, value.length() - 2));
+        }
+        log("Can't parse style property value '" + value + "' for " + propertyName);
+        return 0;
+    }
+
+    private static Insets computeInsets(Element element) {
+        Insets insets = new Insets();
+        Style style = Window.get().getComputedStyle(element, null);
+        insets.top = Math.round(getPx(style, "marginTop") + getPx(style, "borderTop") + getPx(style, "paddingTop"));
+        insets.right = Math.round(getPx(style, "marginRight") + getPx(style, "borderRight") + getPx(style, "paddingRight"));
+        insets.bottom = Math.round(getPx(style, "marginBottom") + getPx(style, "borderBottom") + getPx(style, "paddingBottom"));
+        insets.left = Math.round(getPx(style, "marginLeft") + getPx(style, "borderLeft") + getPx(style, "paddingLeft"));
+        return insets;
+    }
+
+
     @Override
     public Insets getInsets(Scrollable scrollable) {
+        Element element = ((Element) scrollable.peer);
         switch (scrollable.getControlType()) {
             case TAB_FOLDER:
-                return ((GwtTabFolder) scrollable.peer).getInsets();
-            case GROUP: {
-                Insets result = new Insets();
-                result.bottom = result.top = 16;
-                result.left = result.right = 8;
-                return result;
-            }
+                return ((GwtTabFolder) element).getInsets();
+            case GROUP:
+                return computeInsets(element.getFirstElementChild());
+
             case SHELL_DIALOG: {
-                Insets result = new Insets();
-                result.left = result.right = result.bottom = result.top = 12;
+                Insets result = computeInsets(element);
+/*                Insets result = new Insets();
+                result.left = result.right = result.bottom = result.top = 12; */
                 Element label = ((Element) scrollable.peer).getFirstElementChild();
                 if (!"none".equals(label.getStyle().getDisplay())) {
                     result.top += getMinHeight(label);
@@ -480,10 +499,10 @@ public class GwtDisplay extends PlatformDisplay {
         style.setWidth(w + "px");
         style.setHeight(h + "px");
         if (element.getLocalName().equals("canvas")) {
-            // FIXME: Invalidate instead
+            // FIXME: request draw instead?
             element.setAttribute("width", String.valueOf(w));
             element.setAttribute("height", String.valueOf(h));
-            ((Canvas) control).drawBackground(new GwtGC(element), 0, 0, w, h);
+            redrawCanvas((Canvas) control, 0, 0, w, h);
         }
     }
 
@@ -538,10 +557,6 @@ public class GwtDisplay extends PlatformDisplay {
     @Override
     public void setVisible(Control control, boolean visible) {
         ((Element) control.peer).getStyle().setVisibility(visible ? "" : "hidden");
-    }
-
-    @Override
-    public void setMeasuredSize(Control control, int i, int i1) {
     }
 
     @Override
@@ -696,6 +711,15 @@ public class GwtDisplay extends PlatformDisplay {
     @Override
     public void redraw(Control control, int i, int i1, int i2, int i3, boolean b) {
         log("FIXME: GwtDisplay.redraw");
+    }
+
+    private void redrawCanvas(Canvas canvas, int x, int y, int w, int h) {
+        Element element = (Element) canvas.peer;
+        GwtGC gc = new GwtGC(element);
+        canvas.drawBackground(new GwtGC(element), 0, 0, w, h);
+        org.eclipse.swt.widgets.Event event = new org.eclipse.swt.widgets.Event();
+        event.gc = gc;
+        event.setBounds(new Rectangle(x, y, w, h)); canvas.notifyListeners(SWT.Paint, event);
     }
 
     @Override

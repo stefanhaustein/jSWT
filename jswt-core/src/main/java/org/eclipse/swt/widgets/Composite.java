@@ -79,6 +79,9 @@ public class Composite extends Scrollable {
       return super.computeSize(wHint, hHint, changed);
     }
 
+    if (DEBUG_LAYOUT) {
+      System.err.println(depth() + "enter computeSize(" + wHint + ", " + hHint + ") for " + this);
+    }
     //display.runSkin();
     if (wHint != SWT.DEFAULT && wHint < 0) wHint = 0;
     if (hHint != SWT.DEFAULT && hHint < 0) hHint = 0;
@@ -99,9 +102,10 @@ public class Composite extends Scrollable {
     if (wHint != SWT.DEFAULT) size.x = wHint;
     if (hHint != SWT.DEFAULT) size.y = hHint;
     Rectangle trim = computeTrim (0, 0, size.x, size.y);
-    display.setMeasuredSize(this, trim.width, trim.height);
-    System.out.println(this + ".computeSize(" + wHint + ", " + hHint + "): " + trim.width + "x" + trim.height);
 
+    if (DEBUG_LAYOUT) {
+      System.err.println(depth() + "exit computeSize(" + wHint + ", " + hHint + ") = " + trim.width + "x" + trim.height + " for " + this);
+    }
     return new Point (trim.width, trim.height);
   }
 
@@ -212,6 +216,10 @@ public class Composite extends Scrollable {
       parent.state |= LAYOUT_CHILD;
       return;
     } */
+    if (DEBUG_LAYOUT) {
+      System.err.println(depth() + "enter updateLayout(" + all + ") for " + this);
+    }
+
     if ((state & LAYOUT_NEEDED) != 0) {
       boolean changed = (state & LAYOUT_CHANGED) != 0;
       state &= ~(LAYOUT_NEEDED | LAYOUT_CHANGED);
@@ -224,6 +232,10 @@ public class Composite extends Scrollable {
       for (Control child: children) {
         child.updateLayout (all);
       }
+    }
+
+    if (DEBUG_LAYOUT) {
+      System.err.println(depth() + "exit updateLayout(" + all + ") for " + this);
     }
   }
 

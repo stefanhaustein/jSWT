@@ -24,6 +24,15 @@ public class GwtGC extends GC {
         ctx.setTextBaseline("top");
     }
 
+    @Override
+    public void drawArc(int x, int y, int width, int height, int startAngle, int arcAngle) {
+        ctx.beginPath();
+        int endAngle = startAngle + arcAngle;
+        double startRad = startAngle * Math.PI / 180;
+        double endRad = endAngle * Math.PI / 180;
+        ctx.arc(x + width / 2, y + height / 2, Math.min(width, height) / 2, startRad, endRad, arcAngle < 0);
+        ctx.stroke();
+    }
 
     @Override
     public void drawLine(int x1, int y1, int x2, int y2) {
@@ -89,6 +98,18 @@ public class GwtGC extends GC {
 //        graphics.drawString(string, x, y + graphics.getFontMetrics().getAscent());
         setBackground(savedBackground);
     }
+
+    @Override
+    public void fillArc(int x, int y, int width, int height, int startAngle, int arcAngle) {
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        int endAngle = startAngle + arcAngle;
+        double startRad = startAngle * Math.PI / 180;
+        double endRad = endAngle * Math.PI / 180;
+        ctx.arc(x + width / 2, y + height / 2, Math.min(width, height) / 2, startRad, endRad, arcAngle < 0);
+        ctx.fill();
+    }
+
 
     @Override
     public void fillOval(int x, int y, int width, int height) {
@@ -194,7 +215,7 @@ public class GwtGC extends GC {
         }
     }
 
-    public Point stringExtent(String text) {
+    public Point textExtent(String text, int flags) {
         return new Point(Math.round((float) ctx.measureText(text)), font == null ? 10 : font.getFontData()[0].getHeight());
     }
 

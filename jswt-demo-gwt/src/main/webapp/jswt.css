@@ -34,6 +34,7 @@ jswt-group-border {
     position: absolute;
     margin: 8px 4px;
     border: 1px solid darkgray;
+    padding: 7px 3px;
     visibility: inherit;
 }
 
@@ -50,10 +51,15 @@ jswt-group-label {
 
 jswt-shell-dialog {
     box-shadow: 4px 4px 16px;
+    padding: 12px;
 }
 
 jswt-shell-dialog-label {
     display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
     visibility: inherit;
     background-color: #7baaf7;
     color: white;
