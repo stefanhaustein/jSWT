@@ -12,9 +12,7 @@
 package org.eclipse.swt.examples.controlexample;
 
 
-import java.lang.reflect.Method;
-import java.util.BitSet;
-
+import javafx.util.Callback;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Color;
@@ -46,8 +44,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
-import org.kobjects.jswt.Callback;
 import org.kobjects.jswt.Dialogs;
+import org.kobjects.promise.Function;
 // import org.eclipse.swt.widgets.FontDialog;
 // import org.eclipse.swt.widgets.Table;
 // import org.eclipse.swt.widgets.TableItem;
@@ -381,7 +379,7 @@ abstract class Tab {
 						Point pt = setGetButton.getLocation();
 						pt = display.map(setGetButton.getParent(), null, pt);
 						setGetDialog.setLocation(pt.x, pt.y);
-						setGetDialog.open();
+						setGetDialog.openColorDialog();
 					}
 				}
 			});
@@ -489,14 +487,15 @@ abstract class Tab {
 					if (controls.length > 0) oldColor = controls [0].getForeground ();
 				}
 				if (oldColor != null) colorDialog.setRGB(oldColor.getRGB()); // seed dialog with current color
-				Dialogs.open(colorDialog, new Callback<RGB>() {
+				Dialogs.openColorDialog(colorDialog).then(new Function<RGB, Void>() {
 					@Override
-					public void run(RGB rgb) {
-						if (rgb == null) return;
+					public Void call(RGB rgb) {
+						if (rgb == null) return null;
 						Color oldColor = foregroundColor; // save old foreground color to dispose when done
 						foregroundColor = new Color (display, rgb);
 						setExampleWidgetForeground ();
 						if (oldColor != null) oldColor.dispose ();
+						return null;
 					}
 				});
 			}
@@ -508,14 +507,15 @@ abstract class Tab {
 					if (controls.length > 0) oldColor = controls [0].getBackground (); // seed dialog with current color
 				}
 				if (oldColor != null) colorDialog.setRGB(oldColor.getRGB());
-				Dialogs.open(colorDialog, new Callback<RGB>() {
+				Dialogs.openColorDialog(colorDialog).then(new Function<RGB, Void>() {
 					@Override
-					public void run(RGB rgb) {
-						if (rgb == null) return;
+					public Void call(RGB rgb) {
+						if (rgb == null) return null;
 						Color oldColor = backgroundColor; // save old background color to dispose when done
 						backgroundColor = new Color (display, rgb);
 						setExampleWidgetBackground ();
 						if (oldColor != null) oldColor.dispose ();
+						return null;
 					}
 				});
 			}
@@ -527,15 +527,16 @@ abstract class Tab {
 					if (controls.length > 0) oldFont = controls [0].getFont ();
 				}
 				if (oldFont != null) fontDialog.setFontList(oldFont.getFontData()); // seed dialog with current font
-				Dialogs.open(fontDialog, new Callback<FontData>() {
+				Dialogs.openFontDialog(fontDialog).then(new Function<FontData, Void>() {
 					@Override
-					public void run(FontData fontData) {
-						if (fontData == null) return;
+					public Void call(FontData fontData) {
+						if (fontData == null) return null;
 						Font oldFont = font; // dispose old font when done
 						font = new Font (display, fontData);
 						setExampleWidgetFont ();
 						setExampleWidgetSize ();
 						if (oldFont != null) oldFont.dispose ();
+						return null;
 					}
 				});
 			}

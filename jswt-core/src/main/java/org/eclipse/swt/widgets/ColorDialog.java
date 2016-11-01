@@ -8,10 +8,10 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
-import org.kobjects.jswt.Callback;
-import org.kobjects.jswt.CallbackDialog;
+import org.kobjects.jswt.PromiseDialog;
+import org.kobjects.promise.Promise;
 
-public class ColorDialog extends Dialog implements CallbackDialog<RGB> {
+public class ColorDialog extends Dialog implements PromiseDialog<RGB> {
 
     RGB rgb;
 
@@ -20,7 +20,7 @@ public class ColorDialog extends Dialog implements CallbackDialog<RGB> {
     }
 
     @Override
-    public void open(final Callback<RGB> callback) {
+    public Promise<RGB> openPromise() {
         final Shell shell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
         shell.setText("Choose Color");
 
@@ -48,13 +48,15 @@ public class ColorDialog extends Dialog implements CallbackDialog<RGB> {
         buttonPanel.setLayoutData(panelData);
         buttonPanel.setLayout(new RowLayout());
 
+        final Promise<RGB> result = new Promise();
+
         final Button cancelButton = new Button(buttonPanel, SWT.PUSH);
         cancelButton.setText("Cancel");
         cancelButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 shell.dispose();
-                callback.cancel();
+                result.reject(null);
             }
         });
 
@@ -64,7 +66,7 @@ public class ColorDialog extends Dialog implements CallbackDialog<RGB> {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 shell.dispose();
-                callback.run(new RGB(
+                result.resolve(new RGB(
                         red.getSelection(),
                         green.getSelection(),
                         blue.getSelection()));
@@ -73,10 +75,12 @@ public class ColorDialog extends Dialog implements CallbackDialog<RGB> {
 
         shell.pack();
         shell.open();
+
+        return result;
     }
 
     public RGB open() {
-        throw new UnsupportedOperationException("Use org.kobjects.jswt.Dialogs.open() instead.");
+        throw new UnsupportedOperationException("Use org.kobjects.jswt.Dialogs.openColorDialog() instead.");
     }
 
     public void setRGB(RGB rgb) {

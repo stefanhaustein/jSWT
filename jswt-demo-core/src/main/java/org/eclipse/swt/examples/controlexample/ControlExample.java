@@ -14,6 +14,7 @@ package org.eclipse.swt.examples.controlexample;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -30,6 +31,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.kobjects.jswt.ResourceLoader;
+import org.kobjects.promise.Function;
+import org.kobjects.promise.Promise;
 
 public class ControlExample {
 	private static ResourceBundle resourceBundle =
@@ -61,30 +64,37 @@ public class ControlExample {
 	 * 
 	 * @param parent the container of the example
 	 */
-	public ControlExample(Composite parent) {
-		initResources(parent.getDisplay());
-		tabFolder = new TabFolder (parent, SWT.NONE);
-		tabs = createTabs();
-		for (Tab tab : tabs) {
-			TabItem item = new TabItem (tabFolder, SWT.NONE);
-		    item.setText (tab.getTabText ());
-		    item.setControl (tab.createTabFolderPage (tabFolder));
-		    item.setData (tab);
-		}
-		
+	public ControlExample(final Composite parent) {
+		initResources(parent.getDisplay()).then(new Function<Void, Void>() {
+			@Override
+			public Void call(Void param) {
+				tabFolder = new TabFolder (parent, SWT.NONE);
+				tabs = createTabs();
+				for (Tab tab : tabs) {
+					TabItem item = new TabItem (tabFolder, SWT.NONE);
+					item.setText (tab.getTabText ());
+					item.setControl (tab.createTabFolderPage (tabFolder));
+					item.setData (tab);
+				}
+
 		/* Workaround: if the tab folder is wider than the screen,
 		 * Mac platforms clip instead of somehow scrolling the tab items.
 		 * We try to recover some width by using shorter tab names. */
-		Point size = parent.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		Rectangle monitorArea = parent.getMonitor().getClientArea();
-		boolean isMac = SWT.getPlatform().equals("cocoa");
-		if (size.x > monitorArea.width && isMac) {
-			TabItem [] tabItems = tabFolder.getItems();
-			for (int i=0; i<tabItems.length; i++) {
-				tabItems[i].setText (tabs [i].getShortTabText ());
+				Point size = parent.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+				Rectangle monitorArea = parent.getMonitor().getClientArea();
+				boolean isMac = SWT.getPlatform().equals("cocoa");
+				if (size.x > monitorArea.width && isMac) {
+					TabItem [] tabItems = tabFolder.getItems();
+					for (int i=0; i<tabItems.length; i++) {
+						tabItems[i].setText (tabs [i].getShortTabText ());
+					}
+				}
+				startup = false;
+				// TODO: Added b/c async.
+				parent.layout(true, true);
+				return null;
 			}
-		}
-		startup = false;
+		});
 	}
 
 	/**
@@ -185,18 +195,25 @@ public class ControlExample {
 	/**
 	 * Loads the resources
 	 */
-	void initResources(Device device) {
-		final Class<ControlExample> clazz = ControlExample.class;
+	Promise<Void> initResources(Device device) {
+		//final Class<ControlExample> clazz = ControlExample.class;
 		if (resourceBundle == null) {
 			throw new RuntimeException("Could not load resources -- ResourceBundle is null");
 		}
-		try {
-			if (images == null) {
-				images = new Image[imageLocations.length];
-					
-				for (int i = 0; i < imageLocations.length; ++i) {
-					images[i] = ResourceLoader.loadImage(device, "/org/eclipse/swt/examples/controlexample/" + imageLocations[i]);
+		ArrayList<Promise<Image>> allImages = new ArrayList<>();
 
+		if (images == null) {
+			images = new Image[imageLocations.length];
+					
+			for (int i = 0; i < imageLocations.length; i++) {
+				final int index = i;
+				allImages.add(ResourceLoader.loadImage(device, "/org/eclipse/swt/examples/controlexample/" +
+						imageLocations[i]).then(new Function<Image, Image>() {
+					@Override
+					public Image call(Image value) {
+						return images[index] = value;
+					}
+				}));
 /*
 					InputStream sourceStream = clazz.getResourceAsStream(imageLocations[i]);
 					ImageData source = new ImageData(sourceStream);
@@ -213,9 +230,7 @@ public class ControlExample {
 					} */
 				}
 			}
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		return Promise.all(allImages);
 	}
 
 	/**

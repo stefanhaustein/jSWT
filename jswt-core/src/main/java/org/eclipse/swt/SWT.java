@@ -709,7 +709,7 @@ public class SWT {
 	public static final int Skin = 45;
 
 	/**
-	 * The open document event type (value is 46).
+	 * The openColorDialog document event type (value is 46).
 	 *
 	 * <p>
 	 * This event is sent when SWT receives notification that a document
@@ -3060,7 +3060,7 @@ public class SWT {
 	public static final int	IGNORE = 1 << 11;
 
 	/**
-	 * The <code>FileDialog</code> style constant for open file dialog behavior
+	 * The <code>FileDialog</code> style constant for openColorDialog file dialog behavior
 	 * (value is 1&lt;&lt;12).
 	 */
 	public static final int OPEN = 1 << 12;

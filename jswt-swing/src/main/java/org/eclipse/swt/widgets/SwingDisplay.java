@@ -543,7 +543,11 @@ public class SwingDisplay extends PlatformDisplay {
 
   @Override
   public void removeChild(Composite composite, Control child) {
+    if (child.getControlType() == Control.ControlType.SHELL_DIALOG) {
+      SwingUtilities.getRoot((Component) child.peer).setVisible(false);
+    } else {
       ((Container) composite.peer).remove((JComponent) child.peer);
+    }
   }
 
   @Override

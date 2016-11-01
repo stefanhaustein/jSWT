@@ -49,6 +49,15 @@ public class Image extends Resource {
         }
     }
 
+    /**
+     * This is not part of the public API -- used internally for resource loading support in the gwt case.
+     * TODO: Hide via helper?
+     */
+    public Image(Device device, Object platformImage) {
+        this.device = device;
+        this.peer = platformImage;
+    }
+
     public Rectangle getBounds() {
        return ((PlatformDisplay) device).getImageBounds(peer);
     }

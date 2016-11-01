@@ -53,7 +53,7 @@ import org.eclipse.swt.widgets.*;
  * 			}
  * 		});
  *
- * 		shell.open();
+ * 		shell.openColorDialog();
  * 		while (shell != null && !shell.isDisposed()) {
  * 			if (!display.readAndDispatch())
  * 				display.sleep();

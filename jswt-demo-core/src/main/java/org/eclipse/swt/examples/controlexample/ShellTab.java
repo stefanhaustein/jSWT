@@ -28,7 +28,7 @@ class ShellTab extends Tab {
 	Button imageButton;
 	Group parentStyleGroup, modalStyleGroup;
 
-	/* Variables used to track the open shells */
+	/* Variables used to track the openColorDialog shells */
 	int shellCount = 0;
 	Shell [] shells = new Shell [4];
 	
@@ -115,7 +115,7 @@ class ShellTab extends Tab {
 			}
 		});
 
-		/* Set the size, title, and image, and open the shell */
+		/* Set the size, title, and image, and openColorDialog the shell */
 		currentShell.setSize (300, 100);
 		currentShell.setText (ControlExample.getResourceString("Title") + shellCount);
 		if (imageButton.getSelection()) currentShell.setImage(instance.images[ControlExample.ciTarget]);

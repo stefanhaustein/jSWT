@@ -198,9 +198,12 @@ public class GwtDisplay extends PlatformDisplay {
         switch (control.getControlType()) {
             case TEXT:
                 return createControl("input");
-            case BUTTON_PUSH:
-                return createControl("button");
-//                        "mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised");
+            case BUTTON_PUSH: {
+                Element element = createControl("button");
+                Element span = createElement("span");
+                element.appendChild(span);
+                return element;
+            }
             case BUTTON_TOGGLE:
             case BUTTON_CHECKBOX:
             case BUTTON_RADIO: {
@@ -343,6 +346,10 @@ public class GwtDisplay extends PlatformDisplay {
         return canvas;
     }
 
+    public Image createImage(Element img) {
+        return new Image(this, img);
+    }
+
     @Override
     public GC creatGCForPlatformImage(Object platformImage) {
         throw new RuntimeException("FIXME: GwtDisplay.GCForPlatformImage");
@@ -395,10 +402,10 @@ public class GwtDisplay extends PlatformDisplay {
     private static Insets computeInsets(Element element) {
         Insets insets = new Insets();
         Style style = Window.get().getComputedStyle(element, null);
-        insets.top = Math.round(getPx(style, "marginTop") + getPx(style, "borderTop") + getPx(style, "paddingTop"));
-        insets.right = Math.round(getPx(style, "marginRight") + getPx(style, "borderRight") + getPx(style, "paddingRight"));
-        insets.bottom = Math.round(getPx(style, "marginBottom") + getPx(style, "borderBottom") + getPx(style, "paddingBottom"));
-        insets.left = Math.round(getPx(style, "marginLeft") + getPx(style, "borderLeft") + getPx(style, "paddingLeft"));
+        insets.top = Math.round(getPx(style, "marginTop") + getPx(style, "borderTopWidth") + getPx(style, "paddingTop"));
+        insets.right = Math.round(getPx(style, "marginRight") + getPx(style, "borderRightWidth") + getPx(style, "paddingRight"));
+        insets.bottom = Math.round(getPx(style, "marginBottom") + getPx(style, "borderBottomWidth") + getPx(style, "paddingBottom"));
+        insets.left = Math.round(getPx(style, "marginLeft") + getPx(style, "borderLeftWidth") + getPx(style, "paddingLeft"));
         return insets;
     }
 
@@ -499,7 +506,6 @@ public class GwtDisplay extends PlatformDisplay {
         style.setWidth(w + "px");
         style.setHeight(h + "px");
         if (element.getLocalName().equals("canvas")) {
-            // FIXME: request draw instead?
             element.setAttribute("width", String.valueOf(w));
             element.setAttribute("height", String.valueOf(h));
             redrawCanvas((Canvas) control, 0, 0, w, h);
@@ -540,13 +546,13 @@ public class GwtDisplay extends PlatformDisplay {
                 title.setAttribute("style", s.isEmpty() ? "display:none" : "");
                 break;
             }
+            case BUTTON_PUSH:
             case BUTTON_CHECKBOX:
             case BUTTON_RADIO:
             case BUTTON_TOGGLE:
                 element.getLastElementChild().setTextContent(s);
                 break;
             case LABEL:
-            case BUTTON_PUSH:
                  element.setTextContent(s);
                 break;
             default:
@@ -632,7 +638,18 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public void setImage(Control control, Image image) {
-        log("GwtDisplay.setImage()");
+        Element element = (Element) control.peer;
+        switch (control.getControlType()) {
+            case BUTTON_PUSH:
+                if(!element.getFirstElementChild().getLocalName().equals("span")) {
+                    element.removeChild(element.getFirstElementChild());
+                }
+                Element img = (Element) image.peer;
+                element.insertBefore(img.cloneNode(false), element.getLastElementChild());
+                break;
+            default:
+                unsupported(control, "setImage");
+        }
     }
 
     @Override

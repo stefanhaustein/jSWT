@@ -177,4 +177,8 @@ public class Element extends JavaScriptObject {
     public native final void setStep(String value) /*-{
         this.step = value;
     }-*/;
+
+    public native final Element cloneNode(boolean deep) /*-{
+        return this.cloneNode(deep);
+    }-*/;
 }

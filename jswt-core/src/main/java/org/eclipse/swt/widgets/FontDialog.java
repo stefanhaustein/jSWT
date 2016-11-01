@@ -7,10 +7,10 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
-import org.kobjects.jswt.Callback;
-import org.kobjects.jswt.CallbackDialog;
+import org.kobjects.jswt.PromiseDialog;
+import org.kobjects.promise.Promise;
 
-public class FontDialog extends Dialog implements CallbackDialog<FontData> {
+public class FontDialog extends Dialog implements PromiseDialog<FontData> {
 
     private FontData[] fontData;
 
@@ -19,10 +19,10 @@ public class FontDialog extends Dialog implements CallbackDialog<FontData> {
     }
 
     public FontData open() {
-        throw new UnsupportedOperationException("Use org.kobjects.Dialogs.open()");
+        throw new UnsupportedOperationException("Use org.kobjects.Dialogs.openColorDialog()");
     }
 
-    public void open(final Callback<FontData> callback) {
+    public Promise<FontData> openPromise() {
         final Shell shell = new Shell(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
         shell.setText("Select Font");
 
@@ -53,13 +53,15 @@ public class FontDialog extends Dialog implements CallbackDialog<FontData> {
         buttonPanel.setLayoutData(panelData);
         buttonPanel.setLayout(new RowLayout());
 
+        final Promise result = new Promise();
+
         final Button cancelButton = new Button(buttonPanel, SWT.PUSH);
         cancelButton.setText("Cancel");
         cancelButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 shell.dispose();
-                callback.cancel();
+                result.reject(null);
             }
         });
 
@@ -90,11 +92,13 @@ public class FontDialog extends Dialog implements CallbackDialog<FontData> {
                         style = SWT.NONE;
                 }
                 shell.dispose();
-                callback.run(new FontData(name, height, style));
+                result.resolve(new FontData(name, height, style));
             }
         });
         shell.pack();
         shell.open();
+
+        return result;
     }
 
 

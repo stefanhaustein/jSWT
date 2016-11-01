@@ -99,8 +99,6 @@ public abstract class Widget {
         if (isDisposed()) {
             return;
         }
-        if (this instanceof Shell) {
-        }
         if (parent != null) {
             parent.removeChild(this);
         } else if (this instanceof Shell) {
