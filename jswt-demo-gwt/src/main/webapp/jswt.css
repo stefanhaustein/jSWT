@@ -1,15 +1,24 @@
-jswt-tabfolder,
-jswt-composite,
-jswt-label,
-jswt-group,
-jswt-shell-dialog,
-.jswt-control {
+swt-tabfolder,
+swt-composite,
+swt-label,
+swt-group,
+swt-shell-dialog,
+.swt-control {
     box-sizing: border-box;
     position: absolute;
     white-space: nowrap;
     display: block;
     visibility: inherit;
     overflow: hidden;
+}
+
+select[multiple].swt-control {
+    overflow-y: scroll;
+}
+
+swt-label.swt-wrap,
+button.swt-wrap {
+    white-space: normal;
 }
 
 body {
@@ -24,7 +33,7 @@ body {
 
 /* Group */
 
-jswt-group-border {
+swt-group-border {
     display: block;
     height: auto;
     top: 0;
@@ -38,7 +47,7 @@ jswt-group-border {
     visibility: inherit;
 }
 
-jswt-group-label {
+swt-group-label {
     display: inline-block;
     position: relative;
     left: 12px;
@@ -49,12 +58,12 @@ jswt-group-label {
 
 /* shell-dialog */
 
-jswt-shell-dialog {
+swt-shell-dialog {
     box-shadow: 4px 4px 16px;
     padding: 12px;
 }
 
-jswt-shell-dialog-label {
+swt-shell-dialog-label {
     display: block;
     position: absolute;
     left: 0;
@@ -68,7 +77,7 @@ jswt-shell-dialog-label {
 
 /* TabFolder */
 
-jswt-tabbar {
+swt-tabbar {
     white-space: normal;
     display: block;
     background-color: #7baaf7;
@@ -76,14 +85,14 @@ jswt-tabbar {
     visibility: inherit;
 }
 
-jswt-tab {
+swt-tab {
     padding: 12px;
     display: inline-block;
     cursor: pointer;
     visibility: inherit;
 }
 
-jswt-tab.selected {
+swt-tab.selected {
     color: black;
     background-color: white;
 }

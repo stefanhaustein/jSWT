@@ -22,8 +22,8 @@ class GwtTabFolder extends Element {
 
     public static GwtTabFolder create(TabFolder tabFolder) {
         tabFolder.setLayout(new GwtTabLayout());
-        GwtTabFolder gwtTabFolder = (GwtTabFolder) Document.get().createElement("jswt-tabfolder");
-        Element tabBar = Document.get().createElement("jswt-tabbar");
+        GwtTabFolder gwtTabFolder = (GwtTabFolder) Document.get().createElement("swt-tabfolder");
+        Element tabBar = Document.get().createElement("swt-tabbar");
         gwtTabFolder.appendChild(tabBar);
         return gwtTabFolder;
     }
@@ -32,7 +32,7 @@ class GwtTabFolder extends Element {
         boolean isFirst = getFirstElementChild() == getLastElementChild();
 
         Element tabBar = getTabBar();
-        final Element newTab = Document.get().createElement("jswt-tab");
+        final Element newTab = Document.get().createElement("swt-tab");
         newTab.setTextContent("Tab " + index);
         newTab.addEventListener("click", new EventListener() {
             @Override
