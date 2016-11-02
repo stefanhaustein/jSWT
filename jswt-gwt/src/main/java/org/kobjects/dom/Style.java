@@ -7,6 +7,10 @@ public class Style extends JavaScriptObject {
     protected Style() {
     }
 
+    public native final String get(String propertyName) /*-{
+        return this[propertyName];
+    }-*/;
+
     public native final String getBackgroundColor() /*-{
         return this.backgroundColor;
     }-*/;
@@ -23,12 +27,20 @@ public class Style extends JavaScriptObject {
         return this.height;
     }-*/;
 
+    public native final String getTextAlign() /*-{
+        return this.textAlign;
+    }-*/;
+
     public native final String getVisibility() /*-{
         return this.visibility;
     }-*/;
 
     public native final String getWidth() /*-{
         return this.width;
+    }-*/;
+
+    public native final String getWhiteSpace() /*-{
+        return this.whiteSpace;
     }-*/;
 
     public native final void setBackgroundColor(String s) /*-{
@@ -51,6 +63,10 @@ public class Style extends JavaScriptObject {
         this.left = s;
     }-*/;
 
+    public native final void setTextAlign(String s) /*-{
+        this.textAlign = s;
+    }-*/;
+
     public native final void setTop(String s) /*-{
         this.top = s;
     }-*/;
@@ -63,7 +79,8 @@ public class Style extends JavaScriptObject {
         this.width = width;
     }-*/;
 
-    public native final String get(String propertyName) /*-{
-        return this[propertyName];
+    public native final void setWhiteSpace(String ws) /*-{
+        this.whiteSpace = ws;
     }-*/;
+
 }

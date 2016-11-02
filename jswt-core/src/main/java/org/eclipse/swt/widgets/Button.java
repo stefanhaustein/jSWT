@@ -5,8 +5,13 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 
 public class Button extends Control {
+
+  static final int ALIGNMENT_MASK = SWT.LEFT|SWT.RIGHT|SWT.UP|SWT.DOWN|SWT.CENTER;
+  Image image;
+
   public Button(Composite parent, int style) {
     super(parent, style);
+    setAlignment(style & ALIGNMENT_MASK);
   }
 
   public void addSelectionListener(final SelectionListener listener) {
@@ -50,14 +55,21 @@ public class Button extends Control {
   }
 
   public void setImage(Image image) {
+    this.image = image;
     display.setImage(this, image);
   }
 
   public void setAlignment(int alignment) {
+    alignment &= ALIGNMENT_MASK;
     display.setAlignment(this, alignment);
+    style = (style & ~ALIGNMENT_MASK) | alignment;
   }
 
   public String toString() {
     return super.toString() + ":" + getText();
+  }
+
+  public Image getImage() {
+    return image;
   }
 }

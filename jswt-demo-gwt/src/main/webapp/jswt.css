@@ -16,6 +16,18 @@ select[multiple].swt-control {
     overflow-y: scroll;
 }
 
+
+button.swt-control > img,
+button.swt-control > span {
+    vertical-align: middle;
+}
+
+
+button.swt-control > img + span:not(:empty),
+label.swt-control > img + span:not(:empty) {
+    margin-left: 1ex;
+}
+
 swt-label.swt-wrap,
 button.swt-wrap {
     white-space: normal;

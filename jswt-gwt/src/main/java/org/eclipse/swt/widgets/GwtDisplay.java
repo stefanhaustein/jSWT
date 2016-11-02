@@ -139,11 +139,18 @@ public class GwtDisplay extends PlatformDisplay {
         Style style = element.getStyle();
         String savedWidth = style.getWidth();
         String savedHeight = style.getHeight();
-        style.setWidth(wHint == SWT.DEFAULT ? "" : (String.valueOf(wHint) + "px"));
+        String savedWhiteSpace = style.getWhiteSpace();
+        if (wHint == SWT.DEFAULT) {
+            style.setWhiteSpace("no-wrap");
+            style.setWidth("");
+        } else {
+            style.setWidth((String.valueOf(wHint) + "px"));
+        }
         style.setHeight(hHint == SWT.DEFAULT ? "" : (String.valueOf(hHint) + "px"));
         Point result = new Point(element.getOffsetWidth(), element.getOffsetHeight());
         style.setWidth(savedWidth);
         style.setHeight(savedHeight);
+        style.setWhiteSpace(savedWhiteSpace);
         return result;
     }
 
@@ -211,6 +218,7 @@ public class GwtDisplay extends PlatformDisplay {
         switch (control.getControlType()) {
             case TEXT:
                 return createControl(control, "input");
+            case BUTTON_ARROW:
             case BUTTON_PUSH: {
                 Element element = createControl(control, "button",
                         SWT.FLAT, "swt-flat",
@@ -554,6 +562,8 @@ public class GwtDisplay extends PlatformDisplay {
             case LABEL:
                  element.setTextContent(s);
                 break;
+            case BUTTON_ARROW:
+                break;
             default:
                 unsupported(control, "setText");
         }
@@ -639,12 +649,25 @@ public class GwtDisplay extends PlatformDisplay {
     public void setImage(Control control, Image image) {
         Element element = (Element) control.peer;
         switch (control.getControlType()) {
+            case BUTTON_CHECKBOX:
+            case BUTTON_RADIO:
+            case BUTTON_TOGGLE:
+                if(!element.getFirstElementChild().getNextElementSibling().getLocalName().equals("span")) {
+                    element.removeChild(element.getFirstElementChild().getNextElementSibling());
+                }
+                if (image != null) {
+                    Element img = (Element) image.peer;
+                    element.insertBefore(img.cloneNode(false), element.getLastElementChild());
+                }
+                break;
             case BUTTON_PUSH:
                 if(!element.getFirstElementChild().getLocalName().equals("span")) {
                     element.removeChild(element.getFirstElementChild());
                 }
-                Element img = (Element) image.peer;
-                element.insertBefore(img.cloneNode(false), element.getLastElementChild());
+                if (image != null) {
+                    Element img = (Element) image.peer;
+                    element.insertBefore(img.cloneNode(false), element.getLastElementChild());
+                }
                 break;
             default:
                 unsupported(control, "setImage");
@@ -653,7 +676,38 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public void setAlignment(Control button, int alignment) {
-        log("FIXME: GwtDisplay.setAlignment");
+        Element element = (Element) button.peer;
+        String value = "";
+        if (button.getControlType() == Control.ControlType.BUTTON_ARROW) {
+            switch (alignment) {
+                case SWT.LEFT:
+                    value = "\u25c0";
+                    break;
+                case SWT.UP:
+                    value = "\u25b2";
+                    break;
+                case SWT.DOWN:
+                    value = "\u25bc";
+                    break;
+                default:
+                    value = "\u25b6";
+                    break;
+            }
+            element.setTextContent(value);
+        } else {
+            switch (alignment) {
+                case SWT.LEFT:
+                    value = "left";
+                    break;
+                case SWT.RIGHT:
+                    value = "right";
+                    break;
+                case SWT.CENTER:
+                    value = "center";
+                    break;
+            }
+            element.getStyle().setTextAlign(value);
+        }
     }
 
     @Override
