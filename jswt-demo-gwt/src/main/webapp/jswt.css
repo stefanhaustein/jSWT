@@ -53,9 +53,9 @@ swt-group-border {
     left: 0;
     right: 0;
     position: absolute;
-    margin: 8px 4px;
+    margin: 8px 4px 4px 4px;
     border: 1px solid darkgray;
-    padding: 7px 3px;
+    padding: 8px 4px 4px 4px;
     visibility: inherit;
 }
 

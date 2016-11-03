@@ -78,9 +78,15 @@ public class GwtDisplay extends PlatformDisplay {
     public void addChild(Composite composite, Control control) {
         Element parentElement = (Element) composite.peer;
         Element childElement = (Element) control.peer;
-        if (composite.getControlType() != Control.ControlType.TAB_FOLDER) {
-            // log("addChild to: ", composite.peer, "; child: ", control);
-            parentElement.appendChild(childElement);
+        switch (composite.getControlType()) {
+            case TAB_FOLDER:
+                // Do nothing
+                break;
+            case GROUP:  // dialogs, too?
+                parentElement.getFirstElementChild().appendChild(childElement);
+                break;
+            default:
+                parentElement.appendChild(childElement);
         }
     }
 
@@ -380,11 +386,17 @@ public class GwtDisplay extends PlatformDisplay {
     @Override
     public Rectangle getBounds(Control control) {
         Element element = ((Element) control.peer);
-        return new Rectangle(
-                element.getOffsetLeft(),
-                element.getOffsetTop(),
-                element.getOffsetWidth(),
-                element.getOffsetHeight());
+        int x = element.getOffsetLeft();
+        int y = element.getOffsetTop();
+
+        if (control.getParent() != null && control.getParent().getControlType() == Control.ControlType.GROUP) {
+            Element parentElement = element.getParentElement();
+            Style parentStyle = Window.get().getComputedStyle(parentElement, null);
+            x += Math.round(getPx(parentStyle, "marginLeft") + getPx(parentStyle, "borderLeftWidth"));
+            y += Math.round(getPx(parentStyle, "marginTop") + getPx(parentStyle, "borderTopWidth"));
+        }
+
+        return new Rectangle(x, y, element.getOffsetWidth(), element.getOffsetHeight());
     }
 
     @Override
@@ -486,6 +498,8 @@ public class GwtDisplay extends PlatformDisplay {
         Element childElement = (Element) control.peer;
         if (control.getControlType() == Control.ControlType.SHELL_DIALOG) {
             parentElement.removeChild(childElement.getParentElement());
+        } else if (composite.getControlType() == Control.ControlType.GROUP) {
+            parentElement.getFirstElementChild().removeChild(childElement);
         } else {
             parentElement.removeChild(childElement);
         }
@@ -506,7 +520,15 @@ public class GwtDisplay extends PlatformDisplay {
         if (control.getControlType() == Control.ControlType.SHELL_ROOT) {
             return;
         }
+
         Element element = (Element) control.peer;
+        if (control.getParent().getControlType() == Control.ControlType.GROUP) {
+            Element parentElement = element.getParentElement();
+            Style parentStyle = Window.get().getComputedStyle(parentElement, null);
+            x -= Math.round(getPx(parentStyle, "marginLeft") + getPx(parentStyle, "borderLeftWidth"));
+            y -= Math.round(getPx(parentStyle, "marginTop") + getPx(parentStyle, "borderTopWidth"));
+        }
+
         Style style = element.getStyle();
         style.setLeft(x + "px");
         style.setTop(y + "px");
