@@ -8,6 +8,7 @@ public class Button extends Control {
 
   static final int ALIGNMENT_MASK = SWT.LEFT|SWT.RIGHT|SWT.UP|SWT.DOWN|SWT.CENTER;
   Image image;
+    String text;
 
   public Button(Composite parent, int style) {
     super(parent, style);
@@ -39,7 +40,7 @@ public class Button extends Control {
   }
 
   public String getText() {
-    return display.getText(this);
+      return text;
   }
 
   public void removeSelectionListener(SelectionListener listener) {
@@ -51,7 +52,8 @@ public class Button extends Control {
   }
 
   public void setText(String text) {
-    display.setText(this, text);
+        this.text = text;
+      display.setText(this, text);
   }
 
   public void setImage(Image image) {

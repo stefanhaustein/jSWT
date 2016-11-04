@@ -51,6 +51,7 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract int getSelection(Control control);
 
+  /** Used for Combo and Text only b/c speed keys */
   public abstract String getText(Control control);
 
   public abstract Object loadImage(InputStream stream) throws IOException;

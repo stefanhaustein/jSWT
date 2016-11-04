@@ -4,6 +4,7 @@ import org.eclipse.swt.graphics.Image;
 
 public class Label extends Control {
     private Image image;
+  String text;
     public Label(Composite parent, int style) {
     super(parent, style);
   }
@@ -13,7 +14,7 @@ public class Label extends Control {
     }
 
     public String getText() {
-    return display.getText(this);
+    return text;
   }
 
     ControlType getControlType() {
@@ -30,6 +31,7 @@ public class Label extends Control {
     }
 
     public void setText(String text) {
+      this.text = text;
       display.setText(this, text);
     }
 }

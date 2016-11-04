@@ -9,13 +9,13 @@ swt-shell-dialog,
     white-space: nowrap;
     display: block;
     visibility: inherit;
+}
+
+swt-button,
+swt-label,
+swt-composite {
     overflow: hidden;
 }
-
-select[multiple].swt-control {
-    overflow-y: scroll;
-}
-
 
 button.swt-control > img,
 button.swt-control > span {
@@ -57,7 +57,18 @@ swt-group-border {
     border: 1px solid darkgray;
     padding: 8px 4px 4px 4px;
     visibility: inherit;
+    overflow: hidden;
 }
+
+
+swt-group-border.swt-shadow-out {
+    box-shadow: 4px 4px 4px grey;
+}
+
+swt-group-border.swt-shadow-in {
+    box-shadow: inset 4px 4px 4px grey;
+}
+
 
 swt-group-label {
     display: inline-block;
