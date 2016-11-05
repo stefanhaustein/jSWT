@@ -17,6 +17,9 @@ public class ResourceLoader {
         img.addEventListener("load", new EventListener() {
             @Override
             public void onEvent(Event event) {
+                // Ensure size on cloning
+                img.setAttribute("width", String.valueOf(img.getWidth()));
+                img.setAttribute("height", String.valueOf(img.getHeight()));
                 Image image = ((GwtDisplay) device).createImage(img);
                 result.resolve(image);
             }

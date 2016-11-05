@@ -100,7 +100,7 @@ public class GwtDisplay extends PlatformDisplay {
         switch (eventType) {
             case SWT.Selection:
                 switch (control.getControlType()) {
-                    case BUTTON_PUSH:
+                    case BUTTON:
                         element.addEventListener("click", new EventListener() {
                             @Override
                             public void onEvent(Event event) {
@@ -112,9 +112,11 @@ public class GwtDisplay extends PlatformDisplay {
                             }
                         });
                         break;
-                    case BUTTON_CHECKBOX:
+                    case BUTTON_CHECK:
                     case BUTTON_RADIO:
-                        Element input = element.getFirstElementChild();
+                    case SCALE:
+                    case SPINNER:
+                        Element input = element.getLocalName().equals("label") ? element.getFirstElementChild() : element;
                         input.addEventListener("change", new EventListener() {
                             @Override
                             public void onEvent(Event event) {
@@ -137,24 +139,43 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public Point computeSize(Control control, int wHint, int hHint, boolean b) {
-        if (wHint != SWT.DEFAULT && hHint != SWT.DEFAULT) {
-            return new Point(wHint, hHint);
+        if (wHint == SWT.DEFAULT || hHint == SWT.DEFAULT) {
+            Element element = ((Element) control.peer);
+            Style style = element.getStyle();
+            String savedWidth = style.getWidth();
+            String savedHeight = style.getHeight();
+            String savedWhiteSpace = style.getWhiteSpace();
+            if (wHint == SWT.DEFAULT) {
+                style.setWhiteSpace("nowrap");
+                style.setWidth(null);
+            } else {
+                style.setWidth((String.valueOf(wHint) + "px"));
+            }
+            style.setHeight(hHint == SWT.DEFAULT ? "" : (String.valueOf(hHint) + "px"));
+            // In the case of wrap, we add one pixel to account for rounding errors to avoid unintended wrapping.
+
+            if (wHint == SWT.DEFAULT) {
+                if (control.getControlType() == Control.ControlType.SLIDER && (control.style & SWT.VERTICAL) == 0) {
+                    wHint = 128;
+                } else {
+                    wHint = element.getOffsetWidth();
+                    if ((control.getStyle() & SWT.WRAP) != 0) {
+                        wHint++;
+                    }
+                }
+            }
+            if (hHint == SWT.DEFAULT) {
+                if (control.getControlType() == Control.ControlType.SLIDER && (control.style & SWT.VERTICAL) != 0) {
+                    hHint = 128;
+                } else {
+                    hHint = element.getOffsetHeight();
+                }
+            }
+            style.setWidth(savedWidth);
+            style.setHeight(savedHeight);
+            style.setWhiteSpace(savedWhiteSpace);
         }
-        Element element = ((Element) control.peer);
-        Style style = element.getStyle();
-        String savedWidth = style.getWidth();
-        String savedHeight = style.getHeight();
-        String savedWhiteSpace = style.getWhiteSpace();
-        style.setWhiteSpace("nowrap");
-        style.setWidth(wHint == SWT.DEFAULT ? "" : (String.valueOf(wHint) + "px"));
-        style.setHeight(hHint == SWT.DEFAULT ? "" : (String.valueOf(hHint) + "px"));
-        // In the case of wrap, we add one pixel to account for rounding errors to avoid unintended wrapping.
-        Point result = new Point(element.getOffsetWidth() + ((control.getStyle() & SWT.WRAP) != 0 ? 1 : 0),
-                element.getOffsetHeight());
-        style.setWidth(savedWidth);
-        style.setHeight(savedHeight);
-        style.setWhiteSpace(savedWhiteSpace);
-        return result;
+        return new Point(wHint, hHint);
     }
 
     private Color cssToColor(String css) {
@@ -219,10 +240,28 @@ public class GwtDisplay extends PlatformDisplay {
     @Override
     public Object createControl(final Control control) {
         switch (control.getControlType()) {
-            case TEXT:
-                return createControlElement(control, "input");
+            case TEXT: {
+                Element result;
+                if ((control.style & SWT.MULTI) != 0) {
+                    result = createControlElement(control, "textarea");
+                    result.setAttribute("rows", "8");
+                    result.getStyle().set("resize", "none");
+                    /*
+                    result.setAttribute("cols", "20");
+                    if ((control.style & SWT.WRAP) != 0) {
+                        result.setAttribute("wrap", "soft");
+                    }*/
+                } else {
+                    result = createControlElement(control, "input");
+                }
+                if ((control.style & SWT.READ_ONLY) != 0) {
+                    result.setReadOnly(true);
+                }
+                return result;
+            }
             case BUTTON_ARROW:
-            case BUTTON_PUSH: {
+            case BUTTON: {
+                control.style |= SWT.PUSH;
                 Element element = createControlElement(control, "button",
                         SWT.FLAT, "swt-flat",
                         SWT.WRAP, "swt-wrap",
@@ -232,7 +271,7 @@ public class GwtDisplay extends PlatformDisplay {
                 return element;
             }
             case BUTTON_TOGGLE:
-            case BUTTON_CHECKBOX:
+            case BUTTON_CHECK:
             case BUTTON_RADIO: {
                 Element result = createControlElement(control, "label",
                         SWT.FLAT, "swt-flat",
@@ -242,23 +281,12 @@ public class GwtDisplay extends PlatformDisplay {
                 Element span = createElement("span");
                 result.appendChild(input);
                 result.appendChild(span);
-              //  String inputId = "i" + GwtDisplay.id++;
-              //  result.setAttribute("for", inputId);
-              // input.setAttribute("id", inputId);
                 if (control.getControlType() == Control.ControlType.BUTTON_RADIO) {
                     input.setAttribute("type", "radio");
                     input.setAttribute("name", "" + control.getParent().hashCode());
-                   /* result.setAttribute("class", "mdl-radio mdl-js-radio mdl-js-ripple-effect");
-                    input.setAttribute("class", "mdl-radio__button");
-                    span.setAttribute("class", "mdl-radio__label"); */
                 } else {
                     input.setAttribute("type", "checkbox");
-/*                    result.setAttribute("class", "mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect");
-                    input.setAttribute("class", "mdl-checkbox__input");
-                    span.setAttribute("class", "mdl-checkbox__label"); */
                 }
-//                result.setAttribute("style", "block");
-                //              Elements.upgradeElement(result);
                 return result;
             }
             case COMBO:
@@ -266,13 +294,37 @@ public class GwtDisplay extends PlatformDisplay {
             case LIST: {
                 Element result = createControlElement(control, "select");
                 result.setAttribute("size", "8");
+                if ((control.style & SWT.MULTI) != 0) {
+                    result.setAttribute("multiple", "multiple");
+                }
                 return result;
             }
-            case SCALE:
             case SLIDER: {
+                Element result = createControlElement(control, "swt-slider");
+                Element outer = createElement("swt-slider-outer");
+                result.appendChild(outer);
+                Element inner = createElement("swt-slider-inner");
+                outer.appendChild(inner);
+                Style style = outer.getStyle();
+                if ((control.style & SWT.VERTICAL) != 0) {
+                    style.setHeight("100%");
+                    style.set("overflowX", "hidden");
+                    style.set("overflowY", "scroll");
+                } else {
+                    control.style |= SWT.HORIZONTAL;
+                    style.set("overflowX", "scroll");
+                    style.set("overflowY", "hidden");
+                }
+                return result;
+            }
+            case SCALE: {
                 Element result = createControlElement(control, "input");
                 //    result.setAttribute("class", "mdl-slider mdl-js-slider");
                 result.setAttribute("type", "range");
+                if ((control.style & SWT.VERTICAL) != 0) {
+                    result.setAttribute("orient", "vertical");
+                    result.getStyle().set("WebkitAppearance", "slider-vertical");
+                }
                 return result;
             }
             case SHELL_ROOT: {
@@ -293,10 +345,10 @@ public class GwtDisplay extends PlatformDisplay {
 
                 return shell;
             }
-            case SHELL_DIALOG: {
-                Element background = createElement("swt-shell-dialog-background");
+            case SHELL: {
+                Element background = createElement("swt-shell-background");
                 background.setAttribute("style", "visibility:hidden;display:block;width:100%;min-height:100vh;margin:auto;position:absolute;left:0;top:0;background-color:rgba(0,0,0,0.3)");
-                Element dialogShell = createControlElement(control, "swt-shell-dialog");
+                Element dialogShell = createControlElement(control, "swt-shell");
                 dialogShell.setAttribute("style", "background-color: white;margin:auto");
                 background.appendChild(dialogShell);
                 //   Document.get().getBody().setAttribute("style", "min-height:100%");
@@ -308,30 +360,42 @@ public class GwtDisplay extends PlatformDisplay {
 
                 ((Element) control.getParent().peer).appendChild(background);
 
-                Element label = createElement("swt-shell-dialog-label");
+                Element label = createElement("swt-shell-text");
                 label.getStyle().setDisplay("none");
                 dialogShell.appendChild(label);
                 return dialogShell;
 
             }
-            case LABEL:
-                return createControlElement(control, "swt-label",
-                        SWT.WRAP, "swt-wrap", SWT.BORDER, "swt-border");
+            case LABEL: {
+                Element result = createControlElement(control, "swt-label",
+                        SWT.BORDER, "swt-border",
+                        SWT.WRAP, "swt-wrap");
+                if ((control.getStyle() & SWT.SEPARATOR) != 0) {
+                    result.appendChild(createControlElement(control, "swt-label-separator",
+                            SWT.BORDER, "swt-border",
+                            SWT.HORIZONTAL, "swt-horizontal",
+                            SWT.VERTICAL, "swt-vertical",
+                            SWT.SHADOW_IN, "swt-shadow-in",
+                            SWT.SHADOW_OUT, "swt-shadow-out",
+                            SWT.SHADOW_NONE, "swt-shadow-none"));
+                }
+                return result;
+            }
             case CANVAS:
                 return createControlElement(control, "canvas");
             case GROUP: {
                 Element result = createControlElement(control, "swt-group");
                 // Not really a control, but simplifies styling...
                 Element border = createControlElement(control, "swt-group-border",
+                        SWT.BORDER, "swt-border",
                         SWT.SHADOW_ETCHED_IN, "swt-shadow-etched-in",
                         SWT.SHADOW_ETCHED_OUT, "swt-shadow-etched-out",
                         SWT.SHADOW_IN, "swt-shadow-in",
                         SWT.SHADOW_OUT, "swt-shadow-out",
-                        SWT.SHADOW_NONE, "swt-shadow-none",
-                        SWT.BORDER, "swt-border");
+                        SWT.SHADOW_NONE, "swt-shadow-none");
                 result.appendChild(border);
 
-                Element title = createElement("swt-group-label");
+                Element title = createElement("swt-group-text");
                 title.getStyle().setDisplay("none");
                 result.appendChild(title);
                 return result;
@@ -442,7 +506,7 @@ public class GwtDisplay extends PlatformDisplay {
             case GROUP:
                 return computeInsets(element.getFirstElementChild());
 
-            case SHELL_DIALOG: {
+            case SHELL: {
                 Insets result = computeInsets(element);
 /*                Insets result = new Insets();
                 result.left = result.right = result.bottom = result.top = 12; */
@@ -469,20 +533,30 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public String getText(Control text) {
-        return ((Element) text.peer).getTextContent();
+    public String getText(Control control) {
+        Element element = (Element) control.peer;
+        switch (control.getControlType()) {
+            case TEXT:
+                if ((control.style & SWT.MULTI) != 0) {
+                    return element.getTextContent();
+                }
+                return element.getValue();
+            default:
+                unsupported(control, "getText");
+                return element.getTextContent();
+        }
     }
 
     @Override
     public Object loadImage(InputStream stream) throws IOException {
-        throw new RuntimeException("FIXME: GwtDisplay.loadImage");
+        throw new RuntimeException("Synchronous image loading not supported in GWT.");
     }
 
     @Override
     public void openShell(Shell shell) {
         //Element.getBody().appendChild((Element) shell.peer);
     //
-        if (shell.getControlType() == Control.ControlType.SHELL_DIALOG) {
+        if (shell.getControlType() == Control.ControlType.SHELL) {
             Point dialogSize = shell.getSize();
             Point parentSize = shell.getParent().getSize();
             shell.setLocation((parentSize.x - dialogSize.x) / 2, (parentSize.y - dialogSize.y) / 3);
@@ -497,7 +571,7 @@ public class GwtDisplay extends PlatformDisplay {
     public void removeChild(Composite composite, Control control) {
         Element parentElement = (Element) composite.peer;
         Element childElement = (Element) control.peer;
-        if (control.getControlType() == Control.ControlType.SHELL_DIALOG) {
+        if (control.getControlType() == Control.ControlType.SHELL) {
             parentElement.removeChild(childElement.getParentElement());
         } else if (composite.getControlType() == Control.ControlType.GROUP) {
             parentElement.getFirstElementChild().removeChild(childElement);
@@ -520,13 +594,24 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public void setBackgroundImage(Control control, Image image) {
-        log("FIXME: GwtDisplay.setBackgroundImage");
+        Element element = (Element) control.peer;
+        String src = image == null ? null : ((Element) image.peer).getAttribute("src");
+        if (control.getControlType() == Control.ControlType.GROUP ||
+            control.getControlType() == Control.ControlType.SHELL) {
+                 element = element.getFirstElementChild();
+        }
+        element.getStyle().setBackgroundImage(src != null && !src.isEmpty() ? ("url(" + src + ")") : null);
     }
 
     @Override
     public void setBounds(Control control, int x, int y, int w, int h) {
         if (control.getControlType() == Control.ControlType.SHELL_ROOT) {
             return;
+        }
+
+        int sliderPos = -1;
+        if (control.getControlType() == Control.ControlType.SLIDER) {
+            sliderPos = ((Slider) control).getSelection();
         }
 
         Element element = (Element) control.peer;
@@ -547,11 +632,26 @@ public class GwtDisplay extends PlatformDisplay {
             element.setAttribute("height", String.valueOf(h));
             redrawCanvas((Canvas) control, 0, 0, w, h);
         }
+
+        if (sliderPos != -1) {
+            Slider slider = (Slider) control;
+            updateSlider(slider);
+            slider.setSelection(sliderPos);
+        }
     }
 
     @Override
     public void setEnabled(Control control, boolean b) {
-        ((Element) control.peer).setDisabled(!b);
+        Element element = (Element) control.peer;
+        if (element.getLocalName().equals("label")) {
+            if (b) {
+                element.getClassList().remove("swt-disabled");
+            } else {
+                element.getClassList().add("swt-disabled");
+            }
+            element = element.getFirstElementChild();
+        }
+        element.setDisabled(!b);
     }
 
     @Override
@@ -571,7 +671,7 @@ public class GwtDisplay extends PlatformDisplay {
             case SHELL_ROOT:
                 Document.get().setTitle(s);
                 break;
-            case SHELL_DIALOG: {
+            case SHELL: {
                 Element title = element.getFirstElementChild();
                 title.setTextContent(s);
                 title.setAttribute("style", s.isEmpty() ? "display:none" : "");
@@ -583,17 +683,25 @@ public class GwtDisplay extends PlatformDisplay {
                 title.setAttribute("style", s.isEmpty() ? "display:none" : "");
                 break;
             }
-            case BUTTON_PUSH:
-            case BUTTON_CHECKBOX:
+            case BUTTON:
+            case BUTTON_CHECK:
             case BUTTON_RADIO:
             case BUTTON_TOGGLE:
                 element.getLastElementChild().setTextContent(s);
                 break;
             case LABEL:
-                 element.setTextContent(s);
+                if ((control.getStyle() & SWT.SEPARATOR) == 0) {
+                    element.setTextContent(s);
+                }
                 break;
             case BUTTON_ARROW:
                 break;
+            case TEXT:
+                if ((control.style & SWT.MULTI) != 0) {
+                    element.setTextContent(s);
+                } else {
+                    element.setValue(s);
+                }
             default:
                 unsupported(control, "setText");
         }
@@ -604,11 +712,32 @@ public class GwtDisplay extends PlatformDisplay {
         ((Element) control.peer).getStyle().setVisibility(visible ? "" : "hidden");
     }
 
+    void updateSlider(Slider slider) {
+        Element element = (Element) slider.peer;
+        Element outer = element.getFirstElementChild();
+        Element inner = outer.getFirstElementChild();
+
+        float range = slider.getMaximum() - slider.getMinimum();
+        float thumb = slider.getThumb();
+        float percent = range / thumb * 100;
+        if ((slider.style & SWT.VERTICAL) == 0) {
+            inner.getStyle().setWidth(String.valueOf(percent) + "%");
+        } else {
+            inner.getStyle().setHeight(String.valueOf(percent) + "%");
+        }
+    }
+
     @Override
     public void setRange(Control control, int minimum, int maximum) {
         Element element = (Element) control.peer;
-        element.setMax(String.valueOf(maximum));
-        element.setMin(String.valueOf(minimum));
+        if (control.getControlType() == Control.ControlType.PROGRESS_BAR) {
+            element.setMax(String.valueOf(maximum - minimum));
+        } else if (control.getControlType() == Control.ControlType.SLIDER) {
+            updateSlider((Slider) control);
+        } else {
+            element.setMax(String.valueOf(maximum));
+            element.setMin(String.valueOf(minimum));
+        }
     }
 
     @Override
@@ -617,9 +746,10 @@ public class GwtDisplay extends PlatformDisplay {
         switch (control.getControlType()) {
             case SPINNER:
             case SCALE:
-            case SLIDER:
                 element.setStep(String.valueOf(increment));
                 break;
+            case SLIDER:
+                updateSlider((Slider) control);
             default:
                 unsupported(control, "setSliderProperties");
         }
@@ -631,18 +761,41 @@ public class GwtDisplay extends PlatformDisplay {
         switch (control.getControlType()) {
             case BUTTON_RADIO:
             case BUTTON_TOGGLE:
-            case BUTTON_CHECKBOX:
+            case BUTTON_CHECK:
                 element.getFirstElementChild().setChecked(selection != 0);
                 break;
             case LIST:
             case COMBO:
                 element.setSelectedIndex(selection);
                 break;
-            case SLIDER:
+            case SLIDER: {
+                Slider slider = (Slider) control;
+                Element outer = element.getFirstElementChild();
+
+                int logicalRange = slider.getMaximum() - slider.getMinimum();
+                selection -= slider.getMinimum();
+
+                if ((slider.style & SWT.VERTICAL) != 0) {
+                    float physicalRange = outer.getScrollHeight();
+                    int scrollPos = Math.round(selection * physicalRange / logicalRange);
+                    outer.setScrollTop(Math.round(scrollPos));
+                } else {
+                    float physicalRange = outer.getScrollWidth();
+                    int scrollPos = Math.round(selection * physicalRange / logicalRange);
+                    outer.setScrollLeft(Math.round(scrollPos));
+                }
+                break;
+            }
             case SCALE:
+            case SPINNER:
                 element.setValue(String.valueOf(selection));
                 break;
-            case BUTTON_PUSH:
+            case PROGRESS_BAR:
+                if ((control.style & SWT.INDETERMINATE) == 0) {
+                    element.setValue(String.valueOf(selection - ((ProgressBar) control).getMinimum()));
+                }
+                break;
+            case BUTTON:
             case BUTTON_ARROW:
                 break;
             default:
@@ -679,7 +832,7 @@ public class GwtDisplay extends PlatformDisplay {
     public void setImage(Control control, Image image) {
         Element element = (Element) control.peer;
         switch (control.getControlType()) {
-            case BUTTON_CHECKBOX:
+            case BUTTON_CHECK:
             case BUTTON_RADIO:
             case BUTTON_TOGGLE:
                 if(!element.getFirstElementChild().getNextElementSibling().getLocalName().equals("span")) {
@@ -691,16 +844,18 @@ public class GwtDisplay extends PlatformDisplay {
                 }
                 break;
             case LABEL:
-                if (image == null) {
-                    element.setTextContent(((Label) control).getText());
-                } else {
-                    element.setTextContent("");
-                    Element img = (Element) image.peer;
-                    element.appendChild(img.cloneNode(false));
+                if ((control.getStyle() & SWT.SEPARATOR) == 0) {
+                    if (image == null) {
+                        element.setTextContent(((Label) control).getText());
+                    } else {
+                        element.setTextContent("");
+                        Element img = (Element) image.peer;
+                        element.appendChild(img.cloneNode(false));
+                    }
                 }
                 break;
 
-            case BUTTON_PUSH:
+            case BUTTON:
                 if(element.getFirstElementChild().getLocalName().equals("img")) {
                     element.removeChild(element.getFirstElementChild());
                 }
@@ -789,9 +944,9 @@ public class GwtDisplay extends PlatformDisplay {
         Element element = (Element) control.peer;
         switch (control.getControlType()) {
             case BUTTON_ARROW:
-            case BUTTON_PUSH:
+            case BUTTON:
                 return 0;
-            case BUTTON_CHECKBOX:
+            case BUTTON_CHECK:
             case BUTTON_RADIO:
             case BUTTON_TOGGLE:
                 Element input = element.getFirstElementChild();
@@ -799,9 +954,23 @@ public class GwtDisplay extends PlatformDisplay {
             case LIST:
             case COMBO:
                 return element.getSelectedIndex();
+            case SLIDER:
+                Slider slider = (Slider) control;
+                Element outer = element.getFirstElementChild();
+
+                int logicalRange = slider.getMaximum() - slider.getMinimum();
+                int scrollPos;
+                float physicalRange;
+                if ((slider.style & SWT.VERTICAL) != 0) {
+                    physicalRange = outer.getScrollHeight();
+                    scrollPos = outer.getScrollTop();
+                } else {
+                    physicalRange = outer.getScrollWidth();
+                    scrollPos = outer.getScrollLeft();
+                }
+                return Math.round(scrollPos * logicalRange / physicalRange + slider.getMinimum());
             case SPINNER:
-            case SCALE:
-            case SLIDER: {
+            case SCALE:{
                 String value = element.getValue();
                 if (value == null) {
                     return 0;

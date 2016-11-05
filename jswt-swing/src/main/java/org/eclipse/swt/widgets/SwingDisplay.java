@@ -1,6 +1,5 @@
 package org.eclipse.swt.widgets;
 
-import java.awt.GraphicsEnvironment;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -62,7 +61,6 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.EventListener;
 
 public class SwingDisplay extends PlatformDisplay {
   int activeShells = 0;
@@ -104,7 +102,7 @@ public class SwingDisplay extends PlatformDisplay {
   @Override
   public Object createControl(final Control control) {
     switch (control.getControlType()) {
-      case BUTTON_CHECKBOX:
+      case BUTTON_CHECK:
       case BUTTON_TOGGLE:
         return new JCheckBox();
       case BUTTON_RADIO: {
@@ -130,7 +128,7 @@ public class SwingDisplay extends PlatformDisplay {
         }
         return new JButton(label);
       }
-      case BUTTON_PUSH:
+      case BUTTON:
         return new JButton();
       case COMBO:
         return new JComboBox<String>();
@@ -159,7 +157,7 @@ public class SwingDisplay extends PlatformDisplay {
                 javax.swing.JScrollBar.VERTICAL : javax.swing.JScrollBar.HORIZONTAL);
       case SCROLLED_COMPOSITE:
         return new javax.swing.JScrollPane();
-      case SHELL_DIALOG:
+      case SHELL:
       case SHELL_ROOT: {
         final Shell shell = (Shell) control;
         final java.awt.Window window;
@@ -230,7 +228,7 @@ public class SwingDisplay extends PlatformDisplay {
     java.awt.Rectangle rect = new java.awt.Rectangle();
     ((java.awt.Component) control.peer).getBounds(rect);
 
-    if (control.getControlType() == Control.ControlType.SHELL_DIALOG
+    if (control.getControlType() == Control.ControlType.SHELL
             || control.getControlType() == Control.ControlType.SHELL_ROOT) {
       Component root = SwingUtilities.getRoot((java.awt.Component) control.peer);
       rect.x += root.getX();
@@ -274,9 +272,9 @@ public class SwingDisplay extends PlatformDisplay {
   public int getSelection(Control control) {
     switch (control.getControlType()) {
       case BUTTON_ARROW:
-      case BUTTON_PUSH:
+      case BUTTON:
         return 0;
-      case BUTTON_CHECKBOX:
+      case BUTTON_CHECK:
       case BUTTON_RADIO:
       case BUTTON_TOGGLE:
         return ((AbstractButton) control.peer).isSelected() ? 1 : 0;
@@ -299,13 +297,13 @@ public class SwingDisplay extends PlatformDisplay {
   public String getText(Control control) {
     Component peer = (Component) control.peer;
     switch (control.getControlType()) {
-      case BUTTON_CHECKBOX:
-      case BUTTON_PUSH:
+      case BUTTON_CHECK:
+      case BUTTON:
       case BUTTON_RADIO:
         return ((AbstractButton) peer).getText();
       case LABEL:
         return ((JLabel) peer).getText();
-      case SHELL_DIALOG:
+      case SHELL:
         return ((JDialog) SwingUtilities.getRoot(peer)).getTitle();
       case SHELL_ROOT:
         return ((JFrame) SwingUtilities.getRoot(peer)).getTitle();
@@ -404,8 +402,8 @@ public class SwingDisplay extends PlatformDisplay {
       case TEXT:
         ((JTextField) peer).setText(text);
         break;
-      case BUTTON_CHECKBOX:
-      case BUTTON_PUSH:
+      case BUTTON_CHECK:
+      case BUTTON:
       case BUTTON_RADIO:
         ((AbstractButton) peer).setText(text);
         break;
@@ -415,7 +413,7 @@ public class SwingDisplay extends PlatformDisplay {
       case SHELL_ROOT:
         ((JFrame) SwingUtilities.getRoot(peer)).setTitle(text);
         break;
-      case SHELL_DIALOG:
+      case SHELL:
         ((JDialog) SwingUtilities.getRoot(peer)).setTitle(text);
         break;
       case GROUP:
@@ -464,10 +462,10 @@ public class SwingDisplay extends PlatformDisplay {
   public void setSelection(Control control, int selection) {
     switch (control.getControlType()) {
       case BUTTON_ARROW:
-      case BUTTON_PUSH:
+      case BUTTON:
         return;
       case BUTTON_TOGGLE:
-      case BUTTON_CHECKBOX:
+      case BUTTON_CHECK:
       case BUTTON_RADIO:
         ((AbstractButton) control.peer).setSelected(selection != 0);
         break;
@@ -543,7 +541,7 @@ public class SwingDisplay extends PlatformDisplay {
 
   @Override
   public void removeChild(Composite composite, Control child) {
-    if (child.getControlType() == Control.ControlType.SHELL_DIALOG) {
+    if (child.getControlType() == Control.ControlType.SHELL) {
       SwingUtilities.getRoot((Component) child.peer).setVisible(false);
     } else {
       ((Container) composite.peer).remove((JComponent) child.peer);
@@ -590,13 +588,13 @@ public class SwingDisplay extends PlatformDisplay {
   @Override
   public void setImage(Control control, Image image) {
     switch (control.getControlType()) {
-      case BUTTON_PUSH: {
+      case BUTTON: {
         ImageIcon imageIcon = new ImageIcon((java.awt.Image) image.peer);
         ((AbstractButton) control.peer).setIcon(imageIcon);
         break;
       }
       case BUTTON_RADIO:
-      case BUTTON_CHECKBOX:
+      case BUTTON_CHECK:
       case BUTTON_TOGGLE:
         break;   // Image would overwrite control
       case LABEL: {
@@ -804,8 +802,8 @@ public class SwingDisplay extends PlatformDisplay {
         break;
       case SWT.Selection:
         switch (control.getControlType()) {
-          case BUTTON_PUSH:
-          case BUTTON_CHECKBOX:
+          case BUTTON:
+          case BUTTON_CHECK:
           case BUTTON_RADIO: {
             AbstractButton button = (AbstractButton) component;
             button.addActionListener(new ActionListener() {

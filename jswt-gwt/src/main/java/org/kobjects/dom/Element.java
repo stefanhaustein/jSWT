@@ -42,6 +42,10 @@ public class Element extends JavaScriptObject {
         return this.children;
     }-*/;
 
+    public native final ClassList getClassList() /*-{
+        return this.classList;
+    }-*/;
+
     public native final boolean getChecked() /*-{
         return this.checked;
     }-*/;
@@ -60,6 +64,10 @@ public class Element extends JavaScriptObject {
 
     public native final Element getFirstElementChild() /*-{
         return this.firstElementChild;
+    }-*/;
+
+    public native final int getHeight() /*-{
+        return this.height;
     }-*/;
 
     public native final Element getLastElementChild() /*-{
@@ -112,6 +120,26 @@ public class Element extends JavaScriptObject {
 
     public native final String getValue() /*-{
         return this.value;
+    }-*/;
+
+    public native final int getWidth() /*-{
+        return this.width;
+    }-*/;
+
+    public native final int getScrollHeight() /*-{
+        return this.scrollHeight;
+    }-*/;
+
+    public native final int getScrollLeft() /*-{
+        return this.scrollLeft;
+    }-*/;
+
+    public native final int getScrollTop() /*-{
+        return this.scrollTop;
+    }-*/;
+
+    public native final int getScrollWidth() /*-{
+        return this.scrollWidth;
     }-*/;
 
     public native final void insertBefore(Element newItem, Element before) /*-{
@@ -174,11 +202,23 @@ public class Element extends JavaScriptObject {
         this.value = value;
     }-*/;
 
+    public native final void setScrollLeft(int px) /*-{
+        this.scrollLeft = px;
+    }-*/;
+
+    public native final void setScrollTop(int px) /*-{
+        this.scrollTop = px;
+    }-*/;
+
     public native final void setStep(String value) /*-{
         this.step = value;
     }-*/;
 
     public native final Element cloneNode(boolean deep) /*-{
         return this.cloneNode(deep);
+    }-*/;
+
+    public native final void setReadOnly(boolean b) /*-{
+        this.readOnly = b;
     }-*/;
 }

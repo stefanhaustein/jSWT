@@ -99,9 +99,9 @@ public class AndroidDisplay extends PlatformDisplay {
   @Override
   public Object createControl(final Control control) {
     switch (control.getControlType()) {
-      case BUTTON_PUSH:
+      case BUTTON:
         return new AppCompatButton(activity);
-      case BUTTON_CHECKBOX:
+      case BUTTON_CHECK:
       case BUTTON_TOGGLE:
         return new AppCompatCheckBox(activity);
       case BUTTON_RADIO: {
@@ -139,7 +139,7 @@ public class AndroidDisplay extends PlatformDisplay {
       case SCALE:
       case SLIDER:
         return new android.widget.SeekBar(activity);
-      case SHELL_DIALOG:
+      case SHELL:
       case SHELL_ROOT:
         return new AndroidShell(activity, (Shell) control);
       case TAB_FOLDER:
@@ -493,12 +493,12 @@ public class AndroidDisplay extends PlatformDisplay {
   public void setSelection(Control control, int selection) {
     switch (control.getControlType()) {
       case BUTTON_ARROW:
-      case BUTTON_PUSH:
+      case BUTTON:
         break;
       case BUTTON_RADIO:
         handleRadioGroup((Button) control, selection != 0);
         // Fallthrough intended
-      case BUTTON_CHECKBOX:
+      case BUTTON_CHECK:
       case BUTTON_TOGGLE:
         ((CompoundButton) control.peer).setChecked(selection != 0);
         break;
@@ -545,9 +545,9 @@ public class AndroidDisplay extends PlatformDisplay {
   public int getSelection(Control control) {
     switch (control.getControlType()) {
       case BUTTON_ARROW:
-      case BUTTON_PUSH:
+      case BUTTON:
         return 0;
-      case BUTTON_CHECKBOX:
+      case BUTTON_CHECK:
       case BUTTON_RADIO:
       case BUTTON_TOGGLE:
         return ((CompoundButton) control.peer).isChecked() ? 1 : 0;

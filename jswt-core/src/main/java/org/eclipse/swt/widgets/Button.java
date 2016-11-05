@@ -21,7 +21,7 @@ public class Button extends Control {
 
   ControlType getControlType() {
     if ((style & SWT.CHECK) != 0) {
-      return ControlType.BUTTON_CHECKBOX;
+      return ControlType.BUTTON_CHECK;
     }
     if ((style & SWT.RADIO) != 0) {
       return ControlType.BUTTON_RADIO;
@@ -32,7 +32,7 @@ public class Button extends Control {
     if ((style & SWT.ARROW) != 0) {
       return ControlType.BUTTON_ARROW;
     }
-    return ControlType.BUTTON_PUSH;
+    return ControlType.BUTTON;
   }
 
   public boolean getSelection() {

@@ -1,8 +1,10 @@
 swt-tabfolder,
 swt-composite,
 swt-label,
+swt-label-separator,
 swt-group,
 swt-shell-dialog,
+swt-slider,
 .swt-control {
     box-sizing: border-box;
     position: absolute;
@@ -11,7 +13,7 @@ swt-shell-dialog,
     visibility: inherit;
 }
 
-swt-button,
+button.swt-control,
 swt-label,
 swt-composite {
     overflow: hidden;
@@ -21,7 +23,6 @@ button.swt-control > img,
 button.swt-control > span {
     vertical-align: middle;
 }
-
 
 button.swt-control > img + span:not(:empty),
 label.swt-control > img + span:not(:empty) {
@@ -42,6 +43,11 @@ body {
     color: black;
     overflow: hidden;
 }
+
+label.swt-disabled {
+    color: gray;
+}
+
 
 /* Group */
 
@@ -69,8 +75,7 @@ swt-group-border.swt-shadow-in {
     box-shadow: inset 4px 4px 4px grey;
 }
 
-
-swt-group-label {
+swt-group-text {
     display: inline-block;
     position: relative;
     left: 12px;
@@ -79,14 +84,14 @@ swt-group-label {
     visibility: inherit;
 }
 
-/* shell-dialog */
+/* shell (dialog) */
 
-swt-shell-dialog {
+swt-shell {
     box-shadow: 4px 4px 16px;
     padding: 12px;
 }
 
-swt-shell-dialog-label {
+swt-shell-text {
     display: block;
     position: absolute;
     left: 0;
@@ -97,6 +102,28 @@ swt-shell-dialog-label {
     color: white;
     padding: 12px;
 }
+
+
+/* Separators */
+
+swt-label-separator {
+    position:absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: gray;
+    margin: auto;
+}
+
+swt-label-separator.swt-vertical {
+    width: 1px;
+}
+
+swt-label-separator.swt-horizontal{
+    height: 1px;
+}
+
 
 /* TabFolder */
 
@@ -120,3 +147,14 @@ swt-tab.selected {
     background-color: white;
 }
 
+swt-slider-outer {
+    display: block;
+    visibility: inherit;
+}
+
+swt-slider-inner {
+    display: block;
+    visibility: inherit;
+    height: 1px;
+    width: 1px;
+}

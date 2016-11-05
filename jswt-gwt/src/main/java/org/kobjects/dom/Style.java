@@ -2,85 +2,93 @@ package org.kobjects.dom;
 
 import com.google.gwt.core.client.JavaScriptObject;
 
-public class Style extends JavaScriptObject {
+public final class Style extends JavaScriptObject {
 
     protected Style() {
     }
 
-    public native final String get(String propertyName) /*-{
+    public native String get(String propertyName) /*-{
         return this[propertyName];
     }-*/;
 
-    public native final String getBackgroundColor() /*-{
+    public native String getBackgroundColor() /*-{
         return this.backgroundColor;
     }-*/;
 
-    public native final String getColor() /*-{
+    public native String getColor() /*-{
         return this.color;
     }-*/;
 
-    public native final String getDisplay() /*-{
+    public native String getDisplay() /*-{
         return this.display;
     }-*/;
 
-    public native final String getHeight() /*-{
+    public native String getHeight() /*-{
         return this.height;
     }-*/;
 
-    public native final String getTextAlign() /*-{
+    public native String getTextAlign() /*-{
         return this.textAlign;
     }-*/;
 
-    public native final String getVisibility() /*-{
+    public native String getVisibility() /*-{
         return this.visibility;
     }-*/;
 
-    public native final String getWidth() /*-{
+    public native String getWidth() /*-{
         return this.width;
     }-*/;
 
-    public native final String getWhiteSpace() /*-{
+    public native String getWhiteSpace() /*-{
         return this.whiteSpace;
     }-*/;
 
-    public native final void setBackgroundColor(String s) /*-{
+    public native void set(String name, String value) /*-{
+        this[name] = value;
+    }-*/;
+
+    public native void setBackgroundColor(String s) /*-{
         this.backgroundColor = s;
     }-*/;
 
-    public native final void setColor(String s) /*-{
+    public native void setColor(String s) /*-{
         this.color = s;
     }-*/;
 
-    public native final void setDisplay(String value) /*-{
+    public native void setDisplay(String value) /*-{
         this.display = value;
     }-*/;
 
-    public native final void setHeight(String height) /*-{
+    public native void setHeight(String height) /*-{
         this.height = height;
     }-*/;
 
-    public native final void setLeft(String s) /*-{
+    public native void setLeft(String s) /*-{
         this.left = s;
     }-*/;
 
-    public native final void setTextAlign(String s) /*-{
+    public native void setTextAlign(String s) /*-{
         this.textAlign = s;
     }-*/;
 
-    public native final void setTop(String s) /*-{
+    public native void setTop(String s) /*-{
         this.top = s;
     }-*/;
 
-    public native final void setVisibility(String visibility) /*-{
+    public native void setVisibility(String visibility) /*-{
         this.visibility = visibility;
     }-*/;
 
-    public native final void setWidth(String width) /*-{
+    public native void setWidth(String width) /*-{
         this.width = width;
     }-*/;
 
-    public native final void setWhiteSpace(String ws) /*-{
+    public native void setWhiteSpace(String ws) /*-{
         this.whiteSpace = ws;
+    }-*/;
+
+    public native void setBackgroundImage(String s) /*-{
+        this.backgroundImage = s;
     }-*/;
 
 }

@@ -1,5 +1,6 @@
 package org.eclipse.swt.widgets;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 
 public class Label extends Control {
@@ -18,8 +19,8 @@ public class Label extends Control {
   }
 
     ControlType getControlType() {
-    return ControlType.LABEL;
-  }
+      return ControlType.LABEL;
+    }
 
     public void setAlignment(int alignment) {
       display.setAlignment(this, alignment);
