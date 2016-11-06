@@ -33,7 +33,7 @@ public interface DisposeListener extends SWTEventListener {
 /**
  * Sent when the widget is disposed.
  *
- * @param e an event containing information about the dispose
+ * @param e an event containing information about the disposePeer
  */
 public void widgetDisposed(DisposeEvent e);
 }

@@ -165,15 +165,6 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
-  public void disposeRootShell(Shell shell) {
-    AndroidShell shellView = (AndroidShell) shell.peer;
-    if (shellView.dialog != null) {
-      shellView.dialog.hide();
-      shellView.dialog = null;
-    }
-  }
-
-  @Override
   public boolean isEnabled(Control control) {
     return ((View) control.peer).isEnabled();
   }
@@ -587,8 +578,17 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
-  public void dispose(Control child) {
-    ((ViewGroup) composite.peer).removeView((View) child.peer);
+  public void disposePeer(Control control) {
+    if (control.getControlType() == Control.ControlType.SHELL) {
+      AndroidShell shellView = (AndroidShell) control.peer;
+      if (shellView.dialog != null) {
+        shellView.dialog.hide();
+        shellView.dialog = null;
+      }
+    } else {
+      Composite parent = control.getParent();
+      ((ViewGroup) parent.peer).removeView((View) control.peer);
+    }
   }
 
   @Override

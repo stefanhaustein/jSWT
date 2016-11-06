@@ -209,7 +209,7 @@ public class SWT {
 	public static final int Resize = 11;
 
 	/**
-	 * The dispose event type (value is 12).
+	 * The disposePeer event type (value is 12).
 	 *
 	 * @see org.eclipse.swt.widgets.Widget#addListener
 	 * @see org.eclipse.swt.widgets.Display#addListener

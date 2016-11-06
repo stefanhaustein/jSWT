@@ -467,7 +467,7 @@ abstract class Tab {
 				/*	TableItem [] items = colorAndFontTable.getItems();
 				for (int i = 0; i < items.length; i++) {
 					Image image = items[i].getImage();
-					if (image != null) image.dispose();
+					if (image != null) image.disposePeer();
 				} */
 				}
 			}
@@ -491,7 +491,7 @@ abstract class Tab {
 					@Override
 					public Void call(RGB rgb) {
 						if (rgb == null) return null;
-						Color oldColor = foregroundColor; // save old foreground color to dispose when done
+						Color oldColor = foregroundColor; // save old foreground color to disposePeer when done
 						foregroundColor = new Color (display, rgb);
 						setExampleWidgetForeground ();
 						if (oldColor != null) oldColor.dispose ();
@@ -511,7 +511,7 @@ abstract class Tab {
 					@Override
 					public Void call(RGB rgb) {
 						if (rgb == null) return null;
-						Color oldColor = backgroundColor; // save old background color to dispose when done
+						Color oldColor = backgroundColor; // save old background color to disposePeer when done
 						backgroundColor = new Color (display, rgb);
 						setExampleWidgetBackground ();
 						if (oldColor != null) oldColor.dispose ();
@@ -531,7 +531,7 @@ abstract class Tab {
 					@Override
 					public Void call(FontData fontData) {
 						if (fontData == null) return null;
-						Font oldFont = font; // dispose old font when done
+						Font oldFont = font; // disposePeer old font when done
 						font = new Font (display, fontData);
 						setExampleWidgetFont ();
 						setExampleWidgetSize ();
@@ -1911,7 +1911,7 @@ void setValue() {
 		if (color == null) color = controls [0].getBackground ();
 		TableItem item = colorAndFontTable.getItem(BACKGROUND_COLOR);
 		Image oldImage = item.getImage();
-		if (oldImage != null) oldImage.dispose();
+		if (oldImage != null) oldImage.disposePeer();
 		item.setImage (colorImage (color));
 		*/
 	}
@@ -1945,7 +1945,7 @@ void setValue() {
 		if (ft == null) ft = controls [0].getFont ();
 		TableItem item = colorAndFontTable.getItem(FONT);
 		Image oldImage = item.getImage();
-		if (oldImage != null) oldImage.dispose();
+		if (oldImage != null) oldImage.disposePeer();
 		item.setImage (fontImage (ft));
 		item.setFont(ft);
 		colorAndFontTable.layout ();
@@ -1970,7 +1970,7 @@ void setValue() {
 		if (color == null) color = controls [0].getForeground ();
 		TableItem item = colorAndFontTable.getItem(FOREGROUND_COLOR);
 		Image oldImage = item.getImage();
-		if (oldImage != null) oldImage.dispose();
+		if (oldImage != null) oldImage.disposePeer();
 		item.setImage (colorImage(color));
 		*/
 	}

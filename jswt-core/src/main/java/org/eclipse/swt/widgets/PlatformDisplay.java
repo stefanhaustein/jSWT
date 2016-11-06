@@ -27,8 +27,6 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract GC creatGCForPlatformImage(Object platformImage);
 
-  public abstract void disposeRootShell(Shell shell);
-
   public abstract boolean isEnabled(Control control);
 
   public abstract Color getBackground(Control control);
@@ -62,7 +60,7 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract void removeItems(Control control, int start, int end);
 
-  public abstract void dispose(Control child);
+  public abstract void disposePeer(Control child);
 
   public abstract void setBackground(Control control, Color color);
 

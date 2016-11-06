@@ -141,7 +141,7 @@ protected void layout(Composite composite, boolean flushCache) {
 			contentRect.y = -vSelection;
 		}
 	}
-	gc.dispose ();
+	gc.disposePeer ();
 */
 	sc.content.setBounds (contentRect);
 

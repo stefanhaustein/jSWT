@@ -31,7 +31,7 @@ import java.io.*;
  * <p>
  * Application code does <em>not</em> need to explicitly release the
  * resources managed by each instance when those instances are no longer
- * required, and thus no <code>dispose()</code> method is provided.
+ * required, and thus no <code>disposePeer()</code> method is provided.
  * </p>
  *
  * @see Rectangle

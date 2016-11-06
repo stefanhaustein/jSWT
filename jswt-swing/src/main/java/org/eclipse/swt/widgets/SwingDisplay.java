@@ -9,6 +9,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -204,11 +205,6 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
-  public void disposeRootShell(Shell shell) {
-    SwingUtilities.getRoot((Component) shell.peer).setVisible(false);
-  }
-
-  @Override
   public Rectangle getBounds(Control control) {
     java.awt.Rectangle rect = new java.awt.Rectangle();
     ((java.awt.Component) control.peer).getBounds(rect);
@@ -378,7 +374,11 @@ public class SwingDisplay extends PlatformDisplay {
         ((JLabel) peer).setText(text);
         break;
       case SHELL:
-        ((java.awt.Frame) SwingUtilities.getRoot(peer)).setTitle(text);
+        if (control.getParent() == null) {
+          ((JFrame) SwingUtilities.getRoot(peer)).setTitle(text);
+        } else {
+          ((JDialog) SwingUtilities.getRoot(peer)).setTitle(text);
+        }
         break;
       case GROUP:
         ((JPanel) peer).setBorder(new TitledBorder(text));
@@ -491,19 +491,13 @@ public class SwingDisplay extends PlatformDisplay {
     }
   }
 
-  /*
   @Override
-  public void pack(Shell shell) {
-    ((Window) SwingUtilities.getRoot((Component) shell.peer)).pack();
-  }
-*/
-
-  @Override
-  public void dispose(Control child) {
+  public void disposePeer(Control child) {
     if (child.getControlType() == Control.ControlType.SHELL) {
       SwingUtilities.getRoot((Component) child.peer).setVisible(false);
     } else {
-      ((Container) composite.peer).remove((JComponent) child.peer);
+      Composite parent = child.getParent();
+      ((Container) parent.peer).remove((JComponent) child.peer);
     }
   }
 

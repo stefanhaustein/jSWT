@@ -61,7 +61,7 @@ import org.eclipse.swt.widgets.*;
  * by the default button, not the text widget.  If the text widget has
  * a default selection listener, it will not run because the return key
  * will be processed by the default button.  Imagine that the text control
- * is being used as an in-place editor and return is used to dispose the
+ * is being used as an in-place editor and return is used to disposePeer the
  * widget.  Setting doit to <code>false</code> will stop the system from
  * activating the default button but the key will be delivered to the text
  * control, running the key and selection listeners for the text.  How

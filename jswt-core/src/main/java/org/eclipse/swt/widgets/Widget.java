@@ -101,10 +101,11 @@ public abstract class Widget {
         }
         if (parent != null) {
             parent.removeChild(this);
-        } else if (this instanceof Shell) {
-            display.disposeRootShell((Shell) this);
         }
-        System.err.println("FIXME: Widget.dispose(): Notify dispose listeners!");
+        notifyListeners(SWT.Dispose, new Event());
+        if (this instanceof Control) {
+            display.disposePeer((Control) this);
+        }
         state |= DISPOSED;
     }
 
@@ -146,7 +147,7 @@ public abstract class Widget {
     void releaseWidget () {
     }
 
-    // Called from dispose
+    // Called from disposePeer
     void removeChild(Widget widget) {
     }
 

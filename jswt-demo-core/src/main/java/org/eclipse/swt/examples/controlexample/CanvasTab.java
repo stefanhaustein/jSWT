@@ -312,13 +312,13 @@ class CanvasTab extends Tab {
 			GC gc = new GC(canvas);
 			gc.setFont(font);
 			newCaret.setBounds(1, 1, 1, gc.getFontMetrics().getHeight());
-			gc.dispose();
+			gc.disposePeer();
 			canvas.setCaret (newCaret);
 			canvas.setFocus();
 		} else {
 			canvas.setCaret (null);
 		}
-		if (oldCaret != null) oldCaret.dispose ();
+		if (oldCaret != null) oldCaret.disposePeer ();
 		*/
 	}
 

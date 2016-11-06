@@ -25,11 +25,15 @@ public class Promise<T> implements Thenable<T> {
         final Promise<Void> result = new Promise<Void>();
         for (Promise<T> promise: promises) {
             expected[0]++;
+        }
+        for (Promise<T> promise: promises) {
             promise.then(new Function<T, Void>() {
                 public Void call(T value) {
-                    expected[0]--;
-                    if (expected[0] == 0) {
-                        result.resolve(null);
+                    synchronized (expected) {
+                        expected[0]--;
+                        if (expected[0] == 0) {
+                            result.resolve(null);
+                        }
                     }
                     return null;
                 }

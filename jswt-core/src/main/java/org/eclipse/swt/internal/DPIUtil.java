@@ -199,10 +199,10 @@ private static ImageData autoScaleImageData (Device device, final ImageData imag
 				// Nevertheless, we still have some rounding errors due to the point-based API GC#drawImage(..).
 
 				0, 0, Math.round (DPIUtil.autoScaleDown ((float) width * scaleFactor)), Math.round (DPIUtil.autoScaleDown ((float) height * scaleFactor)));
-		gc.dispose ();
-		original.dispose ();
+		gc.disposePeer ();
+		original.disposePeer ();
 		ImageData result = resultImage.getImageDataAtCurrentZoom ();
-		resultImage.dispose ();
+		resultImage.disposePeer ();
 		return result;
 	case NEAREST:
 	default:

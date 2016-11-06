@@ -181,12 +181,9 @@ public class Composite extends Scrollable {
     return new Point (width, height);
   }
 
-  // Called from dispose
+  // Called from disposePeer
   void removeChild(Widget widget) {
     children.remove(widget);
-    if (widget instanceof Control) {
-      display.dispose((Control) widget);
-    }
   }
 
   public void pack() {
