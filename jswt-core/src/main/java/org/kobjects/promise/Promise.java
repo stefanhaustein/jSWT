@@ -36,7 +36,10 @@ public class Promise<T> implements Thenable<T> {
             }, new Function<Exception, Void>() {
                 @Override
                 public Void call(Exception param) {
-                    result.reject(param);
+                    if (expected[0] > 0) {
+                        expected[0] = Integer.MIN_VALUE / 2;
+                        result.reject(param);
+                    }
                     return null;
                 }
             });
@@ -104,6 +107,7 @@ public class Promise<T> implements Thenable<T> {
                     try {
                         result.resolve(onFulfilled.call(value));
                     } catch (Exception e) {
+                        e.printStackTrace();
                         result.reject(e);
                     }
                 } else {
@@ -133,6 +137,7 @@ public class Promise<T> implements Thenable<T> {
                             try {
                                 result.resolve(onFulfilled.call(value));
                             } catch (Exception e) {
+                                e.printStackTrace();
                                 result.reject(e);
                             }
                         } else {
@@ -150,6 +155,7 @@ public class Promise<T> implements Thenable<T> {
                                onRejected.call(reason);
                                result.reject(reason);
                             } catch(Exception e) {
+                                e.printStackTrace();
                                result.reject(reason);
                             }
                         }

@@ -19,6 +19,9 @@ public final class Document extends JavaScriptObject {
         return this.body;
     }-*/;
 
+    public native Element getElementById(String id) /*-{
+        return this.getElementById(id);
+    }-*/;
 
     public native String getTitle() /*-{
         return this.title;

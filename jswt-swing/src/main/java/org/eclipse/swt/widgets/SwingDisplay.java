@@ -102,33 +102,20 @@ public class SwingDisplay extends PlatformDisplay {
   @Override
   public Object createControl(final Control control) {
     switch (control.getControlType()) {
-      case BUTTON_CHECK:
-      case BUTTON_TOGGLE:
-        return new JCheckBox();
-      case BUTTON_RADIO: {
-        Composite parent = control.getParent();
-        ButtonGroup group = (ButtonGroup) parent.radioGroup;
-        if (group == null) {
-          parent.radioGroup = group = new ButtonGroup();
-        }
-        JRadioButton result = new JRadioButton();
-        group.add(result);
-        return result;
-      }
-      case BUTTON_ARROW: {
-        String label;
-        if ((control.style & SWT.UP) != 0) {
-          label = "^";
-        } else if ((control.style & SWT.DOWN) != 0) {
-          label = "v";
-        } else if ((control.style & SWT.LEFT) != 0) {
-          label = "<";
-        } else {
-          label = ">";
-        }
-        return new JButton(label);
-      }
       case BUTTON:
+        if ((control.style & SWT.RADIO) != 0) {
+          Composite parent = control.getParent();
+          ButtonGroup group = (ButtonGroup) parent.radioGroup;
+          if (group == null) {
+            parent.radioGroup = group = new ButtonGroup();
+          }
+          JRadioButton result = new JRadioButton();
+          group.add(result);
+          return result;
+        }
+        if ((control.style & (SWT.CHECK | SWT.TOGGLE)) != 0) {
+          return new JCheckBox();
+        }
         return new JButton();
       case COMBO:
         return new JComboBox<String>();
@@ -157,8 +144,7 @@ public class SwingDisplay extends PlatformDisplay {
                 javax.swing.JScrollBar.VERTICAL : javax.swing.JScrollBar.HORIZONTAL);
       case SCROLLED_COMPOSITE:
         return new javax.swing.JScrollPane();
-      case SHELL:
-      case SHELL_ROOT: {
+      case SHELL: {
         final Shell shell = (Shell) control;
         final java.awt.Window window;
         if (shell.parent != null) {
@@ -228,8 +214,7 @@ public class SwingDisplay extends PlatformDisplay {
     java.awt.Rectangle rect = new java.awt.Rectangle();
     ((java.awt.Component) control.peer).getBounds(rect);
 
-    if (control.getControlType() == Control.ControlType.SHELL
-            || control.getControlType() == Control.ControlType.SHELL_ROOT) {
+    if (control.getControlType() == Control.ControlType.SHELL) {
       Component root = SwingUtilities.getRoot((java.awt.Component) control.peer);
       rect.x += root.getX();
       rect.y += root.getY();
@@ -271,12 +256,7 @@ public class SwingDisplay extends PlatformDisplay {
   @Override
   public int getSelection(Control control) {
     switch (control.getControlType()) {
-      case BUTTON_ARROW:
       case BUTTON:
-        return 0;
-      case BUTTON_CHECK:
-      case BUTTON_RADIO:
-      case BUTTON_TOGGLE:
         return ((AbstractButton) control.peer).isSelected() ? 1 : 0;
       case COMBO:
         return ((JComboBox<String>) control.peer).getSelectedIndex();
@@ -297,16 +277,6 @@ public class SwingDisplay extends PlatformDisplay {
   public String getText(Control control) {
     Component peer = (Component) control.peer;
     switch (control.getControlType()) {
-      case BUTTON_CHECK:
-      case BUTTON:
-      case BUTTON_RADIO:
-        return ((AbstractButton) peer).getText();
-      case LABEL:
-        return ((JLabel) peer).getText();
-      case SHELL:
-        return ((JDialog) SwingUtilities.getRoot(peer)).getTitle();
-      case SHELL_ROOT:
-        return ((JFrame) SwingUtilities.getRoot(peer)).getTitle();
       case TEXT:
         return ((JTextField) peer).getText();
       default:
@@ -402,19 +372,14 @@ public class SwingDisplay extends PlatformDisplay {
       case TEXT:
         ((JTextField) peer).setText(text);
         break;
-      case BUTTON_CHECK:
       case BUTTON:
-      case BUTTON_RADIO:
         ((AbstractButton) peer).setText(text);
         break;
       case LABEL:
         ((JLabel) peer).setText(text);
         break;
-      case SHELL_ROOT:
-        ((JFrame) SwingUtilities.getRoot(peer)).setTitle(text);
-        break;
       case SHELL:
-        ((JDialog) SwingUtilities.getRoot(peer)).setTitle(text);
+        ((java.awt.Frame) SwingUtilities.getRoot(peer)).setTitle(text);
         break;
       case GROUP:
         ((JPanel) peer).setBorder(new TitledBorder(text));
@@ -461,12 +426,7 @@ public class SwingDisplay extends PlatformDisplay {
   @Override
   public void setSelection(Control control, int selection) {
     switch (control.getControlType()) {
-      case BUTTON_ARROW:
       case BUTTON:
-        return;
-      case BUTTON_TOGGLE:
-      case BUTTON_CHECK:
-      case BUTTON_RADIO:
         ((AbstractButton) control.peer).setSelected(selection != 0);
         break;
       case SCALE:
@@ -588,14 +548,11 @@ public class SwingDisplay extends PlatformDisplay {
   @Override
   public void setImage(Control control, Image image) {
     switch (control.getControlType()) {
-      case BUTTON: {
-        ImageIcon imageIcon = new ImageIcon((java.awt.Image) image.peer);
-        ((AbstractButton) control.peer).setIcon(imageIcon);
-        break;
-      }
-      case BUTTON_RADIO:
-      case BUTTON_CHECK:
-      case BUTTON_TOGGLE:
+      case BUTTON:
+        if ((control.style & (SWT.RADIO | SWT.TOGGLE | SWT.CHECK | SWT.ARROW)) == 0) {
+          ImageIcon imageIcon = new ImageIcon((java.awt.Image) image.peer);
+          ((AbstractButton) control.peer).setIcon(imageIcon);
+        }
         break;   // Image would overwrite control
       case LABEL: {
         ImageIcon imageIcon = new ImageIcon((java.awt.Image) image.peer);
@@ -608,8 +565,20 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
-  public void setAlignment(Control button, int alignment) {
-    System.err.println("FIXME: SwingDisplay.setImage()");  // FIXME
+  public void setAlignment(Control control, int alignment) {
+    if (control.getControlType() == Control.ControlType.BUTTON && ((control.style & SWT.ARROW) != 0)) {
+      String label;
+      if ((control.style & SWT.UP) != 0) {
+        label = "^";
+      } else if ((control.style & SWT.DOWN) != 0) {
+        label = "v";
+      } else if ((control.style & SWT.LEFT) != 0) {
+        label = "<";
+      } else {
+        label = ">";
+      }
+      ((JButton) control.peer).setText(label);
+    }
   }
 
   @Override
@@ -802,9 +771,7 @@ public class SwingDisplay extends PlatformDisplay {
         break;
       case SWT.Selection:
         switch (control.getControlType()) {
-          case BUTTON:
-          case BUTTON_CHECK:
-          case BUTTON_RADIO: {
+          case BUTTON: {
             AbstractButton button = (AbstractButton) component;
             button.addActionListener(new ActionListener() {
                 @Override

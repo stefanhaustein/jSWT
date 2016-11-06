@@ -94,6 +94,12 @@ public class ControlExample {
 				parent.layout(true, true);
 				return null;
 			}
+		}, new Function<Exception, Void>() {
+			@Override
+			public Void call(Exception param) {
+				param.printStackTrace();
+				return null;
+			}
 		});
 	}
 

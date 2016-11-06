@@ -30,7 +30,7 @@ public class Shell extends Decorations {
   }
 
   ControlType getControlType() {
-    return parent == null ? ControlType.SHELL_ROOT : ControlType.SHELL;
+    return ControlType.SHELL;
   }
 
   public void open() {

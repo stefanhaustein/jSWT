@@ -221,4 +221,8 @@ public class Element extends JavaScriptObject {
     public native final void setReadOnly(boolean b) /*-{
         this.readOnly = b;
     }-*/;
+
+    public native final Element querySelector(String s) /*-{
+        return this.querySelector(s);
+    }-*/;
 }

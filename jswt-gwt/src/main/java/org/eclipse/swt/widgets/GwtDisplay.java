@@ -22,10 +22,20 @@ public class GwtDisplay extends PlatformDisplay {
 
     static HashMap<Control.ControlType,HashMap<Integer,String>> styleMap = new HashMap<>();
 
-
     static String colorToCss(Color color) {
         return color == null ? null
                 : "rgba(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + "," + (color.getAlpha() / 255f) + ")";
+    }
+
+    static Element findList(Control control) {
+        Element element = (Element) control.peer;
+        if (element.getLocalName().equals("select")) {
+            return element;
+        }
+        String id = element.getAttribute("list");
+        log("id", id, element);
+        element = Document.get().getElementById(id);
+        return element;
     }
 
     static int getMinHeight(Element element) {
@@ -62,11 +72,7 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public void addItem(Control control, String s, int index) {
-        if (control.getControlType() == Control.ControlType.COMBO) {
-            log("#### Adding to combo: ", control, s, index);
-        }
-
-        Element element = (Element) control.peer;
+        Element element = findList(control);
         Element before = element.getChildren().get(index);
         Element newItem = createElement("option");
         newItem.setTextContent(s);
@@ -99,37 +105,29 @@ public class GwtDisplay extends PlatformDisplay {
         final Element element = (Element) control.peer;
         switch (eventType) {
             case SWT.Selection:
-                switch (control.getControlType()) {
-                    case BUTTON:
-                        element.addEventListener("click", new EventListener() {
+                if (element.getLocalName().equals("button")) {
+                    element.addEventListener("click", new EventListener() {
+                        @Override
+                        public void onEvent(Event event) {
+                            org.eclipse.swt.widgets.Event swtEvent = new org.eclipse.swt.widgets.Event();
+                            swtEvent.widget = control;
+                            swtEvent.display = GwtDisplay.this;
+                            swtEvent.type = SWT.Selection;
+                            control.notifyListeners(SWT.Selection, swtEvent);
+                        }
+                    });
+                } else {
+                    Element input = element.getLocalName().equals("label") ? element.getFirstElementChild() : element;
+                    input.addEventListener("change", new EventListener() {
                             @Override
                             public void onEvent(Event event) {
-                                org.eclipse.swt.widgets.Event swtEvent = new org.eclipse.swt.widgets.Event();
-                                swtEvent.widget = control;
-                                swtEvent.display = GwtDisplay.this;
-                                swtEvent.type = SWT.Selection;
-                                control.notifyListeners(SWT.Selection, swtEvent);
-                            }
+                            org.eclipse.swt.widgets.Event swtEvent = new org.eclipse.swt.widgets.Event();
+                            swtEvent.widget = control;
+                            swtEvent.display = GwtDisplay.this;
+                            swtEvent.type = SWT.Selection;
+                            control.notifyListeners(SWT.Selection, swtEvent);
+                    }
                         });
-                        break;
-                    case BUTTON_CHECK:
-                    case BUTTON_RADIO:
-                    case SCALE:
-                    case SPINNER:
-                        Element input = element.getLocalName().equals("label") ? element.getFirstElementChild() : element;
-                        input.addEventListener("change", new EventListener() {
-                            @Override
-                            public void onEvent(Event event) {
-                                org.eclipse.swt.widgets.Event swtEvent = new org.eclipse.swt.widgets.Event();
-                                swtEvent.widget = control;
-                                swtEvent.display = GwtDisplay.this;
-                                swtEvent.type = SWT.Selection;
-                                control.notifyListeners(SWT.Selection, swtEvent);
-                            }
-                        });
-                        break;
-                    default:
-                        log("FIXME GwtDisplay.addListener SWT.Selection", control.getControlType().name());
                 }
             default:
                 log("FIXME: GwtDisplay.addListener ", eventType);
@@ -259,9 +257,24 @@ public class GwtDisplay extends PlatformDisplay {
                 }
                 return result;
             }
-            case BUTTON_ARROW:
             case BUTTON: {
-                control.style |= SWT.PUSH;
+                if ((control.style & (SWT.RADIO | SWT.CHECK | SWT.TOGGLE)) != 0) {
+                    Element result = createControlElement(control, "label",
+                            SWT.FLAT, "swt-flat",
+                            SWT.WRAP, "swt-wrap",
+                            SWT.BORDER, "swt-border");
+                    Element input = createElement("input");
+                    Element span = createElement("span");
+                    result.appendChild(input);
+                    result.appendChild(span);
+                    if ((control.style & SWT.RADIO) != 0) {
+                        input.setAttribute("type", "radio");
+                        input.setAttribute("name", "" + control.getParent().hashCode());
+                    } else   {
+                        input.setAttribute("type", "checkbox");
+                    }
+                    return result;
+                }
                 Element element = createControlElement(control, "button",
                         SWT.FLAT, "swt-flat",
                         SWT.WRAP, "swt-wrap",
@@ -270,27 +283,21 @@ public class GwtDisplay extends PlatformDisplay {
                 element.appendChild(span);
                 return element;
             }
-            case BUTTON_TOGGLE:
-            case BUTTON_CHECK:
-            case BUTTON_RADIO: {
-                Element result = createControlElement(control, "label",
-                        SWT.FLAT, "swt-flat",
-                        SWT.WRAP, "swt-wrap",
-                        SWT.BORDER, "swt-border");
-                Element input = createElement("input");
-                Element span = createElement("span");
-                result.appendChild(input);
-                result.appendChild(span);
-                if (control.getControlType() == Control.ControlType.BUTTON_RADIO) {
-                    input.setAttribute("type", "radio");
-                    input.setAttribute("name", "" + control.getParent().hashCode());
-                } else {
-                    input.setAttribute("type", "checkbox");
+            case COMBO: {
+                if ((control.style & SWT.READ_ONLY) != 0) {
+                    return createControlElement(control, "select");
                 }
-                return result;
+                String id = generateId();
+                Element input = createControlElement(control, "input");
+                input.setAttribute("list", id);
+
+                Element datalist = createElement("datalist");
+                datalist.setAttribute("id", id);
+                Element container = Document.get().getBody();
+                container.appendChild(datalist);
+
+                return input;
             }
-            case COMBO:
-                return createControlElement(control, "select");
             case LIST: {
                 Element result = createControlElement(control, "select");
                 result.setAttribute("size", "8");
@@ -324,28 +331,29 @@ public class GwtDisplay extends PlatformDisplay {
                 if ((control.style & SWT.VERTICAL) != 0) {
                     result.setAttribute("orient", "vertical");
                     result.getStyle().set("WebkitAppearance", "slider-vertical");
+                } else {
+                    control.style |= SWT.HORIZONTAL;
                 }
                 return result;
             }
-            case SHELL_ROOT: {
-                Element shell = createElement("swt-shell-root");
-                shell.setAttribute("style", "display:block;width:100%;min-height:100vh;margin:auto;position:relative");
-                //   Document.get().getBody().setAttribute("style", "min-height:100%");
-                //   Document.get().getBody().getParentElement().setAttribute("style", "height:100%");
-                Document.get().getBody().appendChild(shell);
-
-                // FIXME
-                Window.get().addEventListener("resize", new EventListener() {
-                    @Override
-                    public void onEvent(Event event) {
-                        // FIXME: Use cached sizes!
-                        ((Shell) control).layout(true, true);
-                    }
-                });
-
-                return shell;
-            }
             case SHELL: {
+                if (control.getParent() == null) {
+                    Element shell = createElement("swt-shell-root");
+                    shell.setAttribute("style", "display:block;width:100%;min-height:100vh;margin:auto;position:relative");
+                    //   Document.get().getBody().setAttribute("style", "min-height:100%");
+                    //   Document.get().getBody().getParentElement().setAttribute("style", "height:100%");
+                    Document.get().getBody().appendChild(shell);
+
+                    // FIXME
+                    Window.get().addEventListener("resize", new EventListener() {
+                        @Override
+                        public void onEvent(Event event) {
+                            // FIXME: Use cached sizes!
+                            ((Shell) control).layout(true, true);
+                        }
+                    });
+                    return shell;
+                }
                 Element background = createElement("swt-shell-background");
                 background.setAttribute("style", "visibility:hidden;display:block;width:100%;min-height:100vh;margin:auto;position:absolute;left:0;top:0;background-color:rgba(0,0,0,0.3)");
                 Element dialogShell = createControlElement(control, "swt-shell");
@@ -364,7 +372,6 @@ public class GwtDisplay extends PlatformDisplay {
                 label.getStyle().setDisplay("none");
                 dialogShell.appendChild(label);
                 return dialogShell;
-
             }
             case LABEL: {
                 Element result = createControlElement(control, "swt-label",
@@ -414,6 +421,12 @@ public class GwtDisplay extends PlatformDisplay {
             default:
                 throw new RuntimeException("FIXME: GwtDisplay.createControlElement type " + control.getControlType());
         }
+    }
+
+    static int nextId = 0;
+
+    private static String generateId() {
+        return "swtid" + String.valueOf(nextId++);
     }
 
     @Override
@@ -498,19 +511,22 @@ public class GwtDisplay extends PlatformDisplay {
 
 
     @Override
-    public Insets getInsets(Scrollable scrollable) {
-        Element element = ((Element) scrollable.peer);
-        switch (scrollable.getControlType()) {
+    public Insets getInsets(Scrollable control) {
+        Element element = ((Element) control.peer);
+        switch (control.getControlType()) {
             case TAB_FOLDER:
                 return ((GwtTabFolder) element).getInsets();
             case GROUP:
                 return computeInsets(element.getFirstElementChild());
 
             case SHELL: {
+                if (control.getParent() == null) {
+                    return new Insets();
+                }
                 Insets result = computeInsets(element);
 /*                Insets result = new Insets();
                 result.left = result.right = result.bottom = result.top = 12; */
-                Element label = ((Element) scrollable.peer).getFirstElementChild();
+                Element label = ((Element) control.peer).getFirstElementChild();
                 if (!"none".equals(label.getStyle().getDisplay())) {
                     result.top += getMinHeight(label);
                 }
@@ -523,7 +539,7 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public int getItemCount(Control control) {
-        return ((Element) control.peer).getChildElementCount();
+        return findList(control).getChildElementCount();
     }
 
     @Override
@@ -556,7 +572,7 @@ public class GwtDisplay extends PlatformDisplay {
     public void openShell(Shell shell) {
         //Element.getBody().appendChild((Element) shell.peer);
     //
-        if (shell.getControlType() == Control.ControlType.SHELL) {
+        if (shell.getParent() != null) {
             Point dialogSize = shell.getSize();
             Point parentSize = shell.getParent().getSize();
             shell.setLocation((parentSize.x - dialogSize.x) / 2, (parentSize.y - dialogSize.y) / 3);
@@ -605,7 +621,7 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public void setBounds(Control control, int x, int y, int w, int h) {
-        if (control.getControlType() == Control.ControlType.SHELL_ROOT) {
+        if (control.getParent() == null) {
             return;
         }
 
@@ -668,13 +684,14 @@ public class GwtDisplay extends PlatformDisplay {
     public void setText(Control control, String s) {
         Element element = (Element) control.peer;
         switch (control.getControlType()) {
-            case SHELL_ROOT:
-                Document.get().setTitle(s);
-                break;
             case SHELL: {
-                Element title = element.getFirstElementChild();
-                title.setTextContent(s);
-                title.setAttribute("style", s.isEmpty() ? "display:none" : "");
+                if (control.getParent() == null) {
+                    Document.get().setTitle(s);
+                } else {
+                    Element title = element.getFirstElementChild();
+                    title.setTextContent(s);
+                    title.setAttribute("style", s.isEmpty() ? "display:none" : "");
+                }
                 break;
             }
             case GROUP: {
@@ -684,17 +701,14 @@ public class GwtDisplay extends PlatformDisplay {
                 break;
             }
             case BUTTON:
-            case BUTTON_CHECK:
-            case BUTTON_RADIO:
-            case BUTTON_TOGGLE:
-                element.getLastElementChild().setTextContent(s);
+                if ((control.style & SWT.ARROW) == 0) {
+                    element.getLastElementChild().setTextContent(s);
+                }
                 break;
             case LABEL:
                 if ((control.getStyle() & SWT.SEPARATOR) == 0) {
                     element.setTextContent(s);
                 }
-                break;
-            case BUTTON_ARROW:
                 break;
             case TEXT:
                 if ((control.style & SWT.MULTI) != 0) {
@@ -759,10 +773,10 @@ public class GwtDisplay extends PlatformDisplay {
     public void setSelection(Control control, int selection) {
         Element element = ((Element) control.peer);
         switch (control.getControlType()) {
-            case BUTTON_RADIO:
-            case BUTTON_TOGGLE:
-            case BUTTON_CHECK:
-                element.getFirstElementChild().setChecked(selection != 0);
+            case BUTTON:
+                if (element.getLocalName().equals("label")) {
+                    element.getFirstElementChild().setChecked(selection != 0);
+                }
                 break;
             case LIST:
             case COMBO:
@@ -794,9 +808,6 @@ public class GwtDisplay extends PlatformDisplay {
                 if ((control.style & SWT.INDETERMINATE) == 0) {
                     element.setValue(String.valueOf(selection - ((ProgressBar) control).getMinimum()));
                 }
-                break;
-            case BUTTON:
-            case BUTTON_ARROW:
                 break;
             default:
                 unsupported(control, "setSelection");
@@ -832,19 +843,20 @@ public class GwtDisplay extends PlatformDisplay {
     public void setImage(Control control, Image image) {
         Element element = (Element) control.peer;
         switch (control.getControlType()) {
-            case BUTTON_CHECK:
-            case BUTTON_RADIO:
-            case BUTTON_TOGGLE:
-                if(!element.getFirstElementChild().getNextElementSibling().getLocalName().equals("span")) {
-                    element.removeChild(element.getFirstElementChild().getNextElementSibling());
-                }
-                if (image != null) {
-                    Element img = (Element) image.peer;
-                    element.insertBefore(img.cloneNode(false), element.getLastElementChild());
+            case BUTTON:
+                if ((control.style & SWT.ARROW) == 0) {
+                    Element imgElement = element.querySelector("img");
+                    if (imgElement != null) {
+                        imgElement.getParentElement().removeChild(imgElement);
+                    }
+                    if (image != null && (control.style & SWT.ARROW) == 0) {
+                        Element img = (Element) image.peer;
+                        element.insertBefore(img.cloneNode(false), element.getLastElementChild());
+                    }
                 }
                 break;
             case LABEL:
-                if ((control.getStyle() & SWT.SEPARATOR) == 0) {
+                if ((control.style & SWT.SEPARATOR) == 0) {
                     if (image == null) {
                         element.setTextContent(((Label) control).getText());
                     } else {
@@ -855,15 +867,6 @@ public class GwtDisplay extends PlatformDisplay {
                 }
                 break;
 
-            case BUTTON:
-                if(element.getFirstElementChild().getLocalName().equals("img")) {
-                    element.removeChild(element.getFirstElementChild());
-                }
-                if (image != null) {
-                    Element img = (Element) image.peer;
-                    element.insertBefore(img.cloneNode(false), element.getLastElementChild());
-                }
-                break;
             default:
                 unsupported(control, "setImage");
         }
@@ -873,7 +876,7 @@ public class GwtDisplay extends PlatformDisplay {
     public void setAlignment(Control button, int alignment) {
         Element element = (Element) button.peer;
         String value = "";
-        if (button.getControlType() == Control.ControlType.BUTTON_ARROW) {
+        if ((button.style & SWT.ARROW) != 0) {
             switch (alignment) {
                 case SWT.LEFT:
                     value = "\u25c0";
@@ -917,7 +920,7 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public void setItem(Control control, int index, String string) {
-        Element element = (Element) control.peer;
+        Element element = findList(control);
         element.getChildren().get(index).setTextContent(string);
     }
 
@@ -929,7 +932,7 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public String getItem(Control control, int index) {
-        Element element = (Element) control.peer;
+        Element element = findList(control);
         return element.getChildren().get(index).getTextContent();
     }
 
@@ -943,13 +946,8 @@ public class GwtDisplay extends PlatformDisplay {
     public int getSelection(Control control) {
         Element element = (Element) control.peer;
         switch (control.getControlType()) {
-            case BUTTON_ARROW:
             case BUTTON:
-                return 0;
-            case BUTTON_CHECK:
-            case BUTTON_RADIO:
-            case BUTTON_TOGGLE:
-                Element input = element.getFirstElementChild();
+                Element input = element.querySelector("input");
                 return input != null && input.getChecked() ? 1 : 0;
             case LIST:
             case COMBO:

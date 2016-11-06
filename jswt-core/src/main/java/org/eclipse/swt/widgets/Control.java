@@ -14,12 +14,12 @@ public class Control extends Widget {
   static final boolean DEBUG_LAYOUT = false;
 
   enum ControlType {
-      BUTTON, BUTTON_ARROW, BUTTON_CHECK, BUTTON_RADIO, BUTTON_TOGGLE,
+      BUTTON,
       CANVAS, COMBO, COMPOSITE,
       GROUP,
       LABEL, LIST,
       PROGRESS_BAR,
-      SCALE, SHELL, SHELL_ROOT, SLIDER, SCROLLED_COMPOSITE, SPINNER,
+      SCALE, SHELL, SLIDER, SCROLLED_COMPOSITE, SPINNER,
       TAB_FOLDER, TEXT};
 
   Menu menu;

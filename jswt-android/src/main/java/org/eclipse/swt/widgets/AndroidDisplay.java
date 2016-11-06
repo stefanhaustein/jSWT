@@ -100,21 +100,21 @@ public class AndroidDisplay extends PlatformDisplay {
   public Object createControl(final Control control) {
     switch (control.getControlType()) {
       case BUTTON:
+        if ((control.style & SWT.RADIO) != 0) {
+          RadioButton radioButton = new AppCompatRadioButton(activity);
+          radioButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+              handleRadioGroup((Button) control, b);
+              control.notifyListeners(SWT.Selection, null);
+            }
+          });
+          return radioButton;
+        }
+        if ((control.style & (SWT.CHECK | SWT.TOGGLE)) != 0) {
+          return new AppCompatCheckBox(activity);
+        }
         return new AppCompatButton(activity);
-      case BUTTON_CHECK:
-      case BUTTON_TOGGLE:
-        return new AppCompatCheckBox(activity);
-      case BUTTON_RADIO: {
-        RadioButton radioButton = new AppCompatRadioButton(activity);
-        radioButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-          @Override
-          public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-            handleRadioGroup((Button) control, b);
-            control.notifyListeners(SWT.Selection, null);
-          }
-        });
-        return radioButton;
-      }
       case COMBO: {
         android.widget.Spinner spinner = new android.widget.Spinner(activity);
         spinner.setAdapter(new ArrayAdapter<String>(activity, android.R.layout.simple_dropdown_item_1line));
@@ -140,7 +140,6 @@ public class AndroidDisplay extends PlatformDisplay {
       case SLIDER:
         return new android.widget.SeekBar(activity);
       case SHELL:
-      case SHELL_ROOT:
         return new AndroidShell(activity, (Shell) control);
       case TAB_FOLDER:
         return new AndroidTabFolder(activity);
@@ -429,8 +428,20 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
-  public void setAlignment(Control button, int alignment) {
-    throw new RuntimeException("NYI");
+  public void setAlignment(Control control, int alignment) {
+    if (control.getControlType() == Control.ControlType.BUTTON && ((control.style & SWT.ARROW) != 0)) {
+      String label;
+      if ((control.style & SWT.UP) != 0) {
+        label = "^";
+      } else if ((control.style & SWT.DOWN) != 0) {
+        label = "v";
+      } else if ((control.style & SWT.LEFT) != 0) {
+        label = "<";
+      } else {
+        label = ">";
+      }
+      ((android.widget.Button) control.peer).setText(label);
+    }
   }
 
   @Override
@@ -492,15 +503,13 @@ public class AndroidDisplay extends PlatformDisplay {
   @Override
   public void setSelection(Control control, int selection) {
     switch (control.getControlType()) {
-      case BUTTON_ARROW:
       case BUTTON:
-        break;
-      case BUTTON_RADIO:
-        handleRadioGroup((Button) control, selection != 0);
-        // Fallthrough intended
-      case BUTTON_CHECK:
-      case BUTTON_TOGGLE:
-        ((CompoundButton) control.peer).setChecked(selection != 0);
+        if ((control.style & SWT.RADIO) != 0) {
+          handleRadioGroup((Button) control, selection != 0);
+        }
+        if ((control.style & (SWT.RADIO | SWT.TOGGLE | SWT.CHECK)) != 0) {
+          ((CompoundButton) control.peer).setChecked(selection != 0);
+        }
         break;
       case SLIDER:
       case SCALE:
@@ -544,13 +553,11 @@ public class AndroidDisplay extends PlatformDisplay {
   @Override
   public int getSelection(Control control) {
     switch (control.getControlType()) {
-      case BUTTON_ARROW:
       case BUTTON:
+        if ((control.style & (SWT.CHECK | SWT.RADIO | SWT.TOGGLE)) != 0) {
+          return ((CompoundButton) control.peer).isChecked() ? 1 : 0;
+        }
         return 0;
-      case BUTTON_CHECK:
-      case BUTTON_RADIO:
-      case BUTTON_TOGGLE:
-        return ((CompoundButton) control.peer).isChecked() ? 1 : 0;
       case SCALE:
       case SLIDER:
       case PROGRESS_BAR:
