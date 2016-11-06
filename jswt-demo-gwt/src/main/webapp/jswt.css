@@ -1,3 +1,7 @@
+/*
+ * Common and Controls
+ */
+
 swt-tabfolder,
 swt-composite,
 swt-label,
@@ -5,6 +9,7 @@ swt-label-separator,
 swt-group,
 swt-shell-dialog,
 swt-slider,
+swt-shell,
 .swt-control {
     box-sizing: border-box;
     position: absolute;
@@ -49,9 +54,8 @@ label.swt-disabled {
 }
 
 
-/* Group */
-
-swt-group-border {
+swt-shell-decoration,
+swt-group-decoration {
     display: block;
     height: auto;
     top: 0;
@@ -59,19 +63,31 @@ swt-group-border {
     left: 0;
     right: 0;
     position: absolute;
-    margin: 8px 4px 4px 4px;
-    border: 1px solid darkgray;
-    padding: 8px 4px 4px 4px;
     visibility: inherit;
     overflow: hidden;
 }
 
+/*
+ * Group
+ */
 
-swt-group-border.swt-shadow-out {
+swt-group-decoration {
+    margin: 4px;
+    border: 1px solid darkgray;
+    padding: 4px;
+}
+
+swt-group-decoration.swt-title {
+    margin-top: 8px;
+    padding-top: 8px;
+}
+
+
+swt-group-decoration.swt-shadow-out {
     box-shadow: 4px 4px 4px grey;
 }
 
-swt-group-border.swt-shadow-in {
+swt-group-decoration.swt-shadow-in {
     box-shadow: inset 4px 4px 4px grey;
 }
 
@@ -84,27 +100,9 @@ swt-group-text {
     visibility: inherit;
 }
 
-/* shell (dialog) */
-
-swt-shell {
-    box-shadow: 4px 4px 16px;
-    padding: 12px;
-}
-
-swt-shell-text {
-    display: block;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    visibility: inherit;
-    background-color: #7baaf7;
-    color: white;
-    padding: 12px;
-}
-
-
-/* Separators */
+/*
+ * Label
+ */
 
 swt-label-separator {
     position:absolute;
@@ -125,7 +123,65 @@ swt-label-separator.swt-horizontal{
 }
 
 
-/* TabFolder */
+/*
+ * Shell (dialog) 
+ */
+
+swt-shell {
+    box-shadow: 4px 4px 16px;
+    background-color: white;
+}
+
+swt-shell-background {
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width:100%;
+    min-height:100vh;
+    margin:auto;
+    background-color:rgba(0,0,0,0.3)
+}
+
+swt-shell-text {
+    display: block;
+    position: relative;
+    left: 12px;
+    visibility: inherit;
+    color: white;
+    padding: 12px;
+}
+
+swt-shell-decoration.swt-border {
+    padding: 12px;
+}
+
+swt-shell-decoration.swt-title {
+    border-top: 36px solid #7baaf7;
+}
+
+
+/*
+ * Slider
+ */
+
+swt-slider-outer {
+    display: block;
+    visibility: inherit;
+}
+
+swt-slider-inner {
+    display: block;
+    visibility: inherit;
+    height: 1px;
+    width: 1px;
+}
+
+/*
+ * TabFolder
+ */
 
 swt-tabbar {
     white-space: normal;
@@ -147,14 +203,3 @@ swt-tab.selected {
     background-color: white;
 }
 
-swt-slider-outer {
-    display: block;
-    visibility: inherit;
-}
-
-swt-slider-inner {
-    display: block;
-    visibility: inherit;
-    height: 1px;
-    width: 1px;
-}

@@ -3,7 +3,6 @@ package org.eclipse.swt.widgets;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
@@ -186,7 +185,7 @@ public class Composite extends Scrollable {
   void removeChild(Widget widget) {
     children.remove(widget);
     if (widget instanceof Control) {
-      display.removeChild(this, (Control) widget);
+      display.dispose((Control) widget);
     }
   }
 

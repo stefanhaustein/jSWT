@@ -9,7 +9,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -500,7 +499,7 @@ public class SwingDisplay extends PlatformDisplay {
 */
 
   @Override
-  public void removeChild(Composite composite, Control child) {
+  public void dispose(Control child) {
     if (child.getControlType() == Control.ControlType.SHELL) {
       SwingUtilities.getRoot((Component) child.peer).setVisible(false);
     } else {

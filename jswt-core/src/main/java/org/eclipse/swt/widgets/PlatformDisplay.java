@@ -62,7 +62,7 @@ public abstract class PlatformDisplay extends Display {
 
   public abstract void removeItems(Control control, int start, int end);
 
-  public abstract void removeChild(Composite composite, Control child);
+  public abstract void dispose(Control child);
 
   public abstract void setBackground(Control control, Color color);
 

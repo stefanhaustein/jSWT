@@ -587,7 +587,7 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
-  public void removeChild(Composite composite, Control child) {
+  public void dispose(Control child) {
     ((ViewGroup) composite.peer).removeView((View) child.peer);
   }
 
