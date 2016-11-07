@@ -1,6 +1,7 @@
 package org.eclipse.swt.widgets;
 
 import com.google.gwt.core.client.JsArrayNumber;
+import java.util.ArrayList;
 import java.util.HashMap;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -80,6 +81,21 @@ public class GwtDisplay extends PlatformDisplay {
         }
     }-*/;
 
+    ArrayList<Shell> rootShells = new ArrayList<Shell>();
+
+    public GwtDisplay() {
+        Window.get().addEventListener("resize", new EventListener() {
+            @Override
+            public void onEvent(Event event) {
+                // FIXME: Top only, rest on demand?
+                for (Shell shell: rootShells){
+                    shell.layout(true, true);
+                }
+            }
+        });
+
+    }
+
     public void asyncExec(Runnable runnable) {
         runnable.run();                                   // FIXME
     }
@@ -93,6 +109,7 @@ public class GwtDisplay extends PlatformDisplay {
         element.insertBefore(newItem, before);
     }
 
+    // FIXME: Remove addChild() from SWT, move the work to createPeer!
     @Override
     public void addChild(Composite parent, Control child) {
         Element parentElement = (Element) parent.peer;
@@ -102,11 +119,9 @@ public class GwtDisplay extends PlatformDisplay {
                 // Do nothing
                 break;
             case SHELL:
-            case GROUP:  // dialogs, too?
-                if (parent.getParent() != null) {
-                    parentElement.getFirstElementChild().appendChild(childElement);
-                    break;
-                }
+            case GROUP:
+                parentElement.getFirstElementChild().appendChild(childElement);
+                break;
             default:
                 parentElement.appendChild(childElement);
         }
@@ -149,7 +164,6 @@ public class GwtDisplay extends PlatformDisplay {
             default:
                 log("FIXME: GwtDisplay.addListener ", eventType);
         }
-
     }
 
     @Override
@@ -354,33 +368,20 @@ public class GwtDisplay extends PlatformDisplay {
                 return result;
             }
             case SHELL: {
+                Element element = createControlElement(control, "swt-shell");
                 if (control.getParent() == null) {
-                    Element shell = createElement("swt-shell-root");
-                    shell.setAttribute("style", "display:block;width:100%;min-height:100vh;margin:auto;position:relative");
-                    //   Document.get().getBody().setAttribute("style", "min-height:100%");
-                    //   Document.get().getBody().getParentElement().setAttribute("style", "height:100%");
-                    Document.get().getBody().appendChild(shell);
+                    element.getClassList().add("swt-root");
+                    Document.get().getBody().appendChild(element);
+                    rootShells.add((Shell) control);
+                    control.style &= ~(SWT.BORDER | SWT.TITLE);
 
-                    // FIXME
-                    Window.get().addEventListener("resize", new EventListener() {
-                        @Override
-                        public void onEvent(Event event) {
-                            // FIXME: Use cached sizes!
-                            ((Shell) control).layout(true, true);
-                        }
-                    });
-                    return shell;
+                } else {
+                    element.getClassList().add("swt-child");
+                    Element background = createElement("swt-shell-background");
+                    background.getStyle().setVisibility("hidden");
+                    Document.get().getBody().appendChild(background);
+                    background.appendChild(element);
                 }
-                Element background = createElement("swt-shell-background");
-                background.getStyle().setVisibility("hidden");
-                Document.get().getBody().appendChild(background);
-
-                Element dialogShell = createControlElement(control, "swt-shell");
-                background.appendChild(dialogShell);
-
-                // FIXME: the dialog is inserted here because addChidl is not symmetrical: 
-                // FIXME: addChild is not called for dialogs, but dispose is called.
-
                 Element border = createControlElement(control, "swt-shell-decoration",
                         SWT.NO_TRIM, "swt-no-trim",
                         SWT.NO_MOVE, "swt-no-move",
@@ -393,12 +394,14 @@ public class GwtDisplay extends PlatformDisplay {
                         SWT.ON_TOP, "swt-on-top",
                         SWT.TOOL, "swt-tool",
                         SWT.SHEET, "swt-sheet");
-                dialogShell.appendChild(border);
+                element.appendChild(border);
 
-                Element label = createElement("swt-shell-text");
-                label.getStyle().setDisplay("none");
-                dialogShell.appendChild(label);
-                return dialogShell;
+                if ((control.style & SWT.TITLE) != 0) {
+                    Element label = createElement("swt-shell-text");
+                    element.appendChild(label);
+                }
+
+                return element;
             }
             case LABEL: {
                 Element result = createControlElement(control, "swt-label",
@@ -471,11 +474,6 @@ public class GwtDisplay extends PlatformDisplay {
     @Override
     public GC creatGCForPlatformImage(Object platformImage) {
         throw new RuntimeException("FIXME: GwtDisplay.GCForPlatformImage");
-    }
-
-    @Override
-    public void disposeRootShell(Shell shell) {
-        throw new RuntimeException("FIXME: GwtDisplay.disposeRootShell");
     }
 
     @Override
@@ -597,22 +595,25 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public void openShell(Shell shell) {
-        //Element.getBody().appendChild((Element) shell.peer);
-
+        Element moveToTop = (Element) shell.peer;
         if (shell.getParent() == null) {
             shell.layout(true, true);   // FIXME
-            shell.setVisible(true);
-            return;
+            rootShells.remove(shell);
+            rootShells.add(shell);
+            updateWindowTitle();
+        } else {
+            Point dialogSize = shell.getSize();
+            Point parentSize = shell.getParent().getSize();
+            shell.setLocation((parentSize.x - dialogSize.x) / 2, (parentSize.y - dialogSize.y) / 3);
+            ((Element) shell.peer).getParentElement().getStyle().setVisibility("visible");
+            moveToTop = moveToTop.getParentElement();
         }
-        Point dialogSize = shell.getSize();
-        Point parentSize = shell.getParent().getSize();
-        shell.setLocation((parentSize.x - dialogSize.x) / 2, (parentSize.y - dialogSize.y) / 3);
-        ((Element) shell.peer).getParentElement().getStyle().setVisibility("visible");
+        Document.get().getBody().appendChild(moveToTop);
+        shell.setVisible(true);
     }
 
     @Override
-    public void dispose(Control control) {
-        Composite parent = control.getParent();
+    public void disposePeer(Control control) {
         Element element = (Element) control.peer;
         if (control.getControlType() == Control.ControlType.SHELL && control.getParent() != null) {
             Element background = element.getParentElement();
@@ -623,6 +624,11 @@ public class GwtDisplay extends PlatformDisplay {
                 parentElement.removeChild(element);
             }
         }
+
+        if (control.getControlType() == Control.ControlType.SHELL && control.getParent() == null) {
+            rootShells.remove((Shell) control);
+            updateWindowTitle();
+        }
     }
 
     @Override
@@ -630,7 +636,7 @@ public class GwtDisplay extends PlatformDisplay {
         Element element = (Element) control.peer;
         String cssColor = colorToCss(color);
         if (control.getControlType() == Control.ControlType.GROUP ||
-                control.getControlType() == Control.ControlType.SHELL && control.getParent() != null) {
+                control.getControlType() == Control.ControlType.SHELL) {
             element.getFirstElementChild().getStyle().setBackgroundColor(cssColor);
             element.getLastElementChild().getStyle().setBackgroundColor(cssColor);
         } else {
@@ -643,7 +649,7 @@ public class GwtDisplay extends PlatformDisplay {
         Element element = (Element) control.peer;
         String src = image == null ? null : ((Element) image.peer).getAttribute("src");
         if (control.getControlType() == Control.ControlType.GROUP ||
-            control.getControlType() == Control.ControlType.SHELL && control.getParent() != null) {
+            control.getControlType() == Control.ControlType.SHELL) {
                  element = element.getFirstElementChild();
         }
         element.getStyle().setBackgroundImage(src != null && !src.isEmpty() ? ("url(" + src + ")") : null);
@@ -739,11 +745,10 @@ public class GwtDisplay extends PlatformDisplay {
             }
             case SHELL:
                 if (control.getParent() == null) {
-                    Document.get().setTitle(text);
-                } else {
-                    Element title = element.getFirstElementChild().getNextElementSibling();
+                    updateWindowTitle();
+                } else if ((control.style & SWT.TITLE) != 0) {
+                    Element title = element.getLastElementChild();
                     title.setTextContent(text);
-                    title.setAttribute("style", text == null || text.isEmpty() ? "display:none" : "");
                 }
                break;
             case LABEL:
@@ -764,7 +769,11 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public void setVisible(Control control, boolean visible) {
-        ((Element) control.peer).getStyle().setVisibility(visible ? "" : "hidden");
+        Element element = (Element) control.peer;
+        if (control.getControlType() == Control.ControlType.SHELL && control.getParent() != null) {
+            element = element.getParentElement();
+        }
+        element.getStyle().setVisibility(visible ? null : "hidden");
     }
 
     void updateSlider(Slider slider) {
@@ -878,6 +887,12 @@ public class GwtDisplay extends PlatformDisplay {
     @Override
     public void updateTab(TabFolder tabFolder, int index, TabItem tabItem) {
         ((GwtTabFolder) tabFolder.peer).updateTab(index, tabItem);
+    }
+
+    void updateWindowTitle() {
+        if (rootShells.size() > 0) {
+            Document.get().setTitle(rootShells.get(rootShells.size() - 1).text);
+        }
     }
 
     @Override

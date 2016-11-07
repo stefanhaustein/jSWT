@@ -2,14 +2,13 @@
  * Common and Controls
  */
 
-swt-tabfolder,
 swt-composite,
+swt-group,
 swt-label,
 swt-label-separator,
-swt-group,
-swt-shell-dialog,
 swt-slider,
 swt-shell,
+swt-tabfolder,
 .swt-control {
     box-sizing: border-box;
     position: absolute;
@@ -124,12 +123,28 @@ swt-label-separator.swt-horizontal{
 
 
 /*
- * Shell (dialog) 
+ * Shell
  */
 
 swt-shell {
-    box-shadow: 4px 4px 16px;
     background-color: white;
+}
+
+swt-shell.swt-child {
+    box-shadow: 4px 4px 16px;
+}
+
+swt-shell.swt-root {
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    margin: 0;
+    width: 100%;
+    min-width: 100%;
+    height: 100vh;
+    min-height: 100vh;
+    overflow: hidden;
 }
 
 swt-shell-background {
@@ -154,11 +169,11 @@ swt-shell-text {
     padding: 12px;
 }
 
-swt-shell-decoration.swt-border {
+swt-shell.swt-child > swt-shell-decoration.swt-border {
     padding: 12px;
 }
 
-swt-shell-decoration.swt-title {
+swt-shell.swt-child > swt-shell-decoration.swt-title {
     border-top: 36px solid #7baaf7;
 }
 
