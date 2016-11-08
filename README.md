@@ -59,19 +59,15 @@ on different platforms without re-implementing the UI.
   <td>
 <tr>
   <td> CoolBar
-  <td colspan="3" align="center"> Not available
+  <td colspan="3" rowspan="5" align="center"> Not available
 <tr>
   <td> CTabFolder
-  <td colsoan="3" align="center"> Not available
 <tr>
   <td> CoolBar
-  <td colspan="3" align="center"> Not available
 <tr>
   <td> DateTime
-  <td colsoan="3" align="center"> Not available
 <tr>
   <td> ExpandBar
-  <td colspan="3" align="center"> Not available
 <tr>
   <td> Group
   <td>
@@ -84,7 +80,7 @@ on different platforms without re-implementing the UI.
   <td>
 <tr>
   <td> Link
-  <td colsoan="3" align="center"> Not available
+  <td colspan="3" align="center"> Not available
 <tr>
   <td> List
   <td> *
@@ -102,7 +98,7 @@ on different platforms without re-implementing the UI.
   <td>
 <tr>
   <td> Sash
-  <td colsoan="3" align="center"> Not available
+  <td colspan="3" align="center"> Not available
 <tr>
   <td> ScrolledComposite
   <td> *
@@ -144,13 +140,11 @@ on different platforms without re-implementing the UI.
   <td>
 <tr>
   <td> ToolBar
-  <td colspan="3" align="center"> Not available
+  <td colspan="3" rowspan="3" align="center"> Not available
 <tr>
   <td> Tray
-  <td colspan="3" align="center"> Not available
 <tr>
   <td> Tree
-  <td colspan="3" align="center"> Not available
 
 </table>
 
