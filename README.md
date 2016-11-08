@@ -10,7 +10,37 @@ on differnet platforms without re-implementing the UI.
 ## Components
 
 <table>
-<tr><td> Component      <td> Generlal         <td> Android           <td> GWT
+<tr>
+  <td> Component
+  <td> General / API
+  <td> Android
+  <td> GWT
+<tr>
+  <td> Browser
+  <td colspan="3"> Unsupported (but should be straightforward to add)
+<tr>
+  <td> Button
+  <td> setGrayed() / getGrayed() missing
+<tr>
+  <td> Button (SWT.ARROW)
+  <td>
+  <td colspan="2"> Push button with unicode arrows
+<tr>
+  <td> Button (SWT.CHECK)
+  <td>
+  <td> No image
+  <td>
+<tr>
+  <td> Button (SWT.PUSH)
+  <td>
+  <td>
+  <td>
+<tr>
+  <td> Button (SWT.RADIO)
+  <td>
+  <td> No image
+  <td>
+
 
 </table>
 
