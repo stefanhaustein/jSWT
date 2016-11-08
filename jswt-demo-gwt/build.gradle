@@ -26,7 +26,7 @@ gwt {
     evaluationDependsOn(':jswt-core')
     evaluationDependsOn(':jswt-demo-core')
 
-    gwtVersion = '2.7.0'
+    gwtVersion = '2.8.0'
 
     modules 'JswtDemoGwt'
 

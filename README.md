@@ -6,24 +6,14 @@ on differnet platforms without re-implementing the UI.
 
 ![Screenshot](https://raw.githubusercontent.com/stefanhaustein/jSWT/master/img/screenshot.png)
 
-## Todo
 
-- Spinner, ComboBox, Progress bars
-- Missing methods
-- GWT events
-- Image support
-- Android toolbar / GWT menu support 
-- Figure out how to support platform-style dialog buttons.
+## Components
 
-## Done
+<table>
+<tr><td> Component      <td> Generlal         <td> Android           <td> GWT
 
-- 2016-08-11 GWT GC improvements, slider
-- 2016-07-28 Improved ScrolledComposite handling
-- 2016-07-27 ScrollBar starting point
-- 2016-07-26 Turned demo into a stateful class, landscape / portrait adjustment
-- 2016-07-25 Checkbox / Radio button selection, EditText issues
-- 2016-07-24 Some Dialog support, resize listeners, checkboxes
-- 2016-07-23 Android menuBar support (via DrawerLayout)
+</table>
+
 
 
 ## Unsupported
