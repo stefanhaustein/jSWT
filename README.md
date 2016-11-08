@@ -7,12 +7,12 @@ on different platforms without re-implementing the UI.
 ![Screenshot](https://raw.githubusercontent.com/stefanhaustein/jSWT/master/img/screenshot.png)
 
 
-## Components
+## Component Support State
 
 <table style="table-layout:fixed; vertical-align: top">
 <tr>
   <td> Component
-  <td> General / API
+  <td> Common / API
   <td> Android
   <td> GWT
 <tr>
@@ -43,40 +43,38 @@ on different platforms without re-implementing the UI.
 <tr>
   <td> -SWT.TOGGLE
   <td>
-  <td colspan="2">Rendered as checkbox
+  <td colspan="2" align="center">Rendered as checkbox
 <tr>
   <td> Canvas
-  <td colspan="3"> Missing: scroll support, getCaret(), getIME(), scrol(), setCaret(), setIME()
+  <td colspan="3"> Missing: scroll support, getCaret(), getIME(), scroll(), setCaret(), setIME()
 <tr>
   <td> Combo
-  <td> (TBD)
+  <td> *
   <td> No free text
   <td>
 <tr>
   <td> Composite
-  <td> (TBD)
+  <td> *
   <td>
   <td>
 <tr>
   <td> CoolBar
-  <td colspan="3" rowspan="5" align="center"> Not available
+  <td colspan="3" rowspan="4" align="center"> Not available
 <tr>
   <td> CTabFolder
-<tr>
-  <td> CoolBar
 <tr>
   <td> DateTime
 <tr>
   <td> ExpandBar
 <tr>
   <td> Group
-  <td>
+  <td> Complete
   <td> Currently no text and border
   <td>
 <tr>
   <td> Label
-  <td>
-  <td> Currently no wrapping and separator support
+  <td> Complete
+  <td> Currently no wrapping, image and separator support
   <td>
 <tr>
   <td> Link
@@ -93,7 +91,7 @@ on different platforms without re-implementing the UI.
   <td> Not available
 <tr>
   <td> ProgressBar
-  <td> *
+  <td> Missing: getState(), setState()
   <td>
   <td>
 <tr>
@@ -109,12 +107,12 @@ on different platforms without re-implementing the UI.
   <td colspan="3"> Only one root shell visible, several decorations missing, dialog shells can't be freely positioned.
 <tr>
   <td> Slider
-  <td> *
+  <td> Complete
   <td> Mapped to Scale
-  <td> Doesn't render on MacOS
+  <td> (Doesn't seem to render on MacOS currently)
 <tr>
   <td> Scale
-  <td> *
+  <td> Complete
   <td> Horizontal only
   <td>
 <tr>
@@ -153,8 +151,6 @@ on different platforms without re-implementing the UI.
 ## Unsupported
 
 - Display event loop. JswtDemo shows how to work around this, maintaining full SWT compatibility.
-
-- Trees and Tables won't be supported (at least initially) as they don't seem to make much sense on mobile.
 
 - SWT Dialogs rely on a blocking open() call, which won't work for GWT (and might be tricky to support on Android).
   One option might be to provide a showDialog(dialog, callback) method somewhere that would still work with SWT by
