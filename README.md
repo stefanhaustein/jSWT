@@ -19,32 +19,142 @@ on differnet platforms without re-implementing the UI.
   <td> Browser
   <td colspan="3"> Unsupported (but should be straightforward to add)
 <tr>
-  <td> Button
-  <td> setGrayed() / getGrayed() missing
+  <td> Button (general / API)
+  <td> Missing: getGrayed(), setFocus(), setGrayed()</ul>
 <tr>
-  <td> Button (SWT.ARROW)
+  <td> -SWT.ARROW
   <td>
-  <td colspan="2"> Push button with unicode arrows
+  <td colspan="2"> Rendered as push button with unicode arrows
 <tr>
-  <td> Button (SWT.CHECK)
+  <td> -SWT.CHECK
   <td>
   <td> No image
   <td>
 <tr>
-  <td> Button (SWT.PUSH)
+  <td> -SWT.PUSH
   <td>
   <td>
   <td>
 <tr>
-  <td> Button (SWT.RADIO)
+  <td> -SWT.RADIO
   <td>
   <td> No image
   <td>
-
+<tr>
+  <td> -SWT.TOGGLE
+  <td>
+  <td colspan="2">Rendered as checkbox
+<tr>
+  <td> Canvas
+  <td colspan="3"> Missing: scroll support, getCaret(), getIME(), scrol(), setCaret(), setIME()
+<tr>
+  <td> Combo
+  <td> (TBD)
+  <td> No free text
+  <td>
+<tr>
+  <td> Composite
+  <td> (TBD)
+  <td>
+  <td>
+<tr>
+  <td> CoolBar
+  <td colspan="3"> N/A
+<tr>
+  <td> CTabFolder
+  <td colsoan="3"> N/+
+<tr>
+  <td> CoolBar
+  <td colspan="3"> N/A
+<tr>
+  <td> DateTime
+  <td colsoan="3"> N/+
+<tr>
+  <td> ExpandBar
+  <td colspan="3"> N/A
+<tr>
+  <td> Group
+  <td>
+  <td> Currently no text and border
+  <td>
+<tr>
+  <td> Label
+  <td>
+  <td> Currently no wrapping and separator support
+  <td>
+<tr>
+  <td> Link
+  <td colsoan="3"> N/+
+<tr>
+  <td> List
+  <td> *
+  <td>
+  <td>
+<tr>
+  <td> Menu
+  <td> *
+  <td>
+  <td> N/A
+<tr>
+  <td> ProgressBar
+  <td> *
+  <td>
+  <td>
+<tr>
+  <td> Sash
+  <td colsoan="3"> N/+
+<tr>
+  <td> ScrolledComposite
+  <td> *
+  <td>
+  <td>
+<tr>
+  <td> Shell
+  <td colspan="3"> Only one root shell visible, several decorations missing, dialog shells can't be freely positioned.
+<tr>
+  <td> Slider
+  <td> *
+  <td> Mapped to Scale
+  <td> Doesn't render on MacOS
+<tr>
+  <td> Scale
+  <td> *
+  <td> Horizontal only
+  <td>
+<tr>
+  <td> Spinner
+  <td> *
+  <td>
+  <td>
+<tr>
+  <td> StyledText
+  <td colspan="3"> N/A
+<tr>
+  <td> TabFolder
+  <td>
+  <td>
+  <td>
+<tr>
+  <td> Table
+  <td colsoan="3"> N/A
+<tr>
+  <td> Text
+  <td> *
+  <td>
+  <td>
+<tr>
+  <td> ToolBar
+  <td colsoan="3"> N/A
+<tr>
+  <td> Tray
+  <td colsoan="3"> N/A
+<tr>
+  <td> Tree
+  <td colspan="3"> N/A
 
 </table>
 
-
+*) Still needs to be documented, probably some methods missing
 
 ## Unsupported
 
