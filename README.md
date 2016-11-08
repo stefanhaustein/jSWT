@@ -59,19 +59,19 @@ on differnet platforms without re-implementing the UI.
   <td>
 <tr>
   <td> CoolBar
-  <td colspan="3"> N/A
+  <td colspan="3" align="center"> Not available
 <tr>
   <td> CTabFolder
-  <td colsoan="3"> N/+
+  <td colsoan="3" align="center"> Not available
 <tr>
   <td> CoolBar
-  <td colspan="3"> N/A
+  <td colspan="3" align="center"> Not available
 <tr>
   <td> DateTime
-  <td colsoan="3"> N/+
+  <td colsoan="3" align="center"> Not available
 <tr>
   <td> ExpandBar
-  <td colspan="3"> N/A
+  <td colspan="3" align="center"> Not available
 <tr>
   <td> Group
   <td>
@@ -94,7 +94,7 @@ on differnet platforms without re-implementing the UI.
   <td> Menu
   <td> *
   <td>
-  <td> N/A
+  <td> Not available
 <tr>
   <td> ProgressBar
   <td> *
@@ -128,7 +128,7 @@ on differnet platforms without re-implementing the UI.
   <td>
 <tr>
   <td> StyledText
-  <td colspan="3"> N/A
+  <td colspan="3"> Not available
 <tr>
   <td> TabFolder
   <td>
@@ -136,7 +136,7 @@ on differnet platforms without re-implementing the UI.
   <td>
 <tr>
   <td> Table
-  <td colsoan="3"> N/A
+  <td colsoan="3"> Not available
 <tr>
   <td> Text
   <td> *
@@ -144,13 +144,13 @@ on differnet platforms without re-implementing the UI.
   <td>
 <tr>
   <td> ToolBar
-  <td colsoan="3"> N/A
+  <td colsoan="3"> Not available
 <tr>
   <td> Tray
-  <td colsoan="3"> N/A
+  <td colsoan="3"> Not available
 <tr>
   <td> Tree
-  <td colspan="3"> N/A
+  <td colspan="3"> Not available
 
 </table>
 
