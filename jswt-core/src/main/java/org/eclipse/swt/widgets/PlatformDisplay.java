@@ -17,6 +17,20 @@ public abstract class PlatformDisplay extends Display {
     // FIXME: Should just loading be static and visible instead, delegating to a corresponding hidden instance method?
     public static PlatformDisplay instance;
 
+    static String removeAccelerators(String s) {
+        if (s == null) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder(s.length());
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c != '&') {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+
     abstract void addItem(Control control, String s, int index);
 
     /**
@@ -44,6 +58,8 @@ public abstract class PlatformDisplay extends Display {
 
     abstract Color getForeground(Control control);
 
+    abstract int getFocusIndex(List list);
+
     abstract boolean getGrayed(Button control);
 
     /**
@@ -70,6 +86,8 @@ public abstract class PlatformDisplay extends Display {
     abstract String getText(Control control);
 
     abstract Font getFont(Control control);
+
+    abstract int getTopIndex(List list);
 
     abstract boolean isEnabled(Control control);
 
@@ -126,6 +144,9 @@ public abstract class PlatformDisplay extends Display {
 
     abstract void updateTab(TabFolder tabFolder, int index, TabItem tabItem);
 
+    abstract void setTopIndex(List list, int topIndex);
+
+    abstract void showSelection(List list);
 
     public static class Insets {
         public int top;

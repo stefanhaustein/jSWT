@@ -19,7 +19,7 @@ on different platforms without re-implementing the UI.
   <td> Browser
   <td colspan="3" align="center"> Unsupported (but should be straightforward to add)
 <tr>
-  <td> Button (general / API)
+  <td> Button
   <td> Complete
   <td>
   <td>
@@ -83,9 +83,9 @@ on different platforms without re-implementing the UI.
   <td colspan="3" align="center"> Not available
 <tr>
   <td> List
+  <td> Complete
   <td> *
-  <td>
-  <td>
+  <td> focusIndex/show/topIndex functionality not available.
 <tr>
   <td> Menu
   <td> *

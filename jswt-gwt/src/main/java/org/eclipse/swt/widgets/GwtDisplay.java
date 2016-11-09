@@ -39,20 +39,6 @@ public class GwtDisplay extends PlatformDisplay {
         return element;
     }
 
-    static String removeAccelerators(String s) {
-        if (s == null) {
-            return null;
-        }
-        StringBuilder sb = new StringBuilder(s.length());
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (c != '&') {
-                sb.append(c);
-            }
-        }
-        return sb.toString();
-    }
-
     static int getMinHeight(Element element) {
         Style style = element.getStyle();
         String savedHeight = style.getHeight();
@@ -510,6 +496,11 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
+    int getFocusIndex(List list) {
+        return -1;
+    }
+
+    @Override
     boolean getGrayed(Button control) {
         return ((Element) control.peer).getIndeterminate();
     }
@@ -901,6 +892,16 @@ public class GwtDisplay extends PlatformDisplay {
         ((GwtTabFolder) tabFolder.peer).updateTab(index, tabItem);
     }
 
+    @Override
+    void setTopIndex(List list, int topIndex) {
+        // Not supported
+    }
+
+    @Override
+    void showSelection(List list) {
+        // Not supported
+    }
+
     void updateWindowTitle() {
         if (rootShells.size() > 0) {
             Document.get().setTitle(rootShells.get(rootShells.size() - 1).text);
@@ -996,6 +997,11 @@ public class GwtDisplay extends PlatformDisplay {
     Font getFont(Control control) {
         log("FIXME: GwtDisplay.setFont");
         return null;
+    }
+
+    @Override
+    int getTopIndex(List list) {
+        return 0;
     }
 
     @Override

@@ -65,6 +65,10 @@ public class List extends Scrollable {
         return result;
     }
 
+    public int getFocusIndex() {
+        return display.getFocusIndex(this);
+    }
+
     public int getItemCount() {
         return display.getItemCount(this);
     }
@@ -107,6 +111,10 @@ public class List extends Scrollable {
             }
         }
         return result;
+    }
+
+    public int getTopIndex() {
+        return display.getTopIndex(this);
     }
 
     public int indexOf(String string) {
@@ -217,5 +225,13 @@ public class List extends Scrollable {
         for (int i = 0; i < getItemCount(); i++) {
             display.setIndexSelected(this, i, i >= start && i <= end);
         }
+    }
+
+    public void setTopIndex(int topIndex) {
+        display.setTopIndex(this, topIndex);
+    }
+
+    public void showSelection() {
+        display.showSelection(this);
     }
 }

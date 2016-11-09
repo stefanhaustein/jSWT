@@ -238,6 +238,11 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
+  int getFocusIndex(List list) {
+    return -1;
+  }
+
+  @Override
   boolean getGrayed(Button control) {
     return false;
   }
@@ -348,7 +353,9 @@ public class AndroidDisplay extends PlatformDisplay {
   @Override
   public void setText(Control control, String text) {
     Object peer = control.peer;
-    if (peer instanceof TextView) {
+    if (peer instanceof android.widget.Button) {
+      ((android.widget.Button) peer).setText(removeAccelerators(text));
+    } else if (peer instanceof TextView) {
       ((TextView) peer).setText(text);
     } else if (peer instanceof AndroidShell) {
       ((AndroidShell) peer).setText(text);
@@ -419,6 +426,16 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
+  void setTopIndex(List list, int topIndex) {
+
+  }
+
+  @Override
+  void showSelection(List list) {
+
+  }
+
+  @Override
   public void setImage(Control control, Image image) {
     if (control.peer instanceof ImageButton) {
       ((ImageButton) control.peer).setImageBitmap((Bitmap) image.peer);
@@ -466,6 +483,11 @@ public class AndroidDisplay extends PlatformDisplay {
   @Override
   public Font getFont(Control control) {
     return null;
+  }
+
+  @Override
+  int getTopIndex(List list) {
+    return 0;
   }
 
   @Override
@@ -527,7 +549,7 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public void setIndexSelected(List list, int index, boolean selected) {
-
+    System.err.println("FIXME: setIndexSelected()");
   }
 
   @Override
@@ -570,7 +592,8 @@ public class AndroidDisplay extends PlatformDisplay {
           return 0;
         }
       default:
-        throw new RuntimeException("NYI: getSelection() for " + control.getControlType());
+        System.err.println("NYI: getSelection() for " + control.getControlType());
+        return 0;
     }
   }
 

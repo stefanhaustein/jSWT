@@ -26,6 +26,7 @@ import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
 import org.eclipse.swt.SWT;
@@ -73,7 +74,7 @@ public class SwingDisplay extends PlatformDisplay {
         ((JComboBox<String>) control.peer).insertItemAt(s, index);
         break;
       case LIST:
-        ((DefaultListModel) (((JList<String>) control.peer).getModel())).add(index, s);
+        ((DefaultListModel) (getList(control).getModel())).add(index, s);
         break;
       default:
         throw new UnsupportedOperationException();
@@ -130,8 +131,12 @@ public class SwingDisplay extends PlatformDisplay {
       }
       case LABEL:
         return new javax.swing.JLabel();
-      case LIST:
-        return new javax.swing.JList<String>(new DefaultListModel<String>());
+      case LIST: {
+        JList<String> list = new JList<String>(new DefaultListModel<String>());
+        list.setSelectionMode((control.style & SWT.MULTI) == 0 ? ListSelectionModel.SINGLE_SELECTION
+                : ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        return new JScrollPane(list);
+      }
       case TEXT:
         return new javax.swing.JTextField();
       case PROGRESS_BAR:
@@ -225,6 +230,11 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
+  int getFocusIndex(List list) {
+    return 0;
+  }
+
+  @Override
   boolean getGrayed(Button control) {
     return false;
   }
@@ -266,6 +276,8 @@ public class SwingDisplay extends PlatformDisplay {
         return (Integer) ((JSpinner) control.peer).getValue();
       case SLIDER:
         return ((JScrollBar) control.peer).getValue();
+      case LIST:
+        return getList(control).getSelectedIndex();
       case SCALE:
         return ((JSlider) control.peer).getValue();
       default:
@@ -378,7 +390,7 @@ public class SwingDisplay extends PlatformDisplay {
         ((JTextField) peer).setText(text);
         break;
       case BUTTON:
-        ((AbstractButton) peer).setText(text);
+        ((AbstractButton) peer).setText(removeAccelerators(text));
         break;
       case LABEL:
         ((JLabel) peer).setText(text);
@@ -458,9 +470,13 @@ public class SwingDisplay extends PlatformDisplay {
     }
   }
 
+  public JList<String> getList(Control control) {
+    return (JList<String>) ((JScrollPane) control.peer).getViewport().getView();
+  }
+
   @Override
   public void setIndexSelected(List control, int index, boolean selected) {
-    JList<String> list = (JList<String>) control.peer;
+    JList<String> list = getList(control);
     if (selected) {
       list.addSelectionInterval(index, index);
     } else {
@@ -493,7 +509,7 @@ public class SwingDisplay extends PlatformDisplay {
         break;
       }
       case LIST:
-        JList<String> list = ((JList<String>) control.peer);
+        JList<String> list = getList(control);
         while (end >= start) {
           list.remove(end--);
         }
@@ -549,6 +565,16 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
+  void setTopIndex(List list, int topIndex) {
+    getList(list).ensureIndexIsVisible(topIndex);
+  }
+
+  @Override
+  void showSelection(List list) {
+    getList(list).ensureIndexIsVisible(getSelection(list));
+  }
+
+  @Override
   public void setImage(Control control, Image image) {
     switch (control.getControlType()) {
       case BUTTON:
@@ -598,7 +624,7 @@ public class SwingDisplay extends PlatformDisplay {
   public void setItem(Control control, int index, String string) {
     switch (control.getControlType()) {
       case LIST:
-        ((DefaultListModel<String>) ((JList<String>) control.peer).getModel()).set(index, string);
+        ((DefaultListModel<String>) getList(control).getModel()).set(index, string);
         break;
       default:
         System.err.println("FIXME: SwingDisplay.setItem()");
@@ -613,12 +639,17 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
+  int getTopIndex(List list) {
+    return getList(list).getFirstVisibleIndex();
+  }
+
+  @Override
   public String getItem(Control control, int i) {
     switch (control.getControlType()) {
       case COMBO:
         return ((JComboBox<String>) control.peer).getItemAt(i);
       case LIST:
-        return ((JList<String>) control.peer).getModel().getElementAt(i);
+        return (getList(control)).getModel().getElementAt(i);
       default:
         throw new UnsupportedOperationException();
     }
@@ -839,7 +870,7 @@ public class SwingDisplay extends PlatformDisplay {
       case COMBO:
         return ((JComboBox<String>) control.peer).getItemCount();
       case LIST:
-        return ((JList<String>) control.peer).getModel().getSize();
+        return getList(control).getModel().getSize();
       default:
         throw new UnsupportedOperationException();
     }
