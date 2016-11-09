@@ -18,6 +18,10 @@ public class Element extends JavaScriptObject {
         this.appendChild(child);
     }-*/;
 
+    public native final Element cloneNode(boolean deep) /*-{
+        return this.cloneNode(deep);
+    }-*/;
+
     public native final void focus() /*-{
         this.focus();
     }-*/;
@@ -68,6 +72,10 @@ public class Element extends JavaScriptObject {
 
     public native final int getHeight() /*-{
         return this.height;
+    }-*/;
+
+    public native final boolean getIndeterminate() /*-{
+        return this.indeterminate;
     }-*/;
 
     public native final Element getLastElementChild() /*-{
@@ -150,6 +158,18 @@ public class Element extends JavaScriptObject {
         this.replaceChild(newChild, oldChild);
     }-*/;
 
+    public native final String getLocalName() /*-{
+        return this.localName;
+    }-*/;
+
+    public native final void removeAttribute(String name) /*-{
+        this.removeAttribute(name);
+    }-*/;
+
+    public native final void removeChild(Element child) /*-{
+        this.removeChild(child);
+    }-*/;
+
     public native final void setAttribute(String name, String value) /*-{
         this.setAttribute(name, value);
     }-*/;
@@ -166,14 +186,6 @@ public class Element extends JavaScriptObject {
         this.selected = b;
     }-*/;
 
-    public native final void setTextContent(String content) /*-{
-        this.textContent = content;
-    }-*/;
-
-    public native final String getLocalName() /*-{
-        return this.localName;
-    }-*/;
-
     public native final void setClassName(String s) /*-{
         this.className = s;
     }-*/;
@@ -182,12 +194,8 @@ public class Element extends JavaScriptObject {
         this.selectedIndex = index;
     }-*/;
 
-    public native final void removeAttribute(String name) /*-{
-        this.removeAttribute(name);
-    }-*/;
-
-    public native final void removeChild(Element child) /*-{
-        this.removeChild(child);
+    public native void setIndeterminate(boolean b) /*-{
+        this.indeterminated = b;
     }-*/;
 
     public native final void setMax(String maximum) /*-{
@@ -196,6 +204,10 @@ public class Element extends JavaScriptObject {
 
     public native final void setMin(String minimum) /*-{
         this.min = minimum;
+    }-*/;
+
+    public native final void setTextContent(String content) /*-{
+        this.textContent = content;
     }-*/;
 
     public native final void setValue(String value) /*-{
@@ -214,10 +226,6 @@ public class Element extends JavaScriptObject {
         this.step = value;
     }-*/;
 
-    public native final Element cloneNode(boolean deep) /*-{
-        return this.cloneNode(deep);
-    }-*/;
-
     public native final void setReadOnly(boolean b) /*-{
         this.readOnly = b;
     }-*/;
@@ -225,4 +233,5 @@ public class Element extends JavaScriptObject {
     public native final Element querySelector(String s) /*-{
         return this.querySelector(s);
     }-*/;
+
 }

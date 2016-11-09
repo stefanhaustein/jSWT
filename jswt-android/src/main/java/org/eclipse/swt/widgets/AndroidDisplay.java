@@ -238,6 +238,11 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
+  boolean getGrayed(Button control) {
+    return false;
+  }
+
+  @Override
   public Rectangle getImageBounds(Object platformImage) {
     Bitmap bitmap = (Bitmap) platformImage;
     return new Rectangle(0, 0, bitmap.getWidth(), bitmap.getHeight());
@@ -315,6 +320,11 @@ public class AndroidDisplay extends PlatformDisplay {
       TextView tv = (TextView) control.peer;
       tv.setTextColor(getArgb(color));
     }
+  }
+
+  @Override
+  void setGrayed(Button button) {
+    // Unsupported on Android
   }
 
   @Override

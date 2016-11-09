@@ -225,6 +225,11 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
+  boolean getGrayed(Button control) {
+    return false;
+  }
+
+  @Override
   public Rectangle getImageBounds(Object platformImage) {
     BufferedImage image = (BufferedImage) platformImage;
     return new Rectangle(0, 0, image.getWidth(), image.getHeight());
@@ -358,6 +363,11 @@ public class SwingDisplay extends PlatformDisplay {
   public void setForeground(Control control, Color color) {
     ((Component) control.peer).setForeground(color == null ? null :
             new java.awt.Color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()));
+  }
+
+  @Override
+  void setGrayed(Button button) {
+    // Not supported by Swing.
   }
 
   @Override

@@ -62,7 +62,7 @@ public class GwtDisplay extends PlatformDisplay {
         return minHeight;
     }
 
-    public static native void log(Object... args) /*-{
+    static native void log(Object... args) /*-{
         switch (args.length) {
             case 1:
                 $wnd.console.log(args[0]);
@@ -101,7 +101,7 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public void addItem(Control control, String s, int index) {
+    void addItem(Control control, String s, int index) {
         Element element = findList(control);
         Element before = element.getChildren().get(index);
         Element newItem = createElement("option");
@@ -128,12 +128,12 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public void addTab(TabFolder tabFolder, int index, TabItem tabItem) {
+    void addTab(TabFolder tabFolder, int index, TabItem tabItem) {
         ((GwtTabFolder) tabFolder.peer).addTab(index, tabItem);
     }
 
     @Override
-    public void addListener(final Control control, int eventType, Listener listener) {
+    void addListener(final Control control, int eventType, Listener listener) {
         final Element element = (Element) control.peer;
         switch (eventType) {
             case SWT.Selection:
@@ -167,7 +167,7 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public Point computeSize(Control control, int wHint, int hHint, boolean b) {
+    Point computeSize(Control control, int wHint, int hHint, boolean b) {
         if (wHint == SWT.DEFAULT || hHint == SWT.DEFAULT) {
             Element element = ((Element) control.peer);
             Style style = element.getStyle();
@@ -267,7 +267,7 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public Object createControl(final Control control) {
+    Object createControl(final Control control) {
         switch (control.getControlType()) {
             case TEXT: {
                 Element result;
@@ -477,17 +477,17 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public boolean isEnabled(Control control) {
+    boolean isEnabled(Control control) {
         return ((Element) control.peer).getDisabled();
     }
 
     @Override
-    public Color getBackground(Control control) {
+    Color getBackground(Control control) {
         return cssToColor(((Element) control.peer).getStyle().getBackgroundColor());
     }
 
     @Override
-    public Rectangle getBounds(Control control) {
+    Rectangle getBounds(Control control) {
         Element element = ((Element) control.peer);
         int x = element.getOffsetLeft();
         int y = element.getOffsetTop();
@@ -505,8 +505,13 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public Color getForeground(Control control) {
+    Color getForeground(Control control) {
         return cssToColor(((Element) control.peer).getStyle().getColor());
+    }
+
+    @Override
+    boolean getGrayed(Button control) {
+        return ((Element) control.peer).getIndeterminate();
     }
 
     @Override
@@ -563,18 +568,18 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public int getItemCount(Control control) {
+    int getItemCount(Control control) {
         return findList(control).getChildElementCount();
     }
 
     @Override
-    public Monitor getMonitor(Control control) {
+    Monitor getMonitor(Control control) {
         log("FIXME: GwtDisplay.getMonitor");
         return new Monitor(new Rectangle(0, 0, 2000, 1000), new Rectangle(0, 0, 2000, 1000));
     }
 
     @Override
-    public String getText(Control control) {
+    String getText(Control control) {
         Element element = (Element) control.peer;
         switch (control.getControlType()) {
             case TEXT:
@@ -594,7 +599,7 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public void openShell(Shell shell) {
+    void openShell(Shell shell) {
         Element moveToTop = (Element) shell.peer;
         if (shell.getParent() == null) {
             shell.layout(true, true);   // FIXME
@@ -613,7 +618,7 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public void disposePeer(Control control) {
+    void disposePeer(Control control) {
         Element element = (Element) control.peer;
         if (control.getControlType() == Control.ControlType.SHELL && control.getParent() != null) {
             Element background = element.getParentElement();
@@ -632,7 +637,7 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public void setBackground(Control control, Color color) {
+    void setBackground(Control control, Color color) {
         Element element = (Element) control.peer;
         String cssColor = colorToCss(color);
         if (control.getControlType() == Control.ControlType.GROUP ||
@@ -645,7 +650,7 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public void setBackgroundImage(Control control, Image image) {
+    void setBackgroundImage(Control control, Image image) {
         Element element = (Element) control.peer;
         String src = image == null ? null : ((Element) image.peer).getAttribute("src");
         if (control.getControlType() == Control.ControlType.GROUP ||
@@ -656,7 +661,7 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public void setBounds(Control control, int x, int y, int w, int h) {
+    void setBounds(Control control, int x, int y, int w, int h) {
         Composite parent = control.getParent();
         if (parent == null) {
             return;
@@ -695,7 +700,7 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public void setEnabled(Control control, boolean b) {
+    void setEnabled(Control control, boolean b) {
         Element element = (Element) control.peer;
         if (element.getLocalName().equals("label")) {
             if (b) {
@@ -709,17 +714,24 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public void setFocus(Control control) {
+    void setFocus(Control control) {
         log("FIXME: GwtDisplay.setFocus");
     }
 
     @Override
-    public void setForeground(Control control, Color color) {
+    void setForeground(Control control, Color color) {
         ((Element) control.peer).getStyle().setColor(colorToCss(color));
     }
 
     @Override
-    public void setText(Control control, String text) {
+    void setGrayed(Button button) {
+        if ((button.style & SWT.CHECK) != 0) {
+            ((Element) button.peer).setIndeterminate(true);
+        }
+    }
+
+    @Override
+    void setText(Control control, String text) {
         Element element = (Element) control.peer;
         switch (control.getControlType()) {
             case BUTTON:
@@ -768,7 +780,7 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public void setVisible(Control control, boolean visible) {
+    void setVisible(Control control, boolean visible) {
         Element element = (Element) control.peer;
         if (control.getControlType() == Control.ControlType.SHELL && control.getParent() != null) {
             element = element.getParentElement();
@@ -792,7 +804,7 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public void setRange(Control control, int minimum, int maximum) {
+    void setRange(Control control, int minimum, int maximum) {
         Element element = (Element) control.peer;
         if (control.getControlType() == Control.ControlType.PROGRESS_BAR) {
             element.setMax(String.valueOf(maximum - minimum));
@@ -805,7 +817,7 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public void setSliderProperties(Control control, int thumb, int increment, int pageIncrement) {
+    void setSliderProperties(Control control, int thumb, int increment, int pageIncrement) {
         Element element = (Element) control.peer;
         switch (control.getControlType()) {
             case SPINNER:
@@ -820,7 +832,7 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public void setSelection(Control control, int selection) {
+    void setSelection(Control control, int selection) {
         Element element = ((Element) control.peer);
         switch (control.getControlType()) {
             case BUTTON:
@@ -865,13 +877,13 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public void setIndexSelected(List control, int index, boolean selected) {
+    void setIndexSelected(List control, int index, boolean selected) {
         ((Element) control.peer).getChildren().get(index).setSelected(selected);
 
     }
 
     @Override
-    public void showPopupMenu(Menu menu) {
+    void showPopupMenu(Menu menu) {
         throw new RuntimeException("FIXME: GwtDisplay.showPopupMenu");
     }
 
@@ -880,12 +892,12 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public void updateMenuBar(Decorations decorations) {
+    void updateMenuBar(Decorations decorations) {
         throw new RuntimeException("FIXME: GwtDisplay.updateMenuBar");
     }
 
     @Override
-    public void updateTab(TabFolder tabFolder, int index, TabItem tabItem) {
+    void updateTab(TabFolder tabFolder, int index, TabItem tabItem) {
         ((GwtTabFolder) tabFolder.peer).updateTab(index, tabItem);
     }
 
@@ -896,7 +908,7 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public void setImage(Control control, Image image) {
+    void setImage(Control control, Image image) {
         Element element = (Element) control.peer;
         switch (control.getControlType()) {
             case BUTTON:
@@ -929,7 +941,7 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public void setAlignment(Control button, int alignment) {
+    void setAlignment(Control button, int alignment) {
         Element element = (Element) button.peer;
         String value = "";
         if ((button.style & SWT.ARROW) != 0) {
@@ -965,29 +977,29 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public boolean isSelected(List list, int i) {
+    boolean isSelected(List list, int i) {
         return ((Element) list.peer).getChildren().get(i).getSelected();
     }
 
     @Override
-    public void setFont(Control control, Font font) {
+    void setFont(Control control, Font font) {
         log("FIXME: GwtDisplay.setFont");
     }
 
     @Override
-    public void setItem(Control control, int index, String string) {
+    void setItem(Control control, int index, String string) {
         Element element = findList(control);
         element.getChildren().get(index).setTextContent(string);
     }
 
     @Override
-    public Font getFont(Control control) {
+    Font getFont(Control control) {
         log("FIXME: GwtDisplay.setFont");
         return null;
     }
 
     @Override
-    public String getItem(Control control, int index) {
+    String getItem(Control control, int index) {
         Element element = findList(control);
         return element.getChildren().get(index).getTextContent();
     }
@@ -999,7 +1011,7 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public int getSelection(Control control) {
+    int getSelection(Control control) {
         Element element = (Element) control.peer;
         switch (control.getControlType()) {
             case BUTTON:
@@ -1042,7 +1054,7 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public void redraw(Control control, int i, int i1, int i2, int i3, boolean b) {
+    void redraw(Control control, int i, int i1, int i2, int i3, boolean b) {
         log("FIXME: GwtDisplay.redraw");
     }
 
@@ -1056,7 +1068,7 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public void removeItems(Control control, int start, int end) {
+    void removeItems(Control control, int start, int end) {
         log("FIXME: GwtDisplay.removeItems");
     }
 

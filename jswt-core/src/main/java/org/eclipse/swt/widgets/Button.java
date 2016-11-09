@@ -6,9 +6,13 @@ import org.eclipse.swt.graphics.Image;
 
 public class Button extends Control {
 
-  static final int ALIGNMENT_MASK = SWT.LEFT|SWT.RIGHT|SWT.UP|SWT.DOWN|SWT.CENTER;
-  Image image;
-    String text;
+  private static final int ALIGNMENT_MASK = SWT.LEFT|SWT.RIGHT|SWT.UP|SWT.DOWN|SWT.CENTER;
+
+  /** Stored here because it is a resource */
+  private Image image;
+
+  /** Stored here because accelerator keys get removed from the actual content */
+  private String text;
 
   public Button(Composite parent, int style) {
     super(parent, style);
@@ -21,6 +25,10 @@ public class Button extends Control {
 
   ControlType getControlType() {
     return ControlType.BUTTON;
+  }
+
+  public boolean getGrayed() {
+    return display.getGrayed(this);
   }
 
   public boolean getSelection() {
@@ -37,6 +45,14 @@ public class Button extends Control {
 
   public void setSelection(boolean selected) {
     display.setSelection(this, selected ? 1 : 0);
+  }
+
+  public void setFocus() {
+    display.setFocus(this);
+  }
+
+  public void setGrayed(boolean grayed) {
+    display.setGrayed(this);
   }
 
   public void setText(String text) {

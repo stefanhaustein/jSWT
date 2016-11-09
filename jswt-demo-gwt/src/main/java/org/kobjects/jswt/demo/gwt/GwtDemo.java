@@ -9,8 +9,6 @@ import org.eclipse.swt.widgets.GwtDisplay;
 public class GwtDemo implements EntryPoint {
 
     public void onModuleLoad() {
-        GwtDisplay.log("A");
         ControlExample.start(new GwtDisplay());
-        GwtDisplay.log("B");
     }
 }

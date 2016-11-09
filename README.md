@@ -20,7 +20,9 @@ on different platforms without re-implementing the UI.
   <td colspan="3" align="center"> Unsupported (but should be straightforward to add)
 <tr>
   <td> Button (general / API)
-  <td> Missing: getGrayed(), setFocus(), setGrayed()</ul>
+  <td> Complete
+  <td>
+  <td>
 <tr>
   <td> -SWT.ARROW
   <td>
@@ -28,12 +30,12 @@ on different platforms without re-implementing the UI.
 <tr>
   <td> -SWT.CHECK
   <td>
-  <td> No image
+  <td> No image, grayed state not supported.
   <td>
 <tr>
   <td> -SWT.PUSH
   <td>
-  <td>
+  <td> No image
   <td>
 <tr>
   <td> -SWT.RADIO
