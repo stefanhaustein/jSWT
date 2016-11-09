@@ -52,6 +52,17 @@ label.swt-disabled {
     color: gray;
 }
 
+/*
+ * Why?? :.(
+ */
+input[type=checkbox],
+input[type=radio] {
+    vertical-align: middle;
+    position: relative;
+    bottom: 1.5px;
+}
+
+
 
 swt-shell-decoration,
 swt-group-decoration {

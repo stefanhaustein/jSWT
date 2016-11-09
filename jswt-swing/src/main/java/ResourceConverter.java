@@ -123,8 +123,9 @@ public class ResourceConverter {
 
     public static void main(String[] args) throws IOException {
 
-        String inputRoot = "/home/haustein/src/jSWT/jswt-demo-core/src/main/resources";
-        String outputRoot = "/home/haustein/src/jSWT/jswt-demo-gwt/src/main/webapp";
+        String home = System.getProperty("user.home");
+        String inputRoot = home + "/src/jSWT/jswt-demo-core/src/main/resources";
+        String outputRoot = home + "/src/jSWT/jswt-demo-gwt/src/main/webapp";
 
         new ResourceConverter(new File(inputRoot), new File(outputRoot)).run();
     }
