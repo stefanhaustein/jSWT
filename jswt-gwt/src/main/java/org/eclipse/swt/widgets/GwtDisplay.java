@@ -327,6 +327,11 @@ public class GwtDisplay extends PlatformDisplay {
                 Element result = createControlElement(control, "swt-slider");
                 Element outer = createElement("swt-slider-outer");
                 result.appendChild(outer);
+
+                if (Window.get().getNavigator().getUserAgent().indexOf("Mac OS X") != -1) {
+                    outer.getClassList().add("mac-scrollbar");
+                }
+
                 Element inner = createElement("swt-slider-inner");
                 outer.appendChild(inner);
                 Style style = outer.getStyle();

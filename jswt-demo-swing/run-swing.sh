@@ -1,0 +1,1 @@
+java -jar build/libs/jswt-demo-swing-all.jar

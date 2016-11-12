@@ -23,4 +23,8 @@ public final class Window extends JavaScriptObject {
     public native final Style getComputedStyle(Element element, String pseudoElement) /*-{
         return this.getComputedStyle(element, pseudoElement);
     }-*/;
+
+    public native final Navigator getNavigator() /*-{
+        return this.navigator;
+    }-*/;
 }

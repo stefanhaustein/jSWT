@@ -1,0 +1,1 @@
+java  -XstartOnFirstThread -cp ~/Downloads/swt-4.6.1-cocoa-macosx-x86_64/swt-debug.jar:build/libs/jswt-demo-swing-all.jar org.eclipse.swt.examples.controlexample.ControlExample
