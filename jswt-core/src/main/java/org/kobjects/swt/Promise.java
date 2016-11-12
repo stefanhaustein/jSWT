@@ -1,11 +1,9 @@
-package org.kobjects.promise;
+package org.kobjects.swt;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
-import org.eclipse.swt.graphics.Image;
 
 
-public class Promise<T> implements Thenable<T> {
+public class Promise<T> {
 
     enum State {
         PENDING, FULFILLED, REJECTED
@@ -51,7 +49,7 @@ public class Promise<T> implements Thenable<T> {
         return result;
     }
 
-
+/*
     public Promise(Executor<T> executor) {
         executor.run(new Function<T, Void>() {
             @Override
@@ -67,7 +65,7 @@ public class Promise<T> implements Thenable<T> {
             }
         });
     }
-
+*/
     synchronized public Promise<T> resolve(T value) {
         if (state != State.PENDING) {
             throw new IllegalStateException();

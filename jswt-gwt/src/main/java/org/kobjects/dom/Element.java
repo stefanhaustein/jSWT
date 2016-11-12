@@ -194,7 +194,7 @@ public class Element extends JavaScriptObject {
         this.selectedIndex = index;
     }-*/;
 
-    public native void setIndeterminate(boolean b) /*-{
+    public native final void setIndeterminate(boolean b) /*-{
         this.indeterminated = b;
     }-*/;
 

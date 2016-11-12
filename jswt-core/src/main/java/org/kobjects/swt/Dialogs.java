@@ -1,11 +1,10 @@
-package org.kobjects.jswt;
+package org.kobjects.swt;
 
 
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.FontDialog;
-import org.kobjects.promise.Promise;
 
 public class Dialogs {
 
@@ -13,13 +12,13 @@ public class Dialogs {
         if (dialog instanceof PromiseDialog) {
             return ((PromiseDialog<RGB>) dialog).openPromise();
         }
-        return new Promise().resolve(dialog.openPromise());
+        return new Promise().resolve(dialog.open());
     }
 
     public static Promise<FontData> openFontDialog(FontDialog dialog) {
         if (dialog instanceof PromiseDialog) {
             return ((PromiseDialog<FontData>) dialog).openPromise();
         }
-        return new Promise().resolve(dialog.openPromise());
+        return new Promise().resolve(dialog.open());
     }
 }

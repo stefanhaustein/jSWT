@@ -12,7 +12,6 @@
 package org.eclipse.swt.examples.controlexample;
 
 
-import javafx.util.Callback;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Color;
@@ -44,8 +43,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
-import org.kobjects.jswt.Dialogs;
-import org.kobjects.promise.Function;
+import org.kobjects.swt.Dialogs;
+import org.kobjects.swt.Function;
 // import org.eclipse.swt.widgets.FontDialog;
 // import org.eclipse.swt.widgets.Table;
 // import org.eclipse.swt.widgets.TableItem;

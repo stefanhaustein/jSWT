@@ -11,8 +11,6 @@
 package org.eclipse.swt.examples.controlexample;
 
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.MissingResourceException;
@@ -30,9 +28,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
-import org.kobjects.jswt.ResourceLoader;
-import org.kobjects.promise.Function;
-import org.kobjects.promise.Promise;
+import org.kobjects.swt.ResourceLoader;
+import org.kobjects.swt.Function;
+import org.kobjects.swt.Promise;
 
 public class ControlExample {
 	private static ResourceBundle resourceBundle =

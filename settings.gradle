@@ -8,3 +8,4 @@ project(':jswt-demo-gwt').projectDir = new File('jswt-demo-gwt')
 project(':jswt-demo-swing').projectDir = new File('jswt-demo-swing')
 project(':jswt-gwt').projectDir = new File('jswt-gwt')
 project(':jswt-swing').projectDir = new File('jswt-swing')
+

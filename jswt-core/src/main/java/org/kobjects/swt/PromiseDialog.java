@@ -1,6 +1,5 @@
-package org.kobjects.jswt;
+package org.kobjects.swt;
 
-import org.kobjects.promise.Promise;
 
 public interface PromiseDialog<T> {
     Promise<T> openPromise();

@@ -1,10 +1,9 @@
-package org.kobjects.jswt;
+package org.kobjects.swt;
 
 import java.io.IOException;
 import java.io.InputStream;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Image;
-import org.kobjects.promise.Promise;
 
 public class ResourceLoader {
 

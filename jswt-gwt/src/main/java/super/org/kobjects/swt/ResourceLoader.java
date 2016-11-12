@@ -2,13 +2,12 @@ package org.kobjects.jswt;
 
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Image;
-import java.io.IOException;
 import org.eclipse.swt.widgets.GwtDisplay;
 import org.kobjects.dom.Document;
 import org.kobjects.dom.Element;
 import org.kobjects.dom.Event;
 import org.kobjects.dom.EventListener;
-import org.kobjects.promise.Promise;
+import promise.Promise;
 
 public class ResourceLoader {
     public static Promise<Image> loadImage(final Device device, String path)   {

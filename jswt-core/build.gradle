@@ -6,10 +6,6 @@ compileJava {
     targetCompatibility = 1.7
 }
 
-/*
-gwt {
-    gwtVersion='2.7.0'
-}*/
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])

@@ -7,8 +7,8 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
-import org.kobjects.jswt.PromiseDialog;
-import org.kobjects.promise.Promise;
+import org.kobjects.swt.Promise;
+import org.kobjects.swt.PromiseDialog;
 
 public class FontDialog extends Dialog implements PromiseDialog<FontData> {
 
