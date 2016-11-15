@@ -94,11 +94,12 @@ swt-group-decoration.swt-title {
 
 
 swt-group-decoration.swt-shadow-out {
-    box-shadow: 4px 4px 4px grey;
+    box-shadow: rgba(0, 0, 0, 0.15) 2px 2px 2px
+   /* box-shadow: 4px 4px 4px grey; */
 }
 
 swt-group-decoration.swt-shadow-in {
-    box-shadow: inset 4px 4px 4px grey;
+    box-shadow: inset rgba(0, 0, 0, 0.15) 2px 2px 2px
 }
 
 swt-group-text {
