@@ -1,11 +1,11 @@
-include ':jswt-android', ':jswt-demo-android', 'jswt-demo-core', ':jswt-core', ':jswt-swing', ':jswt-demo-swing', 'jswt-demo-gwt', 'jswt-gwt'
+include ':jswt-android', ':jswt-core', 'jswt-gwt', ':jswt-swing', ':controlexample-android', 'controlexample-core', ':controlexample-swing', 'controlexample-gwt'
 
 project(':jswt-android').projectDir = new File('jswt-android')
 project(':jswt-core').projectDir = new File('jswt-core')
-project(':jswt-demo-android').projectDir = new File('jswt-demo-android')
-project(':jswt-demo-core').projectDir = new File('jswt-demo-core')
-project(':jswt-demo-gwt').projectDir = new File('jswt-demo-gwt')
-project(':jswt-demo-swing').projectDir = new File('jswt-demo-swing')
 project(':jswt-gwt').projectDir = new File('jswt-gwt')
 project(':jswt-swing').projectDir = new File('jswt-swing')
 
+project(':controlexample-android').projectDir = new File('examples/controlexample/controlexample-android')
+project(':controlexample-core').projectDir = new File('examples/controlexample/controlexample-core')
+project(':controlexample-gwt').projectDir = new File('examples/controlexample/controlexample-gwt')
+project(':controlexample-swing').projectDir = new File('examples/controlexample/controlexample-swing')

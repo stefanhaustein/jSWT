@@ -29,3 +29,16 @@ proguard/
 # Intellij
 .idea
 *.iml
+
+# Eclipse
+
+.classpath
+.project
+.settings
+
+# Emacs
+
+*~
+*.hprof
+
+# Java

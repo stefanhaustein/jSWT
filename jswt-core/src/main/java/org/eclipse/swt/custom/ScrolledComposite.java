@@ -1,6 +1,5 @@
 package org.eclipse.swt.custom;
 
-import javafx.scene.control.ScrollBar;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
