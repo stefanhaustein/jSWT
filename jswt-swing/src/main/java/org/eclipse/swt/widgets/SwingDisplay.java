@@ -32,6 +32,7 @@ import javax.swing.SwingUtilities;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -44,10 +45,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Window;
+import javax.swing.text.JTextComponent;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
@@ -66,6 +65,7 @@ import java.io.InputStream;
 public class SwingDisplay extends PlatformDisplay {
   int activeShells = 0;
   private Monitor monitor;
+
 
   @Override
   public void addItem(Control control, String s, int index) {
@@ -98,6 +98,11 @@ public class SwingDisplay extends PlatformDisplay {
   @Override
   public void asyncExec(Runnable runnable) {
     SwingUtilities.invokeLater(runnable);
+  }
+
+
+  void unsupported(Control control, String method) {
+    System.err.println("SwingDisplay." + method + "() unsupported for type " + control.getControlType().name());
   }
 
   @Override
@@ -231,11 +236,13 @@ public class SwingDisplay extends PlatformDisplay {
 
   @Override
   int getFocusIndex(List list) {
+    unsupported(list, "getFocusIndex");
     return 0;
   }
 
   @Override
   boolean getGrayed(Button control) {
+    unsupported(control, "getGrayed");
     return false;
   }
 
@@ -470,6 +477,13 @@ public class SwingDisplay extends PlatformDisplay {
     }
   }
 
+  public JTextComponent getJTextComponent(Control control) {
+    if (control.peer instanceof JTextComponent) {
+      return (JTextComponent) control.peer;
+    }
+    return (JTextComponent) ((JScrollPane) control.peer).getViewport().getView();
+  }
+
   public JList<String> getList(Control control) {
     return (JList<String>) ((JScrollPane) control.peer).getViewport().getView();
   }
@@ -535,7 +549,7 @@ public class SwingDisplay extends PlatformDisplay {
 
   @Override
   public void setBackgroundImage(Control control, Image image) {
-    // Unsupported
+    unsupported(control, "serBackgroundimage");
   }
 
   @Override
@@ -565,13 +579,116 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
-  void setTopIndex(List list, int topIndex) {
-    getList(list).ensureIndexIsVisible(topIndex);
+  Point getCaretLocation(Text text) {
+    java.awt.Point awtPoint = getJTextComponent(text).getCaret().getMagicCaretPosition();
+    return new Point(awtPoint.x, awtPoint.y);
   }
 
   @Override
-  void showSelection(List list) {
-    getList(list).ensureIndexIsVisible(getSelection(list));
+  int getCaretPosition(Text text) {
+    return getJTextComponent(text).getCaretPosition();
+  }
+
+  @Override
+  int getLineHeight(Text text) {
+    return 0;
+  }
+
+  @Override
+  Point getSelectedRange(Control control) {
+    return null;
+  }
+
+  @Override
+  int getTopPixel(Text text) {
+    return 0;
+  }
+
+  @Override
+  void paste(Control control) {
+    switch (control.getControlType()) {
+      case TEXT:
+        getJTextComponent(control).paste();
+        break;
+      default:
+        unsupported(control, "paste");
+    }
+  }
+
+  @Override
+  boolean setDoubleClickEnabled(Text text, boolean doubleClick) {
+    return false;
+  }
+
+  @Override
+  char setEchoChar(Text text, char echo) {
+    return 0;
+  }
+
+  @Override
+  boolean setEditable(Text text, boolean editable) {
+    getJTextComponent(text).setEditable(editable);
+    return editable;
+  }
+
+  @Override
+  String setMessage(Text text, String message) {
+    getJTextComponent(text).setToolTipText(message);
+    return message;
+  }
+
+  @Override
+  void setOrientation(Control control, int orientation) {
+    ((Component) control.peer).setComponentOrientation(orientation == SWT.RIGHT_TO_LEFT
+            ? ComponentOrientation.RIGHT_TO_LEFT : ComponentOrientation.LEFT_TO_RIGHT);
+  }
+
+  @Override
+  boolean setRedraw(Text text, boolean redraw) {
+    return false;
+  }
+
+  @Override
+  int setTextLimit(Text text, int limit) {
+    unsupported(text, "setTextLimit");
+    return Integer.MAX_VALUE;
+  }
+
+  @Override
+  int setTabs(Text text, int tabs) {
+    return 0;
+  }
+
+  @Override
+  void setSelectionRange(Text text, int start, int end) {
+    JTextComponent jText = (JTextComponent) text.peer;
+    jText.setSelectionStart(start);
+    jText.setSelectionEnd(end);
+  }
+
+  @Override
+  int getOrientation(Control control) {
+    ComponentOrientation orientation = ((Component) control.peer).getComponentOrientation();
+    return orientation == ComponentOrientation.RIGHT_TO_LEFT ? SWT.RIGHT_TO_LEFT : SWT.LEFT_TO_RIGHT;
+  }
+
+  @Override
+  void setTopIndex(Control control, int topIndex) {
+    switch (control.getControlType()) {
+      case LIST:
+        getList(control).ensureIndexIsVisible(topIndex);
+        break;
+      default:
+        unsupported(control, "setTopIndex");
+    }
+  }
+
+  @Override
+  void showSelection(Control control) {
+    switch (control.getControlType()) {
+      case LIST:
+        getList(control).ensureIndexIsVisible(getSelection(control));
+    }
   }
 
   @Override
@@ -639,8 +756,14 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
-  int getTopIndex(List list) {
-    return getList(list).getFirstVisibleIndex();
+  int getTopIndex(Control control) {
+    switch (control.getControlType()) {
+      case LIST:
+        return getList(control).getFirstVisibleIndex();
+      default:
+        unsupported(control, "getTopIndex");
+        return 0;
+    }
   }
 
   @Override
@@ -837,6 +960,25 @@ public class SwingDisplay extends PlatformDisplay {
           }
         }
         break;
+    }
+  }
+
+  @Override
+  void copy(Control control) {
+    switch (control.getControlType()) {
+      case TEXT:
+        getJTextComponent(control).copy();
+        break;
+      default:
+        unsupported(control, "copy");
+    }
+  }
+
+  @Override
+  void cut(Control control) {
+    switch (control.getControlType()) {
+      case TEXT:
+        getJTextComponent(control).cut();
     }
   }
 

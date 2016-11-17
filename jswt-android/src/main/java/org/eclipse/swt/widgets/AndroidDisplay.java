@@ -1,16 +1,25 @@
 package org.eclipse.swt.widgets;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.*;
 import android.support.v7.widget.PopupMenu;
+import android.text.InputFilter;
 import android.text.InputType;
+import android.text.method.KeyListener;
+import android.text.method.PasswordTransformationMethod;
+import android.text.method.TransformationMethod;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,9 +36,13 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 
 public class AndroidDisplay extends PlatformDisplay {
+
+  static final String TAG = "AndroidDisplay";
 
   AppCompatActivity activity;
   Shell topShell;
@@ -39,6 +52,10 @@ public class AndroidDisplay extends PlatformDisplay {
 
   private static int getArgb(Color color) {
     return (color.getAlpha() << 24) | (color.getRed() << 16) | (color.getGreen() << 8) | (color.getBlue());
+  }
+
+  private static void unsupported(Control control, String method) {
+    Log.d(TAG, "unsupported for " + control.getControlType().name() + ": " + method);
   }
 
   private static ArrayAdapter<String> getArrayAdapter(Control control) {
@@ -94,7 +111,6 @@ public class AndroidDisplay extends PlatformDisplay {
       }
     }
   }
-
 
   @Override
   public Object createControl(final Control control) {
@@ -239,6 +255,7 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   int getFocusIndex(List list) {
+    unsupported(list, "getFocusIndex");
     return -1;
   }
 
@@ -329,7 +346,7 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   void setGrayed(Button button) {
-    // Unsupported on Android
+    unsupported(button, "setGrayed");
   }
 
   @Override
@@ -426,13 +443,140 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
-  void setTopIndex(List list, int topIndex) {
-
+  void setTopIndex(Control control, int topIndex) {
+    unsupported(control, "setTopIndex");
   }
 
   @Override
-  void showSelection(List list) {
+  void showSelection(Control control) {
+    unsupported(control, "showSelection");
+  }
 
+  @Override
+  Point getCaretLocation(Text control) {
+    EditText editText = ((EditText) control.peer);
+    android.text.Layout layout = editText.getLayout();
+    int pos = editText.getSelectionStart();
+    int line = layout.getLineForOffset(pos);
+    int baseline = layout.getLineBaseline(line);
+    int ascent = layout.getLineAscent(line);
+    return new Point(Math.round(layout.getPrimaryHorizontal(pos)), Math.round(baseline + ascent));
+  }
+
+  @Override
+  int getCaretPosition(Text text) {
+    return ((EditText) text.peer).getSelectionStart();
+  }
+
+  @Override
+  int getLineHeight(Text control) {
+    return ((EditText) control.peer).getLineHeight();
+  }
+
+  @Override
+  Point getSelectedRange(Control control) {
+    switch (control.getControlType()) {
+      case TEXT: {
+        EditText editText = (EditText) control.peer;
+        return new Point(editText.getSelectionStart(), editText.getSelectionEnd());
+      }
+      default:
+        unsupported(control, "getSelectedRange");
+        return new Point(0, 0);
+    }
+  }
+
+  @Override
+  int getTopPixel(Text control) {
+    return ((EditText) control.peer).getScrollY();
+  }
+
+  @Override
+  void paste(Control control) {
+    ClipboardManager clipboard = (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
+    CharSequence paste = clipboard.getPrimaryClip().getItemAt(0).getText();
+    switch (control.getControlType()) {
+      case TEXT: {
+        EditText editText = (EditText) control.peer;
+        String oldContent = editText.getText().toString();
+        String newContent = oldContent.substring(0, editText.getSelectionStart()) + paste
+                + oldContent.substring(editText.getSelectionEnd());
+        editText.setText(newContent);
+        break;
+      }
+      default:
+        unsupported(control, "paste");
+    }
+  }
+
+  @Override
+  boolean setDoubleClickEnabled(Text text, boolean doubleClick) {
+    return false;
+  }
+
+  @Override
+  char setEchoChar(Text control, final char echo) {
+    EditText editText = (EditText) control.peer;
+    editText.setTransformationMethod(echo == 0 ? null : new PasswordTransformationMethod() {
+      @Override
+      public CharSequence getTransformation(CharSequence charSequence, View view) {
+        char[] fill = new char[charSequence.length()];
+        Arrays.fill(fill, echo);
+        return new String(fill);
+      }
+    });
+    return echo;
+  }
+
+  @Override
+  boolean setEditable(Text control, boolean editable) {
+    EditText editText = (EditText) control.peer;
+    KeyListener keyListener = editText.getKeyListener();
+    if (editable && keyListener == null) {
+      editText.setKeyListener((KeyListener) editText.getTag());
+    } else if (!editable && keyListener != null) {
+      editText.setTag(keyListener);
+      editText.setKeyListener(null);
+    }
+    return editable;
+  }
+
+  @Override
+  String setMessage(Text text, String message) {
+    ((EditText) text.peer).setHint(message);
+    return message;
+  }
+
+  @Override
+  void setOrientation(Control control, int orientation) {
+    ((View) control.peer).setTextDirection(
+            orientation == SWT.RIGHT_TO_LEFT ? View.TEXT_DIRECTION_RTL : View.TEXT_DIRECTION_LTR);
+  }
+
+  @Override
+  boolean setRedraw(Text text, boolean redraw) {
+    return false;
+  }
+
+  @Override
+  int setTextLimit(Text control, int limit) {
+    ((EditText) control.peer).setFilters(new InputFilter[] {new InputFilter.LengthFilter(limit)});
+    return limit;
+  }
+
+  @Override
+  int setTabs(Text text, int tabs) {
+    return 0;
+  }
+
+  @Override
+  void setSelectionRange(Text control, int start, int end) {
+    ((EditText) control.peer).setSelection(start, end);
+  }
+
+  @Override
+  int getOrientation(Control control) {
+    return ((View) control.peer).getTextDirection() == View.TEXT_DIRECTION_RTL ? SWT.RIGHT_TO_LEFT : SWT.LEFT_TO_RIGHT;
   }
 
   @Override
@@ -486,7 +630,7 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
-  int getTopIndex(List list) {
+  int getTopIndex(Control control) {
     return 0;
   }
 
@@ -549,7 +693,7 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public void setIndexSelected(List list, int index, boolean selected) {
-    System.err.println("FIXME: setIndexSelected()");
+    unsupported(list, "setSelectedIndex");
   }
 
   @Override
@@ -702,6 +846,42 @@ public class AndroidDisplay extends PlatformDisplay {
           });
         }
         break;
+    }
+  }
+
+  @Override
+  void copy(Control control) {
+    ClipboardManager clipboard = (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
+    switch (control.getControlType()) {
+      case TEXT: {
+        EditText editText = (EditText) control.peer;
+        String oldContent = editText.getText().toString();
+        String copy = oldContent.substring(editText.getSelectionStart(), editText.getSelectionEnd());
+        clipboard.setPrimaryClip(ClipData.newPlainText(null, copy);
+        break;
+      }
+      default:
+        unsupported(control, "copy");
+    }
+
+  }
+
+  @Override
+  void cut(Control control) {
+    ClipboardManager clipboard = (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
+    switch (control.getControlType()) {
+      case TEXT: {
+        EditText editText = (EditText) control.peer;
+        String oldContent = editText.getText().toString();
+        String cut = oldContent.substring(editText.getSelectionStart(), editText.getSelectionEnd());
+        String newContent = oldContent.substring(0, editText.getSelectionStart())
+                + oldContent.substring(editText.getSelectionEnd());
+        editText.setText(newContent);
+        clipboard.setPrimaryClip(ClipData.newPlainText(null, cut));
+        break;
+      }
+      default:
+        unsupported(control, "cut");
     }
   }
 

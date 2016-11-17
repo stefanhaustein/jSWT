@@ -20,6 +20,10 @@ public final class Window extends JavaScriptObject {
         });
     }-*/;
 
+    public native final Style getComputedStyle(Element element) /*-{
+        return this.getComputedStyle(element);
+    }-*/;
+
     public native final Style getComputedStyle(Element element, String pseudoElement) /*-{
         return this.getComputedStyle(element, pseudoElement);
     }-*/;

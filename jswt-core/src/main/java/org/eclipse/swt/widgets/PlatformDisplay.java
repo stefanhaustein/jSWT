@@ -42,6 +42,10 @@ public abstract class PlatformDisplay extends Display {
 
     abstract void addListener(Control control, int eventType, Listener listener);
 
+    abstract void copy(Control control);
+
+    abstract void cut(Control control);
+
     abstract Point computeSize(Control control, int wHint, int hHint, boolean changed);
 
     abstract Object createControl(Control control);
@@ -87,7 +91,7 @@ public abstract class PlatformDisplay extends Display {
 
     abstract Font getFont(Control control);
 
-    abstract int getTopIndex(List list);
+    abstract int getTopIndex(Control control);
 
     abstract boolean isEnabled(Control control);
 
@@ -144,9 +148,42 @@ public abstract class PlatformDisplay extends Display {
 
     abstract void updateTab(TabFolder tabFolder, int index, TabItem tabItem);
 
-    abstract void setTopIndex(List list, int topIndex);
+    abstract void setTopIndex(Control control, int topIndex);
 
-    abstract void showSelection(List list);
+    abstract void showSelection(Control control);
+
+    abstract Point getCaretLocation(Text text);
+
+    abstract int getCaretPosition(Text text);
+
+    abstract int getLineHeight(Text text);
+
+    abstract Point getSelectedRange(Control control);
+
+    abstract int getTopPixel(Text text);
+
+    abstract void paste(Control control);
+
+    abstract boolean setDoubleClickEnabled(Text text, boolean doubleClick);
+
+    abstract char setEchoChar(Text text, char echo);
+
+    abstract boolean setEditable(Text text, boolean editable);
+
+    abstract String setMessage(Text text, String message);
+
+    abstract void setOrientation(Control control, int orientation);
+
+    abstract boolean setRedraw(Text text, boolean redraw);
+
+    abstract int setTextLimit(Text text, int limit);
+
+    abstract int setTabs(Text text, int tabs);
+
+    abstract void setSelectionRange(Text text, int start, int end);
+
+    abstract int getOrientation(Control control);
+
 
     public static class Insets {
         public int top;

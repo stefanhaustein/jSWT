@@ -158,8 +158,7 @@ public class Control extends Widget {
     }
 
   public int getOrientation() {
-      System.err.println("FIXME: Control.getOrientation");
-      return 0;
+      return display.getOrientation(this);
   }
 
   public Composite getParent() {
@@ -264,6 +263,12 @@ public class Control extends Widget {
 
   public void setSize(Point p) {
     setSize(p.x, p.y);
+  }
+
+
+  //  Sets the orientation of the receiver, which must be one of the constants SWT.LEFT_TO_RIGHT or SWT.RIGHT_TO_LEFT.
+  void setOrientation(int orientation) {
+    display.setOrientation(this, orientation);
   }
 
   public void setTextDirection(int textDirection) {

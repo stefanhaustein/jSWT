@@ -137,19 +137,31 @@ public class GwtDisplay extends PlatformDisplay {
                 } else {
                     Element input = element.getLocalName().equals("label") ? element.getFirstElementChild() : element;
                     input.addEventListener("change", new EventListener() {
-                            @Override
-                            public void onEvent(Event event) {
+                        @Override
+                        public void onEvent(Event event) {
                             org.eclipse.swt.widgets.Event swtEvent = new org.eclipse.swt.widgets.Event();
                             swtEvent.widget = control;
                             swtEvent.display = GwtDisplay.this;
                             swtEvent.type = SWT.Selection;
                             control.notifyListeners(SWT.Selection, swtEvent);
-                    }
-                        });
+                        }
+                    });
                 }
             default:
                 log("FIXME: GwtDisplay.addListener ", eventType);
         }
+    }
+
+    @Override
+    void copy(Control control) {
+        unsupported(control, "cut");
+    }
+
+    @Override
+    void cut(Control control) {
+        Element element = (Element) control.peer;
+        String oldText = getText(control);
+        setText(control, oldText.substring(0, element.getSelectionStart()) + oldText.substring(element.getSelectionEnd()));
     }
 
     @Override
@@ -898,13 +910,97 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    void setTopIndex(List list, int topIndex) {
-        // Not supported
+    void setTopIndex(Control control, int topIndex) {
+
     }
 
     @Override
-    void showSelection(List list) {
-        // Not supported
+    void showSelection(Control control) {
+        unsupported(control, "showSelection");
+    }
+
+    @Override
+    Point getCaretLocation(Text text) {
+        return null;
+    }
+
+    @Override
+    int getCaretPosition(Text text) {
+        return ((Element) text.peer).getSelectionStart();
+    }
+
+    @Override
+    int getLineHeight(Text text) {
+        return Math.round(getPx(Window.get().getComputedStyle((Element) text.peer), "lineHeight"));
+    }
+
+    @Override
+    Point getSelectedRange(Control control) {
+        Element element = (Element) control.peer;
+        return new Point(element.getSelectionStart(), element.getSelectionEnd());
+    }
+
+    @Override
+    int getTopPixel(Text text) {
+        return 0;
+    }
+
+    @Override
+    void paste(Control control) {
+        unsupported(control, "paste");
+    }
+
+    @Override
+    boolean setDoubleClickEnabled(Text text, boolean doubleClick) {
+        return false;
+    }
+
+    @Override
+    char setEchoChar(Text text, char echo) {
+        ((Element) text.peer).setType(echo == 0 ? "text" : "password");
+        return echo;
+    }
+
+    @Override
+    boolean setEditable(Text text, boolean editable) {
+        ((Element) text.peer).setReadOnly(!editable);
+        return editable;
+    }
+
+    @Override
+    String setMessage(Text text, String message) {
+        return "";
+    }
+
+    @Override
+    void setOrientation(Control control, int orientation) {
+        ((Element) control.peer).setDir(orientation == SWT.RIGHT_TO_LEFT ? "rtl" : "ltr");
+    }
+
+    @Override
+    boolean setRedraw(Text text, boolean redraw) {
+        return true;
+    }
+
+    @Override
+    int setTextLimit(Text text, int limit) {
+        ((Element) text.peer).setMaxlength(limit);
+        return limit;
+    }
+
+    @Override
+    int setTabs(Text text, int tabs) {
+        return 0;
+    }
+
+    @Override
+    void setSelectionRange(Text text, int start, int end) {
+        ((Element) text.peer).setSelectionRange(start, end);
+    }
+
+    @Override
+    int getOrientation(Control control) {
+        return ((Element) control.peer).getDir().equals("rtl") ? SWT.RIGHT_TO_LEFT : SWT.LEFT_TO_RIGHT;
     }
 
     void updateWindowTitle() {
@@ -1005,7 +1101,7 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    int getTopIndex(List list) {
+    int getTopIndex(Control control) {
         return 0;
     }
 

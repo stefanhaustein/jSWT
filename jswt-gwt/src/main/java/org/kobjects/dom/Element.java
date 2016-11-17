@@ -62,6 +62,10 @@ public class Element extends JavaScriptObject {
         return this.clientWidth;
     }-*/;
 
+    public native final String getDir() /*-{
+        return this.dir;
+    }-*/;
+
     public native final boolean getDisabled() /*-{
         return this.disabled;
     }-*/;
@@ -122,6 +126,14 @@ public class Element extends JavaScriptObject {
         return this.selected;
     }-*/;
 
+    public native final int getSelectionEnd() /*-{
+        return this.selectionStart;
+    }-*/;
+
+    public native final int getSelectionStart() /*-{
+        return this.selectionStart;
+    }-*/;
+
     public native final String getTextContent() /*-{
         return this.textContent;
     }-*/;
@@ -170,6 +182,10 @@ public class Element extends JavaScriptObject {
         this.removeChild(child);
     }-*/;
 
+    public native final void select() /*-{
+        this.select();
+    }-*/;
+
     public native final void setAttribute(String name, String value) /*-{
         this.setAttribute(name, value);
     }-*/;
@@ -184,6 +200,10 @@ public class Element extends JavaScriptObject {
 
     public native final void setSelected(boolean b) /*-{
         this.selected = b;
+    }-*/;
+
+    public native final void setSelectionRange(int selectionStart, int selectionEnd) /*-{
+        this.setSelectionRange(selectionStart, selectionEnd);
     }-*/;
 
     public native final void setClassName(String s) /*-{
@@ -234,4 +254,15 @@ public class Element extends JavaScriptObject {
         return this.querySelector(s);
     }-*/;
 
+    public native final void setType(String s) /*-{
+        this.type = s;
+    }-*/;
+
+    public native final void setMaxlength(int limit) /*-{
+        this.maxlength = limit;
+    }-*/;
+
+    public native final void setDir(String s) /*-{
+        this.dir = s;
+    }-*/;
 }
