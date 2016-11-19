@@ -3,6 +3,7 @@ package org.eclipse.swt.widgets;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.ComboBoxEditor;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -123,8 +124,13 @@ public class SwingDisplay extends PlatformDisplay {
           return new JCheckBox();
         }
         return new JButton();
-      case COMBO:
-        return new JComboBox<String>();
+      case COMBO: {
+        JComboBox<String> result = new JComboBox<>();
+        if ((control.style & SWT.READ_ONLY) == 0) {
+          result.setEditable(true);
+        }
+        return result;
+      }
       case CANVAS:
         return new SwingSwtCanvas((Canvas) control);
       case COMPOSITE:
@@ -294,14 +300,7 @@ public class SwingDisplay extends PlatformDisplay {
 
   @Override
   public String getText(Control control) {
-    Component peer = (Component) control.peer;
-    switch (control.getControlType()) {
-      case TEXT:
-        return ((JTextField) peer).getText();
-      default:
-        System.err.println(control.getControlType() + ".getText()");
-        return "";
-    }
+    return getJTextComponent(control).getText();
   }
 
 
@@ -478,6 +477,11 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   public JTextComponent getJTextComponent(Control control) {
+    if (control.peer instanceof JComboBox) {
+      JComboBox combo = (JComboBox) control.peer;
+      ComboBoxEditor editor = combo.getEditor();
+      return (JTextComponent) editor.getEditorComponent();
+    }
     if (control.peer instanceof JTextComponent) {
       return (JTextComponent) control.peer;
     }
@@ -489,12 +493,22 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
-  public void setIndexSelected(List control, int index, boolean selected) {
-    JList<String> list = getList(control);
-    if (selected) {
-      list.addSelectionInterval(index, index);
-    } else {
-      list.removeSelectionInterval(index, index);
+  public void setIndexSelected(Control control, int index, boolean selected) {
+    switch (control.getControlType()) {
+      case LIST: {
+        JList<String> list = getList(control);
+        if (selected) {
+          list.addSelectionInterval(index, index);
+        } else {
+          list.removeSelectionInterval(index, index);
+        }
+        break;
+      }
+      case COMBO:
+        ((JComboBox<String>) control.peer).setSelectedIndex(index);
+        break;
+      default:
+        unsupported(control, "setSelectedIndex");
     }
   }
 
@@ -579,24 +593,31 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
-  Point getCaretLocation(Text text) {
-    java.awt.Point awtPoint = getJTextComponent(text).getCaret().getMagicCaretPosition();
+  Point getCaretLocation(Control control) {
+    java.awt.Point awtPoint = getJTextComponent(control).getCaret().getMagicCaretPosition();
     return new Point(awtPoint.x, awtPoint.y);
   }
 
   @Override
-  int getCaretPosition(Text text) {
-    return getJTextComponent(text).getCaretPosition();
+  int getCaretPosition(Control control) {
+    return getJTextComponent(control).getCaretPosition();
   }
 
   @Override
-  int getLineHeight(Text text) {
-    return 0;
+  int getItemHeight(Control control) {
+    unsupported(control, "getItemHeight");
+    return ((JComponent) control.peer).getFont().getSize();
+  }
+
+  @Override
+  int getLineHeight(Control control) {
+    return getJTextComponent(control).getFont().getSize();
   }
 
   @Override
   Point getSelectedRange(Control control) {
-    return null;
+    JTextComponent textComponent = getJTextComponent(control);
+    return new Point(textComponent.getSelectionStart(), textComponent.getSelectionEnd());
   }
 
   @Override
@@ -606,13 +627,7 @@ public class SwingDisplay extends PlatformDisplay {
 
   @Override
   void paste(Control control) {
-    switch (control.getControlType()) {
-      case TEXT:
-        getJTextComponent(control).paste();
-        break;
-      default:
-        unsupported(control, "paste");
-    }
+    getJTextComponent(control).paste();
   }
 
   @Override
@@ -649,8 +664,8 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
-  int setTextLimit(Text text, int limit) {
-    unsupported(text, "setTextLimit");
+  int setTextLimit(Control control, int limit) {
+    unsupported(control, "setTextLimit");
     return Integer.MAX_VALUE;
   }
 
@@ -660,8 +675,8 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
-  void setSelectionRange(Text text, int start, int end) {
-    JTextComponent jText = (JTextComponent) text.peer;
+  void setSelectionRange(Control control, int start, int end) {
+    JTextComponent jText = getJTextComponent(control);
     jText.setSelectionStart(start);
     jText.setSelectionEnd(end);
   }
@@ -670,6 +685,27 @@ public class SwingDisplay extends PlatformDisplay {
   int getOrientation(Control control) {
     ComponentOrientation orientation = ((Component) control.peer).getComponentOrientation();
     return orientation == ComponentOrientation.RIGHT_TO_LEFT ? SWT.RIGHT_TO_LEFT : SWT.LEFT_TO_RIGHT;
+  }
+
+  @Override
+  boolean getListVisible(Combo control) {
+    return ((JComboBox) control.peer).isPopupVisible();
+  }
+
+  @Override
+  void setListVisible(Combo control, boolean visible) {
+    ((JComboBox) control.peer).showPopup();
+  }
+
+  @Override
+  void setVisibleItemCount(Combo combo, int itemCount) {
+    unsupported(combo, "setVisibleItemCount");
+  }
+
+  @Override
+  int getVisibleItemCount(Combo combo) {
+    unsupported(combo, "getVisibleItemCount");
+    return 5;
   }
 
   @Override
@@ -688,6 +724,9 @@ public class SwingDisplay extends PlatformDisplay {
     switch (control.getControlType()) {
       case LIST:
         getList(control).ensureIndexIsVisible(getSelection(control));
+        break;
+      default:
+        unsupported(control, "showSelection");
     }
   }
 
@@ -728,8 +767,8 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
-  public boolean isSelected(List list, int i) {
-    return ((JList<String>) list.peer).isSelectedIndex(i);
+  public boolean isSelected(List control, int i) {
+    return getList(control).isSelectedIndex(i);
   }
 
   @Override

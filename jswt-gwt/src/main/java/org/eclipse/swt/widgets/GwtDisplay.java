@@ -885,9 +885,14 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    void setIndexSelected(List control, int index, boolean selected) {
-        ((Element) control.peer).getChildren().get(index).setSelected(selected);
-
+    void setIndexSelected(Control control, int index, boolean selected) {
+        switch (control.getControlType()) {
+            case TEXT:
+                ((Element) control.peer).getChildren().get(index).setSelected(selected);
+                break;
+            default:
+                unsupported(control, "setSelectedIndex");
+        }
     }
 
     @Override
@@ -911,7 +916,7 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     void setTopIndex(Control control, int topIndex) {
-
+        unsupported(control, "setTopIndex");
     }
 
     @Override
@@ -920,18 +925,25 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    Point getCaretLocation(Text text) {
-        return null;
+    Point getCaretLocation(Control control) {
+        unsupported(control, "getCaretLocation");
+        return new Point(0, 0);
     }
 
     @Override
-    int getCaretPosition(Text text) {
-        return ((Element) text.peer).getSelectionStart();
+    int getCaretPosition(Control control) {
+        return ((Element) control.peer).getSelectionStart();
     }
 
     @Override
-    int getLineHeight(Text text) {
-        return Math.round(getPx(Window.get().getComputedStyle((Element) text.peer), "lineHeight"));
+    int getItemHeight(Control control) {
+        unsupported(control, "getItemHeight");
+        return 0;
+    }
+
+    @Override
+    int getLineHeight(Control control) {
+        return Math.round(getPx(Window.get().getComputedStyle((Element) control.peer), "lineHeight"));
     }
 
     @Override
@@ -941,7 +953,8 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    int getTopPixel(Text text) {
+    int getTopPixel(Text control) {
+        unsupported(control, "getTopPixel");
         return 0;
     }
 
@@ -983,8 +996,8 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    int setTextLimit(Text text, int limit) {
-        ((Element) text.peer).setMaxlength(limit);
+    int setTextLimit(Control control, int limit) {
+        ((Element) control.peer).setMaxlength(limit);
         return limit;
     }
 
@@ -994,13 +1007,35 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    void setSelectionRange(Text text, int start, int end) {
-        ((Element) text.peer).setSelectionRange(start, end);
+    void setSelectionRange(Control control, int start, int end) {
+        ((Element) control.peer).setSelectionRange(start, end);
     }
 
     @Override
     int getOrientation(Control control) {
         return ((Element) control.peer).getDir().equals("rtl") ? SWT.RIGHT_TO_LEFT : SWT.LEFT_TO_RIGHT;
+    }
+
+    @Override
+    boolean getListVisible(Combo control) {
+        unsupported(control, "getListVisible");
+        return false;
+    }
+
+    @Override
+    void setListVisible(Combo control, boolean visible) {
+        unsupported(control, "setListVisible");
+    }
+
+    @Override
+    void setVisibleItemCount(Combo combo, int itemCount) {
+        unsupported(combo, "setVisibleItemCount");
+    }
+
+    @Override
+    int getVisibleItemCount(Combo combo) {
+        unsupported(combo, "getVisibleItemCount");
+        return 0;
     }
 
     void updateWindowTitle() {

@@ -5,6 +5,7 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Point;
 
 public class Text extends Control {
+  public static final int LIMIT = Integer.MAX_VALUE;
   public static final String DELIMITER = "\n";
 
   public Text(Composite parent, int style) {
@@ -15,9 +16,8 @@ public class Text extends Control {
   private char echoChar;
   private boolean editable = true;
   private String message;
-  private int orientation;
   private int tabs;
-  private int textLimit;
+  private int textLimit = LIMIT;
   private boolean redraw = true;
 
   public void addKeyListener(KeyListener listener) {
@@ -238,7 +238,7 @@ public class Text extends Control {
 
   //Sets the maximum number of characters that the receiver is capable of holding to be the argument.
   public void setTextLimit(int limit) {
-    this.textLimit = display.setTextLimit(this, limit);
+    display.setTextLimit(this, limit);
   }
 
   //  Sets the zero-relative index of the line which is currently at the top of the receiver.

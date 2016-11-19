@@ -2,7 +2,6 @@ package org.kobjects.kswt.demo.android;
 
 import android.os.Bundle;
 
-import android.view.WindowManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.examples.controlexample.ControlExample;
 

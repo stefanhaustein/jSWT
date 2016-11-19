@@ -453,24 +453,49 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
-  Point getCaretLocation(Text control) {
-    EditText editText = ((EditText) control.peer);
-    android.text.Layout layout = editText.getLayout();
-    int pos = editText.getSelectionStart();
-    int line = layout.getLineForOffset(pos);
-    int baseline = layout.getLineBaseline(line);
-    int ascent = layout.getLineAscent(line);
-    return new Point(Math.round(layout.getPrimaryHorizontal(pos)), Math.round(baseline + ascent));
+  Point getCaretLocation(Control control) {
+    switch (control.getControlType()) {
+      case TEXT: {
+        EditText editText = ((EditText) control.peer);
+        android.text.Layout layout = editText.getLayout();
+        int pos = editText.getSelectionStart();
+        int line = layout.getLineForOffset(pos);
+        int baseline = layout.getLineBaseline(line);
+        int ascent = layout.getLineAscent(line);
+        return new Point(Math.round(layout.getPrimaryHorizontal(pos)), Math.round(baseline + ascent));
+      }
+      default:
+        unsupported(control, "getCaretLocation");
+        return new Point(0, 0);
+    }
   }
 
   @Override
-  int getCaretPosition(Text text) {
-    return ((EditText) text.peer).getSelectionStart();
+  int getCaretPosition(Control control) {
+      switch (control.getControlType()) {
+        case TEXT:
+          return ((EditText) control.peer).getSelectionStart();
+        default:
+          unsupported(control, "getCaretPosition");
+          return 0;
+      }
   }
 
   @Override
-  int getLineHeight(Text control) {
-    return ((EditText) control.peer).getLineHeight();
+  int getItemHeight(Control control) {
+    unsupported(control, "getItemHeight");
+    return 0;
+  }
+
+  @Override
+  int getLineHeight(Control control) {
+    switch (control.getControlType()) {
+      case TEXT:
+        return ((EditText) control.peer).getLineHeight();
+      default:
+        unsupported(control, "getLineHeight");
+        return 0;
+    }
   }
 
   @Override
@@ -559,8 +584,14 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
-  int setTextLimit(Text control, int limit) {
-    ((EditText) control.peer).setFilters(new InputFilter[] {new InputFilter.LengthFilter(limit)});
+  int setTextLimit(Control control, int limit) {
+    switch (control.getControlType()) {
+      case TEXT:
+        ((EditText) control.peer).setFilters(new InputFilter[] {new InputFilter.LengthFilter(limit)});
+        break;
+      default:
+        unsupported(control, "setTextLimit");
+    }
     return limit;
   }
 
@@ -570,13 +601,42 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
-  void setSelectionRange(Text control, int start, int end) {
-    ((EditText) control.peer).setSelection(start, end);
+  void setSelectionRange(Control control, int start, int end) {
+    switch (control.getControlType()) {
+      case TEXT:
+        ((EditText) control.peer).setSelection(start, end);
+        break;
+      default:
+        unsupported(control, "setSelectionRange");
+        break;
+    }
   }
 
   @Override
   int getOrientation(Control control) {
     return ((View) control.peer).getTextDirection() == View.TEXT_DIRECTION_RTL ? SWT.RIGHT_TO_LEFT : SWT.LEFT_TO_RIGHT;
+  }
+
+  @Override
+  boolean getListVisible(Combo control) {
+    unsupported(control, "getListVisible");
+    return false;
+  }
+
+  @Override
+  void setListVisible(Combo control, boolean visible) {
+    unsupported(control, "setListVisible");
+  }
+
+  @Override
+  void setVisibleItemCount(Combo combo, int itemCount) {
+    unsupported(combo, "setVisibleItemCount");
+  }
+
+  @Override
+  int getVisibleItemCount(Combo combo) {
+    unsupported(combo, "getVisibleItemCount");
+    return 0;
   }
 
   @Override
@@ -608,12 +668,13 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public boolean isSelected(List list, int i) {
+    unsupported(list, "isSelected");
     return false;
   }
 
   @Override
   public void setFont(Control control, Font font) {
-
+    unsupported(control, "setFont");
   }
 
   @Override
@@ -692,8 +753,8 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
-  public void setIndexSelected(List list, int index, boolean selected) {
-    unsupported(list, "setSelectedIndex");
+  public void setIndexSelected(Control control, int index, boolean selected) {
+    unsupported(control, "setSelectedIndex");
   }
 
   @Override
@@ -857,7 +918,7 @@ public class AndroidDisplay extends PlatformDisplay {
         EditText editText = (EditText) control.peer;
         String oldContent = editText.getText().toString();
         String copy = oldContent.substring(editText.getSelectionStart(), editText.getSelectionEnd());
-        clipboard.setPrimaryClip(ClipData.newPlainText(null, copy);
+        clipboard.setPrimaryClip(ClipData.newPlainText(null, copy));
         break;
       }
       default:

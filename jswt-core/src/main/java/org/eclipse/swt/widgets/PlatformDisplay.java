@@ -128,7 +128,7 @@ public abstract class PlatformDisplay extends Display {
 
     abstract void setImage(Control control, Image image);
 
-    abstract void setIndexSelected(List list, int index, boolean selected);
+    abstract void setIndexSelected(Control control, int index, boolean selected);
 
     abstract void setItem(Control control, int index, String string);
 
@@ -152,11 +152,13 @@ public abstract class PlatformDisplay extends Display {
 
     abstract void showSelection(Control control);
 
-    abstract Point getCaretLocation(Text text);
+    abstract Point getCaretLocation(Control text);
 
-    abstract int getCaretPosition(Text text);
+    abstract int getCaretPosition(Control text);
 
-    abstract int getLineHeight(Text text);
+    abstract int getItemHeight(Control control);
+
+    abstract int getLineHeight(Control control);
 
     abstract Point getSelectedRange(Control control);
 
@@ -176,13 +178,21 @@ public abstract class PlatformDisplay extends Display {
 
     abstract boolean setRedraw(Text text, boolean redraw);
 
-    abstract int setTextLimit(Text text, int limit);
+    abstract int setTextLimit(Control control, int limit);
 
     abstract int setTabs(Text text, int tabs);
 
-    abstract void setSelectionRange(Text text, int start, int end);
+    abstract void setSelectionRange(Control control, int start, int end);
 
     abstract int getOrientation(Control control);
+
+    abstract boolean getListVisible(Combo control);
+
+    abstract void setListVisible(Combo control, boolean visible);
+
+    abstract void setVisibleItemCount(Combo combo, int itemCount);
+
+    abstract int getVisibleItemCount(Combo combo);
 
 
     public static class Insets {

@@ -7,10 +7,6 @@ import org.eclipse.swt.graphics.Font;
 import java.util.ArrayList;
 import java.util.TreeSet;
 
-/**
- * Currently omitted: 
- * getItemHeight(), getTopIndex(), setFont(), setTopIndex(), showSelection()
- */
 public class List extends Scrollable {
     public List(Composite parent, int style) {
         super(parent, style);
@@ -55,6 +51,10 @@ public class List extends Scrollable {
 
     public String getItem(int index) {
         return display.getItem(this, index);
+    }
+
+    public int getItemHeight() {
+        return display.getItemHeight(this);
     }
 
     public String[] getItems() {
@@ -135,7 +135,7 @@ public class List extends Scrollable {
     }
 
     public void remove(int[] indices) {
-        TreeSet<Integer> sorted = new TreeSet<>();
+        TreeSet<Integer> sorted = new TreeSet<Integer>();
         for (int i : indices) {
             sorted.add(i);
         }
