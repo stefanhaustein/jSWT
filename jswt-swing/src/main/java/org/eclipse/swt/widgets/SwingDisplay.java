@@ -165,10 +165,11 @@ public class SwingDisplay extends PlatformDisplay {
         final java.awt.Window window;
         if (shell.parent != null) {
           boolean modal = (shell.style & (SWT.APPLICATION_MODAL | SWT.SYSTEM_MODAL | SWT.PRIMARY_MODAL)) != 0;
-          window = new javax.swing.JDialog((javax.swing.JFrame) SwingUtilities.getRoot((Component) ((Shell) shell.parent).peer), modal);
+          window = new javax.swing.JDialog((javax.swing.JFrame) SwingUtilities.getWindowAncestor((Component) ((Shell) shell.parent).peer), modal);
         } else {
           window = new javax.swing.JFrame();
         }
+        window.pack();  // Makes sure the insets are set.
         Container contentPane = ((RootPaneContainer) window).getContentPane();
         contentPane.setLayout(new SwingSwtLayoutManager((Composite) control));
         window.addWindowListener(new WindowAdapter() {
@@ -223,14 +224,18 @@ public class SwingDisplay extends PlatformDisplay {
   @Override
   public Rectangle getBounds(Control control) {
     java.awt.Rectangle rect = new java.awt.Rectangle();
-    ((java.awt.Component) control.peer).getBounds(rect);
-
     if (control.getControlType() == Control.ControlType.SHELL) {
       Component root = SwingUtilities.getRoot((java.awt.Component) control.peer);
-      rect.x += root.getX();
-      rect.y += root.getY();
+      root.getBounds(rect);
+    } else {
+      ((Component) control.peer).getBounds(rect);
+      if (control.getParent().getControlType() == Control.ControlType.SHELL) {
+        Window root = SwingUtilities.getWindowAncestor((java.awt.Component) control.peer);
+        java.awt.Insets insets = root.getInsets();
+        rect.x += insets.top;
+        rect.y += insets.left;
+      }
     }
-
     return new Rectangle(rect.x, rect.y, rect.width, rect.height);
   }
 
@@ -354,12 +359,17 @@ public class SwingDisplay extends PlatformDisplay {
   @Override
   public void setBounds(Control control, int x, int y, int width, int height) {
     Component component = (Component) control.peer;
-    if (control instanceof Decorations) {
+    if (control.getControlType() == Control.ControlType.SHELL) {
       Window root = SwingUtilities.getWindowAncestor(component);
       root.setLocation(x, y);
       root.setSize(width, height);
-//      component.setSize(width, height);
     } else {
+      if (control.getParent().getControlType() == Control.ControlType.SHELL) {
+        Window window = SwingUtilities.getWindowAncestor(component);
+        java.awt.Insets insets = window.getInsets();
+        x -= insets.left;
+        y -= insets.top;
+      }
       component.setBounds(x, y, width, height);
     }
   /*  if (component.getParent() instanceof JScrollPane) {
@@ -403,9 +413,9 @@ public class SwingDisplay extends PlatformDisplay {
         break;
       case SHELL:
         if (control.getParent() == null) {
-          ((JFrame) SwingUtilities.getRoot(peer)).setTitle(text);
+          ((JFrame) SwingUtilities.getWindowAncestor(peer)).setTitle(text);
         } else {
-          ((JDialog) SwingUtilities.getRoot(peer)).setTitle(text);
+          ((JDialog) SwingUtilities.getWindowAncestor(peer)).setTitle(text);
         }
         break;
       case GROUP:
@@ -471,8 +481,10 @@ public class SwingDisplay extends PlatformDisplay {
       case SPINNER:
         ((JSpinner) control.peer).setValue(selection);
         break;
+      case TAB_FOLDER:
+        ((JTabbedPane) control.peer).setSelectedIndex(selection);
       default:
-        throw new RuntimeException("setSelection() not applicable to " + control.getControlType());
+        unsupported(control, "setSelection");
     }
   }
 
@@ -1026,20 +1038,28 @@ public class SwingDisplay extends PlatformDisplay {
     Insets result = new Insets();
     if (scrollable instanceof Composite) {
       java.awt.Insets insets = ((Container) scrollable.peer).getInsets();
-      result.left = insets.left;
-      result.top = insets.top;
-      result.right = insets.right;
-      result.bottom = insets.bottom;
+      if (scrollable.getControlType() == Control.ControlType.SHELL) {
+        java.awt.Insets outer = SwingUtilities.getWindowAncestor((Component) scrollable.peer).getInsets();
+        result.left = insets.left + outer.left;
+        result.top = insets.top + outer.top;
+        result.right = insets.right + outer.right;
+        result.bottom = insets.bottom + outer.bottom;
+      } else {
+        result.left = insets.left;
+        result.top = insets.top;
+        result.right = insets.right;
+        result.bottom = insets.bottom;
+      }
 
-      if (scrollable.peer instanceof JScrollPane) {
+    /*  if (scrollable.peer instanceof JScrollPane) {
         JScrollPane scrollPane = (JScrollPane) scrollable.peer;
-    /*    if (result.right >= scrollPane.getVScrollbarWidth()) {
+        if (result.right >= scrollPane.getVScrollbarWidth()) {
           result.right -= scrollPane.getVScrollbarWidth();
         }
         if (result.bottom > scrollPane.getHScrollbarHeight()) {
           result.bottom -= scrollPane.getHScrollbarHeight();
-        }*/
-      }
+        }
+      }*/
 
     }
     return result;
