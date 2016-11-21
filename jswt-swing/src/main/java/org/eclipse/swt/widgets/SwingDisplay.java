@@ -343,6 +343,7 @@ public class SwingDisplay extends PlatformDisplay {
       } else {
         JMenu awtMenu = new JMenu(item.text);
         menuAddAll(item.subMenu, awtMenu);
+        destination.add(awtMenu);
       }
     }
   }
