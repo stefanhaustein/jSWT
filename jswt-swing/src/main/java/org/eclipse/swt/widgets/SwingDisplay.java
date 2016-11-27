@@ -414,17 +414,17 @@ public class SwingDisplay extends PlatformDisplay {
     Component peer = (Component) control.peer;
     switch (control.getControlType()) {
       case TEXT:
-        if ((control.style & SWT.WRAP) != 0) {
-          ((JTextField) peer).setText("<html>" + text.replace("\n", "<br>") + "</html>");
-        } else {
-          ((JTextField) peer).setText(text);
-        }
+        ((JTextField) peer).setText(text);
         break;
       case BUTTON:
         ((AbstractButton) peer).setText(removeAccelerators(text));
         break;
       case LABEL:
-        ((JLabel) peer).setText(text);
+        if ((control.style & SWT.WRAP) != 0) {
+          ((JLabel) peer).setText("<html>" + text.replace("\n", "<br>") + "</html>");
+        } else {
+          ((JLabel) peer).setText(text);
+        }
         break;
       case SHELL:
         if (control.getParent() == null) {
