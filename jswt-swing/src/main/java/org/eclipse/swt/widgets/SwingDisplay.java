@@ -230,10 +230,14 @@ public class SwingDisplay extends PlatformDisplay {
     } else {
       ((Component) control.peer).getBounds(rect);
       if (control.getParent().getControlType() == Control.ControlType.SHELL) {
+        Container container = (Container) control.getParent().peer;
         Window root = SwingUtilities.getWindowAncestor((java.awt.Component) control.peer);
-        java.awt.Insets insets = root.getInsets();
-        rect.x += insets.top;
-        rect.y += insets.left;
+        // Adjust for frame insets and menu bar only.
+        if (root != null) {
+          java.awt.Insets insets = root.getInsets();
+          rect.x += insets.top + container.getY();
+          rect.y += insets.left;
+        }
       }
     }
     return new Rectangle(rect.x, rect.y, rect.width, rect.height);
@@ -368,10 +372,14 @@ public class SwingDisplay extends PlatformDisplay {
       root.setSize(width, height);
     } else {
       if (control.getParent().getControlType() == Control.ControlType.SHELL) {
+        // Adjust for frame insets and menu bar only.
+        Container container = (Container) control.getParent().peer;
         Window window = SwingUtilities.getWindowAncestor(component);
-        java.awt.Insets insets = window.getInsets();
-        x -= insets.left;
-        y -= insets.top;
+        if (window != null) {
+          java.awt.Insets insets = window.getInsets();
+          x -= insets.left;
+          y -= insets.top + container.getY();
+        }
       }
       component.setBounds(x, y, width, height);
     }
@@ -406,7 +414,11 @@ public class SwingDisplay extends PlatformDisplay {
     Component peer = (Component) control.peer;
     switch (control.getControlType()) {
       case TEXT:
-        ((JTextField) peer).setText(text);
+        if ((control.style & SWT.WRAP) != 0) {
+          ((JTextField) peer).setText("<html>" + text.replace("\n", "<br>") + "</html>");
+        } else {
+          ((JTextField) peer).setText(text);
+        }
         break;
       case BUTTON:
         ((AbstractButton) peer).setText(removeAccelerators(text));
@@ -1040,11 +1052,12 @@ public class SwingDisplay extends PlatformDisplay {
   public Insets getInsets(Scrollable scrollable) {
     Insets result = new Insets();
     if (scrollable instanceof Composite) {
-      java.awt.Insets insets = ((Container) scrollable.peer).getInsets();
+      Container container = ((Container) scrollable.peer);
+      java.awt.Insets insets = container.getInsets();
       if (scrollable.getControlType() == Control.ControlType.SHELL) {
         java.awt.Insets outer = SwingUtilities.getWindowAncestor((Component) scrollable.peer).getInsets();
         result.left = insets.left + outer.left;
-        result.top = insets.top + outer.top;
+        result.top = insets.top + outer.top + container.getY();  // Menu bar
         result.right = insets.right + outer.right;
         result.bottom = insets.bottom + outer.bottom;
       } else {
