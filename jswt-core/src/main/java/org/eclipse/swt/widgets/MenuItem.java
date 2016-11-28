@@ -16,4 +16,10 @@ public class MenuItem extends Item {
     public void addSelectionListener(SelectionListener selectionListener) {
         addListener(SWT.Selection, new TypedListener(selectionListener));
     }
+
+    public void setEnabled(boolean b) {
+    }
+
+    public void setSelection(boolean b) {
+    }
 }
