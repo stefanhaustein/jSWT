@@ -5,7 +5,9 @@ import org.eclipse.swt.events.SelectionListener;
 
 public class MenuItem extends Item {
 
-    public Menu subMenu;
+    Menu subMenu;
+    private boolean enabled;
+    private boolean selection;
 
     public MenuItem(Menu parent, int style) {
         super(parent, style);
@@ -18,8 +20,14 @@ public class MenuItem extends Item {
     }
 
     public void setEnabled(boolean b) {
+        this.enabled = b;
     }
 
     public void setSelection(boolean b) {
+        this.selection = b;
+    }
+
+    public boolean getSelection() {
+        return selection;
     }
 }
