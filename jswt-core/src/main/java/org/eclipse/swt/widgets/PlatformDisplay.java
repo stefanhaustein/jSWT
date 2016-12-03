@@ -194,6 +194,8 @@ public abstract class PlatformDisplay extends Display {
 
     abstract int getVisibleItemCount(Combo combo);
 
+    abstract void updateItem(Item item);
+
 
     public static class Insets {
         public int top;

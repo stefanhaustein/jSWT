@@ -640,6 +640,11 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
+  void updateItem(Item item) {
+
+  }
+
+  @Override
   public void setImage(Control control, Image image) {
     if (control.peer instanceof ImageButton) {
       ((ImageButton) control.peer).setImageBitmap((Bitmap) image.peer);

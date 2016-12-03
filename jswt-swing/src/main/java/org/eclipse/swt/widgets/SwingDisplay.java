@@ -8,6 +8,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -312,44 +313,39 @@ public class SwingDisplay extends PlatformDisplay {
     return getJTextComponent(control).getText();
   }
 
+  JMenuItem createMenuItem(final MenuItem swtMenuItem) {
+    if ((swtMenuItem.style & SWT.CASCADE) != 0) {
+      JMenu awtMenu = new JMenu();
+      swtMenuItem.peer = awtMenu;
+      menuAddAll(swtMenuItem.subMenu, awtMenu);
+      updateItem(swtMenuItem);
+      return awtMenu;
+    }
+    JMenuItem awtItem = (swtMenuItem.style & SWT.CHECK) != 0
+              ? new JCheckBoxMenuItem() : new JMenuItem();
+    swtMenuItem.peer = awtItem;
+    awtItem.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+          swtMenuItem.notifyListeners(SWT.Selection, null);
+        }
+      });
+    updateItem(swtMenuItem);
+    return awtItem;
+  }
 
   private void menuAddAll(Menu source, JMenu destination) {
-    for (int i = 0; i < source.getItemCount(); i++) {
-      final MenuItem item = source.getItem(i);
-      if (item.subMenu == null) {
-        JMenuItem awtItem = new JMenuItem(item.text);
-        awtItem.addActionListener(new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            item.notifyListeners(SWT.Selection, null);
-          }
-        });
-        destination.add(awtItem);
-      } else {
-        JMenu awtMenu = new JMenu(item.text);
-        menuAddAll(item.subMenu, awtMenu);
-        destination.add(awtMenu);
+    if (source != null) {
+      for (int i = 0; i < source.getItemCount(); i++) {
+        destination.add(createMenuItem(source.getItem(i)));
       }
     }
   }
 
   private void menuAddAll(Menu source, JPopupMenu destination) {
-    for (int i = 0; i < source.getItemCount(); i++) {
-      final MenuItem item = source.getItem(i);
-      if (item.subMenu == null) {
-        JMenuItem awtItem = new JMenuItem(item.text);
-        awtItem.addActionListener(new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-
-            item.notifyListeners(SWT.Selection, null);
-          }
-        });
-        destination.add(awtItem);
-      } else {
-        JMenu awtMenu = new JMenu(item.text);
-        menuAddAll(item.subMenu, awtMenu);
-        destination.add(awtMenu);
+    if (source != null) {
+      for (int i = 0; i < source.getItemCount(); i++) {
+        destination.add(createMenuItem(source.getItem(i)));
       }
     }
   }
@@ -596,14 +592,15 @@ public class SwingDisplay extends PlatformDisplay {
   @Override
   public void updateMenuBar(Decorations decorations) {
     JMenuBar awtMenuBar = new JMenuBar();
-
     for (int i = 0; i < decorations.menuBar.getItemCount(); i++) {
       MenuItem item = decorations.menuBar.getItem(i);
       JMenu awtSubMenu = new JMenu(item.text);
+      item.peer = awtSubMenu;
       awtMenuBar.add(awtSubMenu);
       if (item.subMenu != null) {
         menuAddAll(item.subMenu, awtSubMenu);
       }
+      updateItem(item);
     }
     ((JFrame) SwingUtilities.getRoot((Component) decorations.peer)).setJMenuBar(awtMenuBar);
   }
@@ -733,6 +730,25 @@ public class SwingDisplay extends PlatformDisplay {
   int getVisibleItemCount(Combo combo) {
     unsupported(combo, "getVisibleItemCount");
     return 5;
+  }
+
+  @Override
+  void updateItem(Item item) {
+    if (item.peer == null) {
+      return;
+    }
+    switch (item.getItemType()) {
+      case MENU_ITEM: {
+        MenuItem menuItem = (MenuItem) item;
+        if (item.peer instanceof JCheckBoxMenuItem) {
+          ((JCheckBoxMenuItem) item.peer).setSelected(((MenuItem) item).getSelection());
+        }
+        JMenuItem awtItem = (JMenuItem) item.peer;
+        awtItem.setEnabled(menuItem.getEnabled());
+        awtItem.setText(menuItem.getText());
+        break;
+      }
+    }
   }
 
   @Override

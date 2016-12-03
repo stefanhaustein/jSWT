@@ -1038,6 +1038,11 @@ public class GwtDisplay extends PlatformDisplay {
         return 0;
     }
 
+    @Override
+    void updateItem(Item item) {
+
+    }
+
     void updateWindowTitle() {
         if (rootShells.size() > 0) {
             Document.get().setTitle(rootShells.get(rootShells.size() - 1).text);

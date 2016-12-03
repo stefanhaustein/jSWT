@@ -6,7 +6,7 @@ import org.eclipse.swt.events.SelectionListener;
 public class MenuItem extends Item {
 
     Menu subMenu;
-    private boolean enabled;
+    private boolean enabled = true;
     private boolean selection;
 
     public MenuItem(Menu parent, int style) {
@@ -21,13 +21,24 @@ public class MenuItem extends Item {
 
     public void setEnabled(boolean b) {
         this.enabled = b;
+        display.updateItem(this);
     }
 
     public void setSelection(boolean b) {
         this.selection = b;
+        display.updateItem(this);
     }
 
     public boolean getSelection() {
         return selection;
+    }
+
+    @Override
+    ItemType getItemType() {
+        return ItemType.MENU_ITEM;
+    }
+
+    public boolean getEnabled() {
+        return enabled;
     }
 }

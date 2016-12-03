@@ -33,6 +33,11 @@ import org.eclipse.swt.graphics.*;
 public abstract class Item extends Widget {
 	String text;
 	Image image;
+	Object peer;
+
+	enum ItemType {
+		MENU_ITEM
+	}
 
 /**
  * Constructs a new instance of this class given its parent
@@ -169,6 +174,7 @@ public void setImage (Image image) {
 	checkWidget ();
 	if (image != null && image.isDisposed()) error(SWT.ERROR_INVALID_ARGUMENT);
 	this.image = image;
+	display.updateItem(this);
 }
 
 /**
@@ -196,7 +202,12 @@ public void setText (String string) {
 		updateTextDirection (AUTO_TEXT_DIRECTION);
 	}
 	*/
+	display.updateItem(this);
 }
+
+	ItemType getItemType() {
+		throw new RuntimeException("Implemnt in subclass!");
+	}
 
 	/*
 boolean updateTextDirection(int textDirection) {
