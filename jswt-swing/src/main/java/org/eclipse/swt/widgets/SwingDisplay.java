@@ -150,6 +150,9 @@ public class SwingDisplay extends PlatformDisplay {
         return new JScrollPane(list);
       }
       case TEXT:
+        if ((control.style & SWT.MULTI) != 0) {
+          return new JScrollPane(new javax.swing.JTextArea());
+        }
         return new javax.swing.JTextField();
       case PROGRESS_BAR:
         return new JProgressBar();
@@ -410,7 +413,7 @@ public class SwingDisplay extends PlatformDisplay {
     Component peer = (Component) control.peer;
     switch (control.getControlType()) {
       case TEXT:
-        ((JTextField) peer).setText(text);
+        getJTextComponent(control).setText(text);
         break;
       case BUTTON:
         ((AbstractButton) peer).setText(removeAccelerators(text));
