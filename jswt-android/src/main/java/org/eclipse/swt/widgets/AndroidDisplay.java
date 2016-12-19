@@ -164,8 +164,11 @@ public class AndroidDisplay extends PlatformDisplay {
       case GROUP:
       case COMPOSITE:
         return new AndroidComposite(activity, (Composite) control);
-      case PROGRESS_BAR:
-        return new android.widget.ProgressBar(activity);
+      case PROGRESS_BAR: {
+        android.widget.ProgressBar progressBar = new android.widget.ProgressBar(activity, null, android.R.attr.progressBarStyleHorizontal);
+        progressBar.setIndeterminate((control.style & SWT.INDETERMINATE) != 0);
+        return progressBar;
+      }
       case SPINNER: {
         EditText editText = new EditText(activity);
         editText.setInputType(InputType.TYPE_CLASS_NUMBER);

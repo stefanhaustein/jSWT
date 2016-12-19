@@ -10,9 +10,12 @@ import org.eclipse.swt.graphics.Point;
 public class AndroidGC extends GC {
     final Paint backgroundPaint = new Paint();
     final Paint foregroundPaint = new Paint();
+    final Paint textPaint = new Paint();
     Path path;
     RectF rectF = new RectF();
     Rect rect = new Rect();
+    Rect srcRect = new Rect();
+    Rect dstRect = new Rect();
     final Canvas canvas;
     Color foregroundColor;
     Color backgroundColor;
@@ -23,7 +26,8 @@ public class AndroidGC extends GC {
         this.canvas = canvas;
         backgroundPaint.setStyle(Paint.Style.FILL);
         foregroundPaint.setStyle(Paint.Style.STROKE);
-        setForeground(getDevice().getSystemColor(SWT.COLOR_BLACK));
+        textPaint.setStyle(Paint.Style.FILL);
+        setForeground(getDevice().getSystemColor(SWT.COLOR_WHITE));
         setBackground(getDevice().getSystemColor(SWT.COLOR_BLACK));
     }
 
@@ -39,6 +43,28 @@ public class AndroidGC extends GC {
         rectF.bottom = y + height;
         canvas.drawArc(rectF, startAngle, arcAngle, false, foregroundPaint);
     }
+
+
+    @Override
+    public void drawImage(Image image, int x, int y) {
+        canvas.drawBitmap((Bitmap) image.peer, x, y, null);
+    }
+
+    @Override
+    public void drawImage(Image image, int srcX, int srcY, int srcWidth, int srcHeight, int destX, int destY, int destWidth, int destHeight) {
+        srcRect.left = srcX;
+        srcRect.top = srcY;
+        srcRect.right = srcX + srcWidth;
+        srcRect.bottom = srcY + srcHeight;
+
+        dstRect.left = destX;
+        dstRect.top = destY;
+        dstRect.right = destX + destWidth;
+        dstRect.bottom = destY + destHeight;
+
+        canvas.drawBitmap((Bitmap) image.peer, srcRect, dstRect, null);
+    }
+
 
     @Override
     public void drawOval(int x, int y, int width, int height) {
@@ -65,7 +91,7 @@ public class AndroidGC extends GC {
 
     @Override
     public void drawText(String string, int x, int y, int flags) {
-        canvas.drawText(string, x, y - foregroundPaint.ascent(), foregroundPaint);
+        canvas.drawText(string, x, y - textPaint.ascent(), textPaint);
     }
 
     public void fillArc(int x, int y, int width, int height, int startAngle, int arcAngle) {
@@ -151,19 +177,21 @@ public class AndroidGC extends GC {
     @Override
     public void setFont(Font font) {
         FontData fd = font.getFontData()[0];
-        foregroundPaint.setTextSize(fd.getHeight());
+        textPaint.setTextSize(fd.getHeight());
     }
 
     @Override
     public void setForeground(Color color) {
         foregroundColor = color;
-        foregroundPaint.setColor(0x0ff000000 | (color.getRed() << 16) | (color.getGreen() << 8) | color.getBlue());
+        int argb = (color.getAlpha() << 24) | (color.getRed() << 16) | (color.getGreen() << 8) | color.getBlue();
+        foregroundPaint.setColor(argb);
+        textPaint.setColor(argb);
     }
 
     @Override
     public void setBackground(Color color) {
         backgroundColor = color;
-        backgroundPaint.setColor(0x0ff000000 | (color.getRed() << 16) | (color.getGreen() << 8) | color.getBlue());
+        backgroundPaint.setColor((color.getAlpha() << 24) | (color.getRed() << 16) | (color.getGreen() << 8) | color.getBlue());
     }
 
     @Override
@@ -218,7 +246,7 @@ public class AndroidGC extends GC {
     }
 
     public Point textExtent(String text, int flags) {
-        foregroundPaint.getTextBounds(text, 0, text.length(), rect);
-        return new Point(rect.width(), rect.height());
+        textPaint.getTextBounds(text, 0, text.length(), rect);
+        return new Point(rect.width(), textPaint.getFontMetricsInt(null));
     }
 }

@@ -17,7 +17,6 @@ public class GC extends Resource {
         }
     }
 
-
     public void dispose() {
     }
 
@@ -29,10 +28,10 @@ public class GC extends Resource {
         delegate.drawImage(image, x, y);
     }
 
-    public void drawImage(Image image, int srcX, int srcY, int srcWidth, int srcHeight, int destX, int destY, int destWidth, int destHeight) {
-        delegate.drawImage(image, srcX, srcY, srcWidth, srcHeight, destX, destY, destWidth, destHeight);
+    public void drawImage(Image image, int srcX, int srcY, int srcWidth, int srcHeight,
+                                       int dstX, int dstY, int dstWidth, int dstHeight) {
+        delegate.drawImage(image, srcX, srcY, srcWidth, srcHeight, dstX, dstY, dstWidth, dstHeight);
     }
-
 
     public void drawLine(int x1, int y1, int x2, int y2) {
         delegate.drawLine(x1, y1, x2, y2);
