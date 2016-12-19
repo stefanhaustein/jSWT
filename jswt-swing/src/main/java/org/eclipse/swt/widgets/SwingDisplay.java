@@ -215,7 +215,7 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
-  public GC creatGCForPlatformImage(Object platformImage) {
+  public GC createGCForPlatformImage(Object platformImage) {
     return new SwingGC(this, ((BufferedImage) platformImage).createGraphics());
   }
 

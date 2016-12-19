@@ -475,7 +475,7 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    public GC creatGCForPlatformImage(Object platformImage) {
+    public GC createGCForPlatformImage(Object platformImage) {
         throw new RuntimeException("FIXME: GwtDisplay.GCForPlatformImage");
     }
 

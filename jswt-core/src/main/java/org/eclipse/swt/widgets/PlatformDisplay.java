@@ -52,7 +52,7 @@ public abstract class PlatformDisplay extends Display {
 
     public abstract Object createImage(int width, int height);
 
-    public abstract GC creatGCForPlatformImage(Object platformImage);
+    public abstract GC createGCForPlatformImage(Object platformImage);
 
     abstract void disposePeer(Control child);
 

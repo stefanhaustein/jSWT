@@ -886,11 +886,11 @@ public class AndroidDisplay extends PlatformDisplay {
             switch (motionEvent.getAction()) {
               case MotionEvent.ACTION_DOWN:
               case MotionEvent.ACTION_POINTER_DOWN:
-                control.notifyListeners(SWT.MouseDown, null);
+                notifyListeners(control, SWT.MouseDown, motionEvent);
                 return true;
               case MotionEvent.ACTION_UP:
               case MotionEvent.ACTION_POINTER_UP:
-                control.notifyListeners(SWT.MouseUp, null);
+                notifyListeners(control, SWT.MouseUp, motionEvent);
                 return true;
             }
             return false;
@@ -959,13 +959,21 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
-  public GC creatGCForPlatformImage(Object platformImage) {
+  public GC createGCForPlatformImage(Object platformImage) {
     throw new RuntimeException("NYI");
   }
 
   @Override
   public Object loadImage(InputStream is) {
     return BitmapFactory.decodeStream(is);
+  }
+
+
+  void notifyListeners(Control control, int type, MotionEvent motionEvent) {
+    Event event = new Event();
+    event.x = Math.round(motionEvent.getX());
+    event.y = Math.round(motionEvent.getY());
+    control.notifyListeners(type, event);
   }
 
 }

@@ -13,7 +13,7 @@ public class GC extends Resource {
     public GC(Image image) {
         if (image != null) {
             this.device = image.device;
-            this.delegate = ((PlatformDisplay) device).creatGCForPlatformImage(image.peer);
+            this.delegate = ((PlatformDisplay) device).createGCForPlatformImage(image.peer);
         }
     }
 
