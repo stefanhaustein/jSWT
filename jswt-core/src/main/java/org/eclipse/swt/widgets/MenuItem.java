@@ -41,4 +41,12 @@ public class MenuItem extends Item {
     public boolean getEnabled() {
         return enabled;
     }
+
+    public void setMenu(Menu menu) {
+        throw new RuntimeException("???");
+    }
+
+    public void setAccelerator(int i) {
+        throw new RuntimeException("???");
+    }
 }

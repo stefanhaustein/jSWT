@@ -4,6 +4,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -12,6 +13,10 @@ import org.eclipse.swt.graphics.Rectangle;
 public class Control extends Widget {
 
   static final boolean DEBUG_LAYOUT = false;
+
+  public void setCursor(Cursor cursor) {
+    System.err.println("FIXME: setCursor: " + cursor);
+  }
 
   enum ControlType {
       BUTTON,
@@ -178,8 +183,16 @@ public class Control extends Widget {
     return (Shell) current;
   }
 
+  public boolean getVisible() {
+    return display.isVisible(this);
+  }
+
   public boolean isEnabled() {
     return display.isEnabled(this);
+  }
+
+  public boolean isVisible() {
+    return display.isVisible(this);
   }
 
   void markLayout (boolean changed, boolean all) {

@@ -1,9 +1,12 @@
-include ':jswt-android', ':jswt-core', 'jswt-gwt', ':jswt-swing', ':controlexample-android', 'controlexample-core', ':controlexample-swing', 'controlexample-gwt'
+include ':jswt-android', ':jswt-core', 'jswt-gwt', ':jswt-swing', ':addressbook-core', ':addressbook-swing', ':controlexample-android', 'controlexample-core', ':controlexample-swing', 'controlexample-gwt'
 
 project(':jswt-android').projectDir = new File('jswt-android')
 project(':jswt-core').projectDir = new File('jswt-core')
 project(':jswt-gwt').projectDir = new File('jswt-gwt')
 project(':jswt-swing').projectDir = new File('jswt-swing')
+
+project(':addressbook-core').projectDir = new File('examples/addressbook/addressbook-core')
+project(':addressbook-swing').projectDir = new File('examples/addressbook/addressbook-swing')
 
 project(':controlexample-android').projectDir = new File('examples/controlexample/controlexample-android')
 project(':controlexample-core').projectDir = new File('examples/controlexample/controlexample-core')

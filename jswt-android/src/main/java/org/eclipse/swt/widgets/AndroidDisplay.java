@@ -681,6 +681,11 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
+  boolean isVisible(Control control) {
+    return ((View) control.peer).getVisibility() == View.VISIBLE;
+  }
+
+  @Override
   public void setFont(Control control, Font font) {
     unsupported(control, "setFont");
   }

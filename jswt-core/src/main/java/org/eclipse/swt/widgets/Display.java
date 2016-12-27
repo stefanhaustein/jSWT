@@ -2,6 +2,7 @@ package org.eclipse.swt.widgets;
 
 
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -71,5 +72,10 @@ public class Display extends Device {
     public Rectangle getClientArea() {
         System.err.println("FIXME: Display.getClientArea()");
         return new Rectangle(0, 0, 2000, 1000);
+    }
+
+    public Cursor getSystemCursor(int cursor) {
+        System.err.println("FIXME: Display.getSystemCursor()");
+        return new Cursor(this, cursor);
     }
 }

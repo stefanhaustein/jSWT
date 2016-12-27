@@ -1,5 +1,9 @@
 package org.eclipse.swt.widgets;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuListener;
+
 import java.util.ArrayList;
 
 public class Menu extends Widget {
@@ -35,5 +39,14 @@ public class Menu extends Widget {
         if (visible) {
             display.showPopupMenu(this);
         }
+    }
+
+    public MenuItem[] getItems() {
+        throw new RuntimeException("NYI");
+    }
+
+    public void addMenuListener(MenuListener listener) {
+        addListener(SWT.Hide, new TypedListener(listener));
+        addListener(SWT.Show, new TypedListener(listener));
     }
 }

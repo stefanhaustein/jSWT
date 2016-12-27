@@ -2,7 +2,11 @@ package org.eclipse.swt.widgets;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.ShellAdapter;
+import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.internal.SWTEventListener;
+
+import java.util.HashMap;
 
 public abstract class Widget {
 
@@ -55,6 +59,7 @@ public abstract class Widget {
     PlatformDisplay display;
     EventTable listeners;
     Object data;
+    HashMap<String, Object> dataMap;
 
     public Widget(Widget parent, int style) {
         if (parent != null) {
@@ -68,7 +73,6 @@ public abstract class Widget {
     public void addDisposeListener(DisposeListener listener) {
         addListener(SWT.Dispose, new TypedListener(listener));
     }
-
 
     /**
      * Overriden in Control, adding a platform listener registration.
@@ -116,6 +120,11 @@ public abstract class Widget {
     public Object getData() {
         return data;
     }
+
+    public Object getData(String key) {
+        return dataMap == null ? null : dataMap.get(key);
+    }
+
     public Display getDisplay() {
         return display;
     }
@@ -165,5 +174,12 @@ public abstract class Widget {
 
     public void setData(Object data) {
         this.data = data;
+    }
+
+    public void setData(String key, Object data) {
+        if (dataMap == null) {
+            dataMap = new HashMap<>();
+        }
+        dataMap.put(key, data);
     }
 }

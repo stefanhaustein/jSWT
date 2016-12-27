@@ -818,6 +818,11 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
+  boolean isVisible(Control control) {
+    return ((JComponent) control.peer).isVisible();
+  }
+
+  @Override
   public void setFont(Control control, Font font) {
     System.err.println("FIXME: SwingDisplay.setFont()");         // FIXME
   }

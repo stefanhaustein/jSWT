@@ -97,6 +97,8 @@ public abstract class PlatformDisplay extends Display {
 
     abstract boolean isSelected(List list, int i);
 
+    abstract boolean isVisible(Control control);
+
     /**
      * Used internally for image loading; not part of the public API
      */

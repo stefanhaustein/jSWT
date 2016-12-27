@@ -1124,6 +1124,11 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
+    boolean isVisible(Control control) {
+        return !"hidden".equals(((Element) control.peer).getStyle().getVisibility());
+    }
+
+    @Override
     void setFont(Control control, Font font) {
         log("FIXME: GwtDisplay.setFont");
     }

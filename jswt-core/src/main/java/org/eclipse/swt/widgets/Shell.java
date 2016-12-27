@@ -2,6 +2,7 @@ package org.eclipse.swt.widgets;
 
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Image;
 
 public class Shell extends Decorations {
@@ -29,6 +30,16 @@ public class Shell extends Decorations {
     this.peer = this.display.createControl(this);
   }
 
+
+  public void addShellListener(ShellListener listener) {
+    addListener(SWT.Activate, new TypedListener(listener));
+    addListener(SWT.Close, new TypedListener(listener));
+    addListener(SWT.Deactivate, new TypedListener(listener));
+    addListener(SWT.Deiconify, new TypedListener(listener));
+    addListener(SWT.Iconify, new TypedListener(listener));
+  }
+
+
   ControlType getControlType() {
     return ControlType.SHELL;
   }
@@ -40,11 +51,15 @@ public class Shell extends Decorations {
   public void setDefaultButton(Button button) {
   }
 
-    public void setFullScreen(boolean fullScreen) {
+  public void setFullScreen(boolean fullScreen) {
       System.err.println("FIXME: Shell.setFullScreen()");
     }
 
   public void setImage(Image image) {
     display.setImage(this, image);
+  }
+
+  public void close() {
+    System.err.println("FIXME: Shell.close()");
   }
 }
