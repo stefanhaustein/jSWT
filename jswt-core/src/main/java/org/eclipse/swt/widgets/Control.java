@@ -18,6 +18,20 @@ public class Control extends Widget {
     System.err.println("FIXME: setCursor: " + cursor);
   }
 
+    public void moveAbove(Control other) {
+      display.moveAbove(this, other);
+    }
+
+  public Point toControl(Point point) {
+    return toControl(point.x, point.y);
+  }
+
+
+  public Point toControl(int x, int y) {
+    System.err.println("FIXME: Control.toControl(x,y)");
+    return new Point(x, y);
+  }
+
   enum ControlType {
       BUTTON,
       CANVAS, COMBO, COMPOSITE,
@@ -25,7 +39,7 @@ public class Control extends Widget {
       LABEL, LIST,
       PROGRESS_BAR,
       SCALE, SHELL, SLIDER, SCROLLED_COMPOSITE, SPINNER,
-      TAB_FOLDER, TEXT};
+      TAB_FOLDER, TABLE, TEXT};
 
   Menu menu;
   Object layoutData;

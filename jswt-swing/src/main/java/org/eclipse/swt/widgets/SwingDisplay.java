@@ -27,6 +27,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.RootPaneContainer;
@@ -148,6 +149,10 @@ public class SwingDisplay extends PlatformDisplay {
         list.setSelectionMode((control.style & SWT.MULTI) == 0 ? ListSelectionModel.SINGLE_SELECTION
                 : ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         return new JScrollPane(list);
+      }
+      case TABLE: {
+        JTable table = new JTable(new SwingSwtTableModel((Table) control));
+         return new JScrollPane(table);
       }
       case TEXT:
         if ((control.style & SWT.MULTI) != 0) {
@@ -518,6 +523,10 @@ public class SwingDisplay extends PlatformDisplay {
     return (JList<String>) ((JScrollPane) control.peer).getViewport().getView();
   }
 
+  public JTable getTable(Control control) {
+    return (JTable) ((JScrollPane) control.peer).getViewport().getView();
+  }
+
   @Override
   public void setIndexSelected(Control control, int index, boolean selected) {
     switch (control.getControlType()) {
@@ -752,6 +761,41 @@ public class SwingDisplay extends PlatformDisplay {
         break;
       }
     }
+  }
+
+  @Override
+  void addTableColumn(Table table, TableColumn column) {
+
+  }
+
+  @Override
+  void addTableItem(Table table, TableItem item) {
+
+  }
+
+  @Override
+  void updateTableColumn(Table table, TableColumn item) {
+
+  }
+
+  @Override
+  void updateTableItem(Table table, TableItem item) {
+
+  }
+
+  @Override
+  void removeTableColumn(Table table, TableColumn column) {
+
+  }
+
+  @Override
+  void removeTableItem(Table table, TableItem item) {
+
+  }
+
+  @Override
+  void moveAbove(Control control, Control other) {
+    System.err.println("FIXME: SwingDisplay.moveAbove");
   }
 
   @Override

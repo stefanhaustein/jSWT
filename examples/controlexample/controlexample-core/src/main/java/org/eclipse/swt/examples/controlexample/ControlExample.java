@@ -126,7 +126,7 @@ public class ControlExample {
 			new SliderTab (this),
 			new SpinnerTab (this),
 		//	new TabFolderTab (this),
-		//	new TableTab (this),
+			new TableTab (this),
 			new TextTab (this),
 		//	new ToolBarTab (this),
 		//	new ToolTipTab (this),

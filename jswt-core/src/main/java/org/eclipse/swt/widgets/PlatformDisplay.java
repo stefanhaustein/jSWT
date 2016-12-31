@@ -198,6 +198,19 @@ public abstract class PlatformDisplay extends Display {
 
     abstract void updateItem(Item item);
 
+    abstract void addTableColumn(Table table, TableColumn column);
+
+    abstract void addTableItem(Table table, TableItem item);
+
+    abstract void updateTableColumn(Table table, TableColumn item);
+
+    abstract void updateTableItem(Table table, TableItem item);
+
+    abstract void removeTableColumn(Table table, TableColumn column);
+
+    abstract void removeTableItem(Table table, TableItem item);
+
+    abstract void moveAbove(Control control, Control other);
 
     public static class Insets {
         public int top;
