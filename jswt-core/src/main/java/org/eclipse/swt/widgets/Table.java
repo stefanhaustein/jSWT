@@ -60,8 +60,13 @@ public class Table extends Composite {
         addListener(SWT.Selection, new TypedListener(listener));
     }
 
+    @Override
+    public ControlType getControlType() {
+        return ControlType.TABLE;
+    }
+
     public int getColumnCount() {
-        return columns.size();
+        return columns == null ? 0 : columns.size();
     }
 
     public int getSelectionIndex() {
@@ -69,7 +74,7 @@ public class Table extends Composite {
     }
 
     public int getItemCount() {
-        return rows.size();
+        return rows == null ? 0 : rows.size();
     }
 
     public TableItem getItem(int i) {

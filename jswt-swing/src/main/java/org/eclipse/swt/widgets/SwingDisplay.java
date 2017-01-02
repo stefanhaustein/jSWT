@@ -152,7 +152,7 @@ public class SwingDisplay extends PlatformDisplay {
       }
       case TABLE: {
         JTable table = new JTable(new SwingSwtTableModel((Table) control));
-         return new JScrollPane(table);
+        return new JScrollPane(table);
       }
       case TEXT:
         if ((control.style & SWT.MULTI) != 0) {
@@ -765,11 +765,12 @@ public class SwingDisplay extends PlatformDisplay {
 
   @Override
   void addTableColumn(Table table, TableColumn column) {
-
+    ((SwingSwtTableModel) getTable(table).getModel()).fireTableStructureChanged();
   }
 
   @Override
   void addTableItem(Table table, TableItem item) {
+    ((SwingSwtTableModel) getTable(table).getModel()).fireTableRowsInserted(item.index, item.index);
 
   }
 
