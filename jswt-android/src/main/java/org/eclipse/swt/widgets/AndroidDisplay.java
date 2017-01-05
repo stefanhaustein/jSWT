@@ -147,7 +147,16 @@ public class AndroidDisplay extends PlatformDisplay {
         return new AppCompatTextView(activity);
       case LIST: {
         ListView listView = new ListView(activity);
-        listView.setAdapter(new ArrayAdapter<String>(activity, android.R.layout.simple_list_item_1));
+        if ((control.style & SWT.SINGLE) != 0) {
+          listView.setAdapter(new ArrayAdapter<String>(activity, android.R.layout.simple_list_item_single_choice));
+          listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        } else if ((control.style & SWT.MULTI) != 0) {
+          listView.setAdapter(new ArrayAdapter<String>(activity, android.R.layout.simple_list_item_multiple_choice));
+          listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        } else {
+          listView.setAdapter(new ArrayAdapter<String>(activity, android.R.layout.simple_list_item_1));
+          listView.setChoiceMode(ListView.CHOICE_MODE_NONE);
+        }
         return listView;
       }
       case SCROLLED_COMPOSITE:
@@ -157,6 +166,8 @@ public class AndroidDisplay extends PlatformDisplay {
         return new android.widget.SeekBar(activity);
       case SHELL:
         return new AndroidShell(activity, (Shell) control);
+      case TABLE:
+        return new AndroidTableView(activity, (Table) control);
       case TAB_FOLDER:
         return new AndroidTabFolder(activity);
       case CANVAS:
@@ -190,12 +201,18 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public Color getBackground(Control control) {
-       Drawable bg = ((View) control.peer).getBackground();
-       if (bg instanceof ColorDrawable) {
-          ColorDrawable cd = (ColorDrawable) bg;
-          return createColor(cd.getColor());
-        }
-        return null;
+    View view = (View) control.peer;
+    while (true) {
+      Drawable bg = view.getBackground();
+      if (bg instanceof ColorDrawable) {
+        ColorDrawable cd = (ColorDrawable) bg;
+        return createColor(cd.getColor());
+      }
+      if (!(view.getParent() instanceof View)) {
+        return createColor(0);
+      }
+      view = (View) view.getParent();
+    }
   }
 
   @Override
@@ -253,7 +270,7 @@ public class AndroidDisplay extends PlatformDisplay {
     if (control.peer instanceof TextView) {
       return createColor(((TextView) control.peer).getCurrentTextColor());
     }
-    return null;
+    return createColor(0xffffffff);
   }
 
   @Override
@@ -642,18 +659,64 @@ public class AndroidDisplay extends PlatformDisplay {
     return 0;
   }
 
+
   @Override
-  void updateItem(Item item) {
+  void addTableColumn(Table table, TableColumn column) {
+    ((AndroidTableView) table.peer).getAdapter().notifyDataSetChanged();
+  }
+
+  @Override
+  void addTableItem(Table table, TableItem item) {
+    ((AndroidTableView) table.peer).getAdapter().notifyItemInserted(item.index);
+  }
+
+  @Override
+  void updateTableColumn(Table table, TableColumn item) {
+    ((AndroidTableView) table.peer).getAdapter().notifyDataSetChanged();
+  }
+
+  @Override
+  void updateTableItem(Table table, TableItem item) {
+    ((AndroidTableView) table.peer).getAdapter().notifyItemChanged(item.index);
+  }
+
+  @Override
+  void removeTableColumn(Table table, TableColumn column) {
+    ((AndroidTableView) table.peer).getAdapter().notifyDataSetChanged();
+  }
+
+  @Override
+  void removeTableItem(Table table, TableItem item) {
+    ((AndroidTableView) table.peer).getAdapter().notifyItemRemoved(item.index);
+  }
+
+  @Override
+  void moveAbove(Control control, Control other) {
+
+  }
+
+  @Override
+  void updateTable(Table table) {
+
+  }
+
+  @Override
+  void updateMenuItem(MenuItem item) {
 
   }
 
   @Override
   public void setImage(Control control, Image image) {
+    Bitmap bitmap = (Bitmap) image.peer;
     if (control.peer instanceof ImageButton) {
+      System.out.println("ImageButton.setImage w*h" + bitmap.getWidth() + "*" + bitmap.getHeight());
       ((ImageButton) control.peer).setImageBitmap((Bitmap) image.peer);
-    } else if (control.peer instanceof android.widget.Button) {
+    } else if (control.peer instanceof android.widget.TextView &&
+            !(control.peer instanceof CompoundButton)) {
+      System.out.println("TextView.setImage w*h" + bitmap.getWidth() + "*" + bitmap.getHeight());
       Drawable icon = new BitmapDrawable(activity.getResources(), (Bitmap) image.peer);
-      ((android.widget.Button) control.peer).setCompoundDrawables(icon, null, null, null);
+//      icon.setBounds(0, 0, bitmap.getWidth(), bitmap.getHeight());
+      ((android.widget.TextView) control.peer).setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null);
     }
   }
 
@@ -700,7 +763,11 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public Font getFont(Control control) {
-    return null;
+    int fontSize = 16;
+    if (control.peer instanceof TextView) {
+      fontSize = Math.round(((TextView) control.peer).getTextSize());
+    }
+    return new Font(this, "", fontSize, 0);
   }
 
   @Override
@@ -809,6 +876,8 @@ public class AndroidDisplay extends PlatformDisplay {
         } catch (NumberFormatException e) {
           return 0;
         }
+      case TABLE:
+        return ((AndroidTableView) control.peer).selectedIndex;
       default:
         System.err.println("NYI: getSelection() for " + control.getControlType());
         return 0;
@@ -959,18 +1028,32 @@ public class AndroidDisplay extends PlatformDisplay {
     }
   }
 
-  public Image createImage(int width, int height) {
-    throw new RuntimeException("NYI");
+  public Object createImage(int width, int height) {
+    return Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
   }
 
   @Override
   public GC createGCForPlatformImage(Object platformImage) {
-    throw new RuntimeException("NYI");
+    return new AndroidGC(this, new android.graphics.Canvas((Bitmap) platformImage));
+
   }
 
   @Override
   public Object loadImage(InputStream is) {
-    return BitmapFactory.decodeStream(is);
+
+    Bitmap result = BitmapFactory.decodeStream(is);
+
+    System.out.println("Image size: " + result.getWidth() + "x" + result.getHeight());
+    for (int y = 0; y < result.getHeight(); y++) {
+      for (int x = 0; x < result.getWidth(); x++) {
+        int rgb = result.getPixel(x, y);
+        System.out.print(Integer.toHexString(rgb));
+        System.out.print(",");
+      }
+      System.out.println();
+    }
+
+    return result;
   }
 
 

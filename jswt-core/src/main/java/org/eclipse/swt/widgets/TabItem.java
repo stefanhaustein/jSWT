@@ -32,7 +32,7 @@ public class TabItem extends Item {
         update();
     }
 
-    private void update() {
+    void update() {
         int index = getParent().itemList.indexOf(this);
         display.updateTab((TabFolder) parent, index, this);
     }

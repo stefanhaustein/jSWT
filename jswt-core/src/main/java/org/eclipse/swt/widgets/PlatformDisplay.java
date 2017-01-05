@@ -196,7 +196,7 @@ public abstract class PlatformDisplay extends Display {
 
     abstract int getVisibleItemCount(Combo combo);
 
-    abstract void updateItem(Item item);
+    abstract void updateMenuItem(MenuItem item);
 
     abstract void addTableColumn(Table table, TableColumn column);
 
@@ -211,6 +211,8 @@ public abstract class PlatformDisplay extends Display {
     abstract void removeTableItem(Table table, TableItem item);
 
     abstract void moveAbove(Control control, Control other);
+
+    abstract void updateTable(Table table);
 
     public static class Insets {
         public int top;

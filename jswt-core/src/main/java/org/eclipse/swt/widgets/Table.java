@@ -45,7 +45,10 @@ public class Table extends Composite {
     }
 
     public void setHeaderVisible(boolean b) {
-        System.out.println("FIXME: set header visible");
+        if (headerVisible != b) {
+            headerVisible = b;
+            display.updateTable(this);
+        }
     }
 
     public TableItem[] getItems() {
@@ -70,7 +73,7 @@ public class Table extends Composite {
     }
 
     public int getSelectionIndex() {
-        throw new RuntimeException("NYI");
+        return display.getSelection(this);
     }
 
     public int getItemCount() {
@@ -82,6 +85,7 @@ public class Table extends Composite {
     }
 
     public void setSelection(int i) {
+        display.setSelection(this, i);
     }
 
     public void setSortDirection(int sortDirection) {
@@ -89,6 +93,9 @@ public class Table extends Composite {
     }
 
     public TableColumn getColumn(int column) {
+        if (column >= columns.size()) {
+            return new TableColumn(this, SWT.NONE);
+        }
        return columns.get(column);
     }
 
@@ -97,7 +104,7 @@ public class Table extends Composite {
     }
 
     public int getSelectionCount() {
-        throw new RuntimeException("NYI");
+        return display.getSelectedRange(this).y;
     }
 
     public TableColumn[] getColumns() {

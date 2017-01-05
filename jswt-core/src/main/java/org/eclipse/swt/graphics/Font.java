@@ -2,7 +2,7 @@ package org.eclipse.swt.graphics;
 
 
 public class Font extends Resource {
-    FontData[] fontData;
+    final FontData[] fontData;
 
     public Font(Device device, FontData fd) {
         this.fontData = new FontData[]{fd};

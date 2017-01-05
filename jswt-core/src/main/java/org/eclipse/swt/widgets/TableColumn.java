@@ -8,6 +8,8 @@ public class TableColumn extends Item {
     int index;
     boolean resizable;
     boolean moveable;
+    String tooltip;
+    int width;
 
     public TableColumn(Table parent, int style) {
         this(parent, style, parent.getColumnCount());
@@ -20,6 +22,10 @@ public class TableColumn extends Item {
     }
 
     public void setWidth(int i) {
+        if (this.width != i) {
+            this.width = i;
+            update();
+        }
     }
 
     public void addSelectionListener(SelectionListener listener) {
@@ -27,17 +33,27 @@ public class TableColumn extends Item {
     }
 
     public void setToolTipText(String tooltip) {
+        if (!tooltip.equals(this.tooltip)) {
+            this.tooltip = tooltip;
+            update();
+        }
     }
 
     public void pack() {
     }
 
     public void setMoveable(boolean moveable) {
-        this.moveable = moveable;
+        if (moveable != this.moveable) {
+            this.moveable = moveable;
+            update();
+        }
     }
 
     public void setResizable(boolean resizable) {
-        this.resizable = resizable;
+        if (resizable != this.resizable) {
+            this.resizable = resizable;
+            update();
+        }
     }
 
     public boolean getMoveable() {
@@ -45,8 +61,11 @@ public class TableColumn extends Item {
     }
 
     public boolean getResizable() {
-
         return resizable;
+    }
+
+    void update() {
+        display.updateTableColumn((Table) parent, this);
     }
 
     public void removeSelectionListener(SelectionListener listener) {

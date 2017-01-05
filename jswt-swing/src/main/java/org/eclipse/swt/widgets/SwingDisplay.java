@@ -32,6 +32,7 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
+import javax.swing.table.JTableHeader;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.graphics.*;
@@ -151,7 +152,11 @@ public class SwingDisplay extends PlatformDisplay {
         return new JScrollPane(list);
       }
       case TABLE: {
-        JTable table = new JTable(new SwingSwtTableModel((Table) control));
+        SwingSwtTableModel model = new SwingSwtTableModel((Table) control);
+        JTable table = new JTable(model);
+        table.setSelectionMode((control.style & SWT.MULTI) == 0 ? ListSelectionModel.SINGLE_SELECTION
+                : ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        model.setJTable(table);
         return new JScrollPane(table);
       }
       case TEXT:
@@ -311,6 +316,8 @@ public class SwingDisplay extends PlatformDisplay {
         return getList(control).getSelectedIndex();
       case SCALE:
         return ((JSlider) control.peer).getValue();
+      case TABLE:
+        return getTable(control).getSelectedRow();
       default:
         throw new RuntimeException("getSelection() not applicable to " + control.getControlType());
     }
@@ -326,7 +333,7 @@ public class SwingDisplay extends PlatformDisplay {
       JMenu awtMenu = new JMenu();
       swtMenuItem.peer = awtMenu;
       menuAddAll(swtMenuItem.subMenu, awtMenu);
-      updateItem(swtMenuItem);
+      updateMenuItem(swtMenuItem);
       return awtMenu;
     }
     JMenuItem awtItem = (swtMenuItem.style & SWT.CHECK) != 0
@@ -338,7 +345,7 @@ public class SwingDisplay extends PlatformDisplay {
           swtMenuItem.notifyListeners(SWT.Selection, null);
         }
       });
-    updateItem(swtMenuItem);
+    updateMenuItem(swtMenuItem);
     return awtItem;
   }
 
@@ -612,7 +619,7 @@ public class SwingDisplay extends PlatformDisplay {
       if (item.subMenu != null) {
         menuAddAll(item.subMenu, awtSubMenu);
       }
-      updateItem(item);
+      updateMenuItem(item);
     }
     ((JFrame) SwingUtilities.getRoot((Component) decorations.peer)).setJMenuBar(awtMenuBar);
   }
@@ -745,22 +752,17 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
-  void updateItem(Item item) {
+  void updateMenuItem(MenuItem item) {
     if (item.peer == null) {
       return;
     }
-    switch (item.getItemType()) {
-      case MENU_ITEM: {
-        MenuItem menuItem = (MenuItem) item;
-        if (item.peer instanceof JCheckBoxMenuItem) {
-          ((JCheckBoxMenuItem) item.peer).setSelected(((MenuItem) item).getSelection());
-        }
-        JMenuItem awtItem = (JMenuItem) item.peer;
-        awtItem.setEnabled(menuItem.getEnabled());
-        awtItem.setText(menuItem.getText());
-        break;
-      }
+    MenuItem menuItem = (MenuItem) item;
+    if (item.peer instanceof JCheckBoxMenuItem) {
+      ((JCheckBoxMenuItem) item.peer).setSelected(((MenuItem) item).getSelection());
     }
+    JMenuItem awtItem = (JMenuItem) item.peer;
+    awtItem.setEnabled(menuItem.getEnabled());
+    awtItem.setText(menuItem.getText());
   }
 
   @Override
@@ -797,6 +799,15 @@ public class SwingDisplay extends PlatformDisplay {
   @Override
   void moveAbove(Control control, Control other) {
     System.err.println("FIXME: SwingDisplay.moveAbove");
+  }
+
+  @Override
+  void updateTable(Table table) {
+    JTable jTable = getTable(table);
+    SwingSwtTableModel model = (SwingSwtTableModel) jTable.getModel();
+    JTableHeader header = table.getHeaderVisible() ? model.header : null;
+    jTable.setTableHeader(header);
+    ((JScrollPane) table.peer).setColumnHeaderView(header);
   }
 
   @Override

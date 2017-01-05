@@ -21,21 +21,16 @@ public class MenuItem extends Item {
 
     public void setEnabled(boolean b) {
         this.enabled = b;
-        display.updateItem(this);
+        update();
     }
 
     public void setSelection(boolean b) {
         this.selection = b;
-        display.updateItem(this);
+        update();
     }
 
     public boolean getSelection() {
         return selection;
-    }
-
-    @Override
-    ItemType getItemType() {
-        return ItemType.MENU_ITEM;
     }
 
     public boolean getEnabled() {
@@ -49,4 +44,9 @@ public class MenuItem extends Item {
     public void setAccelerator(int i) {
         throw new RuntimeException("???");
     }
+
+    void update() {
+        display.updateMenuItem(this);
+    }
+
 }

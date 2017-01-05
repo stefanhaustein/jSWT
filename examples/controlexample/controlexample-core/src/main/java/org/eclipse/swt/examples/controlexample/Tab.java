@@ -13,7 +13,27 @@ package org.eclipse.swt.examples.controlexample;
 
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.*;
+import org.eclipse.swt.events.ArmEvent;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.HelpEvent;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TreeEvent;
+import org.eclipse.swt.events.TypedEvent;
+import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
@@ -35,19 +55,17 @@ import org.eclipse.swt.widgets.FontDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.kobjects.swt.Dialogs;
 import org.kobjects.swt.Function;
-// import org.eclipse.swt.widgets.FontDialog;
-// import org.eclipse.swt.widgets.Table;
-// import org.eclipse.swt.widgets.TableItem;
 
 
 /**
@@ -102,15 +120,9 @@ abstract class Tab {
 	static final int FOREGROUND_COLOR = 0;
 	static final int BACKGROUND_COLOR = 1;
 	static final int FONT = 2;
-
-
-	// Table colorAndFontTable;
-	List colorAndFontTable;
-
+	Table colorAndFontTable;
 	ColorDialog colorDialog;
 	FontDialog fontDialog;
-
-
 	Color foregroundColor, backgroundColor;
 	Font font;
 
@@ -276,13 +288,10 @@ abstract class Tab {
 		 * right half of each example tab.  It consists of the
 		 * "Style" group, the "Other" group and the "Size" group.
 		 */
-
-
-		Group group = new Group(tabFolderPage, SWT.NONE);
-		group.setLayout(new GridLayout(2, true));
-		group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
-		group.setText(ControlExample.getResourceString("Parameters"));
-		controlGroup = group;
+		controlGroup = new Group (tabFolderPage, SWT.NONE);
+		controlGroup.setLayout (new GridLayout (2, true));
+		controlGroup.setLayoutData (new GridData(SWT.FILL, SWT.FILL, false, false));
+		controlGroup.setText (ControlExample.getResourceString("Parameters"));
 
 		/* Create individual groups inside the "Control" group */
 		createStyleGroup ();
@@ -378,7 +387,7 @@ abstract class Tab {
 						Point pt = setGetButton.getLocation();
 						pt = display.map(setGetButton.getParent(), null, pt);
 						setGetDialog.setLocation(pt.x, pt.y);
-						setGetDialog.openColorDialog();
+						setGetDialog.open();
 					}
 				}
 			});
@@ -402,15 +411,12 @@ abstract class Tab {
 	 */
 	void createColorAndFontGroup () {
 		/* Create the group. */
-		Group result = new Group (controlGroup, SWT.NONE);
-		result.setLayoutData(new GridData (SWT.FILL, SWT.FILL, false, false));
-		result.setText(ControlExample.getResourceString ("Colors"));
-		colorGroup = result;
+		colorGroup = new Group(controlGroup, SWT.NONE);
 		colorGroup.setLayout (new GridLayout (2, true));
-	//	colorAndFontTable = new Table(colorGroup, SWT.BORDER | SWT.V_SCROLL);
-		colorAndFontTable = new List(colorGroup, SWT.SINGLE);
-		colorAndFontTable.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
-		/*
+		colorGroup.setLayoutData (new GridData (SWT.FILL, SWT.FILL, false, false));
+		colorGroup.setText (ControlExample.getResourceString ("Colors"));
+		colorAndFontTable = new Table(colorGroup, SWT.BORDER | SWT.V_SCROLL);
+		colorAndFontTable.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));		
 		TableItem item = new TableItem(colorAndFontTable, SWT.None);
 		item.setText(ControlExample.getResourceString ("Foreground_Color"));
 		colorAndFontTable.setSelection(0);
@@ -418,11 +424,6 @@ abstract class Tab {
 		item.setText(ControlExample.getResourceString ("Background_Color"));
 		item = new TableItem(colorAndFontTable, SWT.None);
 		item.setText(ControlExample.getResourceString ("Font"));
-		*/
-		colorAndFontTable.add(ControlExample.getResourceString ("Foreground_Color"));
-		// colorAndFontTable.setSelection(0);
-		colorAndFontTable.add(ControlExample.getResourceString ("Background_Color"));
-		colorAndFontTable.add(ControlExample.getResourceString ("Font"));
 		Button changeButton = new Button (colorGroup, SWT.PUSH);
 		changeButton.setText(ControlExample.getResourceString("Change"));
 		changeButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
@@ -431,8 +432,6 @@ abstract class Tab {
 		defaultsButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 
 		/* Add listeners to set/reset colors and fonts. */
-
-
 		colorDialog = new ColorDialog (shell);
 		fontDialog = new FontDialog (shell);
 		colorAndFontTable.addSelectionListener(new SelectionAdapter() {
@@ -463,15 +462,13 @@ abstract class Tab {
 				backgroundColor = null;
 				font = null;
 				if (colorAndFontTable != null && !colorAndFontTable.isDisposed()) {
-				/*	TableItem [] items = colorAndFontTable.getItems();
+				TableItem [] items = colorAndFontTable.getItems();
 				for (int i = 0; i < items.length; i++) {
 					Image image = items[i].getImage();
-					if (image != null) image.disposePeer();
-				} */
+					if (image != null) image.dispose();
 				}
 			}
-
-
+			}
 		});
 
 	}
@@ -549,11 +546,10 @@ abstract class Tab {
 	 */
 	void createOtherGroup () {
 		/* Create the group */
-		Group result = new Group (controlGroup, SWT.NONE);
-		result.setLayoutData(new GridData (SWT.FILL, SWT.FILL, false, false));
-		result.setText(ControlExample.getResourceString("Other"));
-		otherGroup = result;
+		otherGroup = new Group (controlGroup, SWT.NONE);
 		otherGroup.setLayout (new GridLayout ());
+		otherGroup.setLayoutData (new GridData (SWT.FILL, SWT.FILL, false, false));
+		otherGroup.setText (ControlExample.getResourceString("Other"));
 
 		/* Create the controls */
 		enabledButton = new Button(otherGroup, SWT.CHECK);
@@ -603,11 +599,10 @@ abstract class Tab {
 	 */
 	void createBackgroundModeGroup () {
 		/* Create the group */
-		Group result = new Group (controlGroup, SWT.NONE);
-		result.setLayoutData(new GridData (SWT.FILL, SWT.FILL, false, false));
-		result.setText(ControlExample.getResourceString("Background_Mode"));
-		backgroundModeGroup = result;
+		backgroundModeGroup = new Group (controlGroup, SWT.NONE);
 		backgroundModeGroup.setLayout (new GridLayout ());
+		backgroundModeGroup.setLayoutData (new GridData (SWT.FILL, SWT.FILL, false, false));
+		backgroundModeGroup.setText (ControlExample.getResourceString("Background_Mode"));
 
 		/* Create the controls */
 		backgroundModeCombo = new Combo(backgroundModeGroup, SWT.READ_ONLY);
@@ -900,34 +895,20 @@ abstract class Tab {
 		final Shell dialog = new Shell (shell, SWT.DIALOG_TRIM | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		dialog.setText (ControlExample.getResourceString ("Select_Listeners"));
 		dialog.setLayout (new GridLayout (2, false));
-
-		// final Table table = new Table (dialog, SWT.BORDER | SWT.V_SCROLL | SWT.CHECK);
-		final List table = new List(dialog, SWT.MULTI);
+		final Table table = new Table (dialog, SWT.BORDER | SWT.V_SCROLL | SWT.CHECK);
 		GridData data = new GridData(GridData.FILL_BOTH);
 		data.verticalSpan = 3;
 		table.setLayoutData(data);
 		for (int i = 0; i < EVENT_INFO.length; i++) {
-			/* Converted to list
 			TableItem item = new TableItem (table, SWT.NONE);
 			item.setText (EVENT_INFO[i].name);
 			item.setChecked (eventsFilter[i]);
-			*/
-			table.add(EVENT_INFO[i].name);
-			if (eventsFilter[i]) {
-				table.select(i);
-			}
 		}
 		final String [] customNames = getCustomEventNames ();
 		for (int i = 0; i < customNames.length; i++) {
-			/* Converted to list
 			TableItem item = new TableItem (table, SWT.NONE);
 			item.setText (customNames[i]);
 			item.setChecked (eventsFilter[EVENT_INFO.length + i]);
-			*/
-			table.add(customNames[i]);
-			if (eventsFilter[EVENT_INFO.length + i]) {
-				table.select(EVENT_INFO.length + i);
-			}
 		}
 		Button selectAll = new Button (dialog, SWT.PUSH);
 		selectAll.setText(ControlExample.getResourceString ("Select_All"));
@@ -935,7 +916,6 @@ abstract class Tab {
 		selectAll.addSelectionListener (new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				/*
 				TableItem [] items = table.getItems();
 				for (int i = 0; i < EVENT_INFO.length; i++) {
 					items[i].setChecked(true);
@@ -943,8 +923,6 @@ abstract class Tab {
 				for (int i = 0; i < customNames.length; i++) {
 					items[EVENT_INFO.length + i].setChecked(true);
 				}
-				*/
-				table.selectAll();
 			}
 		});
 		Button deselectAll = new Button (dialog, SWT.PUSH);
@@ -953,15 +931,13 @@ abstract class Tab {
 		deselectAll.addSelectionListener (new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				/*
 				TableItem [] items = table.getItems();
 				for (int i = 0; i < EVENT_INFO.length; i++) {
 					items[i].setChecked(false);
 				}
 				for (int i = 0; i < customNames.length; i++) {
 					items[EVENT_INFO.length + i].setChecked(false);
-				}*/
-				table.deselectAll();
+				}
 			}
 		});
 		final Button editEvent = new Button (dialog, SWT.PUSH);
@@ -1010,21 +986,16 @@ abstract class Tab {
 		ok.addSelectionListener (new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-                /*
 				TableItem [] items = table.getItems();
 				for (int i = 0; i < EVENT_INFO.length; i++) {
 					eventsFilter[i] = items[i].getChecked();
 				}
 				for (int i = 0; i < customNames.length; i++) {
 					eventsFilter[EVENT_INFO.length + i] = items[EVENT_INFO.length + i].getChecked();
-				}*/
-                for (int i = 0; i < table.getItemCount(); i++) {
-                    eventsFilter[i] = table.isSelected(i);
                 }
                 dialog.dispose();
 			}
 		});
-
 		dialog.pack ();
 		/*
 		 * If the preferred size of the dialog is too tall for the display,
@@ -1052,11 +1023,10 @@ abstract class Tab {
 	 * goes below the "Example" and "Control" groups.
 	 */
 	void createListenersGroup () {
-		Group result = new Group (controlGroup, SWT.NONE);
-		result.setLayoutData(new GridData (SWT.FILL, SWT.FILL, true, true, 2, 1));
-		result.setText(ControlExample.getResourceString ("Listeners"));
-		listenersGroup = result;
+		listenersGroup = new Group (tabFolderPage, SWT.NONE);
 		listenersGroup.setLayout (new GridLayout (4, false));
+		listenersGroup.setLayoutData (new GridData (SWT.FILL, SWT.FILL, true, true, 2, 1));
+		listenersGroup.setText (ControlExample.getResourceString ("Listeners"));
 
 		/*
 		 * Create the button to access the 'Listeners' dialog.
@@ -1385,11 +1355,10 @@ void setValue() {
 	 */
 	void createSizeGroup () {
 		/* Create the group */
-		Group result = new Group (controlGroup, SWT.NONE);
-		result.setLayoutData(new GridData (SWT.FILL, SWT.FILL, false, false));
-		result.setText(ControlExample.getResourceString("Size"));
-		sizeGroup = result;
+		sizeGroup = new Group (controlGroup, SWT.NONE);
 		sizeGroup.setLayout (new GridLayout());
+		sizeGroup.setLayoutData (new GridData (SWT.FILL, SWT.FILL, false, false));
+		sizeGroup.setText (ControlExample.getResourceString("Size"));
 
 		/* Create the controls */
 
@@ -1440,11 +1409,10 @@ void setValue() {
 	 * the widget to be destroyed and recreated.
 	 */
 	void createStyleGroup () {
-		Group result = new Group (controlGroup, SWT.NONE);
-		result.setLayoutData(new GridData (SWT.FILL, SWT.FILL, false, false));
-		result.setText(ControlExample.getResourceString("Styles"));
-		styleGroup = result;
+		styleGroup = new Group (controlGroup, SWT.NONE);
 		styleGroup.setLayout (new GridLayout ());
+		styleGroup.setLayoutData (new GridData (SWT.FILL, SWT.FILL, false, false));
+		styleGroup.setText (ControlExample.getResourceString("Styles"));
 	}
 
 	/**
@@ -1904,15 +1872,13 @@ void setValue() {
 			}
 		}
 		// Set the background color item's image to match the background color of the example widget(s).
-		/*
 		Color color = backgroundColor;
 		if (controls.length == 0) return;
 		if (color == null) color = controls [0].getBackground ();
 		TableItem item = colorAndFontTable.getItem(BACKGROUND_COLOR);
 		Image oldImage = item.getImage();
-		if (oldImage != null) oldImage.disposePeer();
+		if (oldImage != null) oldImage.dispose();
 		item.setImage (colorImage (color));
-		*/
 	}
 
 	/**
@@ -1929,7 +1895,6 @@ void setValue() {
 	 * Sets the font of the "Example" widgets.
 	 */
 	void setExampleWidgetFont () {
-
 		if (colorAndFontTable == null) return; // user cannot change color/font on this tab
 		Control [] controls = getExampleControls ();
 		if (!instance.startup) {
@@ -1937,18 +1902,16 @@ void setValue() {
 				control.setFont(font);
 			}
 		}
-		// Set the font item's image and font to match the font of the example widget(s).
-		/*
+		/* Set the font item's image and font to match the font of the example widget(s). */
 		Font ft = font;
 		if (controls.length == 0) return;
 		if (ft == null) ft = controls [0].getFont ();
 		TableItem item = colorAndFontTable.getItem(FONT);
 		Image oldImage = item.getImage();
-		if (oldImage != null) oldImage.disposePeer();
+		if (oldImage != null) oldImage.dispose();
 		item.setImage (fontImage (ft));
 		item.setFont(ft);
 		colorAndFontTable.layout ();
-		*/
 	}
 
 	/**
@@ -1962,16 +1925,14 @@ void setValue() {
 				control.setForeground (foregroundColor);
 			}
 		}
-		// Set the foreground color item's image to match the foreground color of the example widget(s).
-		/*
+		/* Set the foreground color item's image to match the foreground color of the example widget(s). */
 		Color color = foregroundColor;
 		if (controls.length == 0) return;
 		if (color == null) color = controls [0].getForeground ();
 		TableItem item = colorAndFontTable.getItem(FOREGROUND_COLOR);
 		Image oldImage = item.getImage();
-		if (oldImage != null) oldImage.disposePeer();
+		if (oldImage != null) oldImage.dispose();
 		item.setImage (colorImage(color));
-		*/
 	}
 
 	/**

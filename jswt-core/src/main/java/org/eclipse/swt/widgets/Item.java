@@ -35,9 +35,6 @@ public abstract class Item extends Widget {
 	Image image;
 	Object peer;
 
-	enum ItemType {
-		MENU_ITEM
-	}
 
 /**
  * Constructs a new instance of this class given its parent
@@ -174,7 +171,7 @@ public void setImage (Image image) {
 	checkWidget ();
 	if (image != null && image.isDisposed()) error(SWT.ERROR_INVALID_ARGUMENT);
 	this.image = image;
-	display.updateItem(this);
+	update();
 }
 
 /**
@@ -202,11 +199,11 @@ public void setText (String string) {
 		updateTextDirection (AUTO_TEXT_DIRECTION);
 	}
 	*/
-	display.updateItem(this);
+	update();
 }
 
-	ItemType getItemType() {
-		throw new RuntimeException("Implemnt in subclass!");
+	void update() {
+		throw new RuntimeException("Implement Item.update() in subclass!");
 	}
 
 	/*

@@ -156,7 +156,7 @@ public class Control extends Widget {
     if (foreground == null) {
       foreground = display.getForeground(this);
     }
-    return null;
+    return foreground;
   }
 
   public Object getLayoutData() {
