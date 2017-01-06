@@ -1039,7 +1039,47 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    void updateItem(Item item) {
+    void updateMenuItem(MenuItem item) {
+
+    }
+
+    @Override
+    void addTableColumn(Table table, TableColumn column) {
+
+    }
+
+    @Override
+    void addTableItem(Table table, TableItem item) {
+
+    }
+
+    @Override
+    void updateTableColumn(Table table, TableColumn item) {
+
+    }
+
+    @Override
+    void updateTableItem(Table table, TableItem item) {
+
+    }
+
+    @Override
+    void removeTableColumn(Table table, TableColumn column) {
+
+    }
+
+    @Override
+    void removeTableItem(Table table, TableItem item) {
+
+    }
+
+    @Override
+    void moveAbove(Control control, Control other) {
+
+    }
+
+    @Override
+    void updateTable(Table table) {
 
     }
 

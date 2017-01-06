@@ -708,14 +708,14 @@ public class AndroidDisplay extends PlatformDisplay {
   @Override
   public void setImage(Control control, Image image) {
     Bitmap bitmap = (Bitmap) image.peer;
-    if (control.peer instanceof ImageButton) {
-      System.out.println("ImageButton.setImage w*h" + bitmap.getWidth() + "*" + bitmap.getHeight());
-      ((ImageButton) control.peer).setImageBitmap((Bitmap) image.peer);
-    } else if (control.peer instanceof android.widget.TextView &&
-            !(control.peer instanceof CompoundButton)) {
-      System.out.println("TextView.setImage w*h" + bitmap.getWidth() + "*" + bitmap.getHeight());
+    if (control.peer instanceof TextView && !(control.peer instanceof CompoundButton)) {
+      // Regular button, but might turn into image button.
+      TextView textView = (TextView) control.peer;
+      if (textView instanceof android.widget.Button && textView.getText().length() == 0) {
+        textView.setMinWidth(0);
+        textView.setMinimumWidth(0);
+      }
       Drawable icon = new BitmapDrawable(activity.getResources(), (Bitmap) image.peer);
-//      icon.setBounds(0, 0, bitmap.getWidth(), bitmap.getHeight());
       ((android.widget.TextView) control.peer).setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null);
     }
   }
