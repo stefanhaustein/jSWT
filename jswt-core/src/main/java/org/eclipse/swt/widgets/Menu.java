@@ -49,4 +49,8 @@ public class Menu extends Widget {
         addListener(SWT.Hide, new TypedListener(listener));
         addListener(SWT.Show, new TypedListener(listener));
     }
+
+    public void setLocation(int x, int y) {
+        System.err.println("FIXME: Menu.setLoclation(x,y);");
+    }
 }

@@ -32,6 +32,15 @@ public class Control extends Widget {
     return new Point(x, y);
   }
 
+  public Point toDisplay(int x, int y) {
+    System.err.println("FIXME: Control.toDisplay(x,y)");
+    return new Point(x, y);
+  }
+
+  public Point toDisplay(Point point) {
+    return toDisplay(point.x, point.y);
+  }
+
   enum ControlType {
       BUTTON,
       CANVAS, COMBO, COMPOSITE,
@@ -39,7 +48,7 @@ public class Control extends Widget {
       LABEL, LIST,
       PROGRESS_BAR,
       SCALE, SHELL, SLIDER, SCROLLED_COMPOSITE, SPINNER,
-      TAB_FOLDER, TABLE, TEXT};
+      TAB_FOLDER, TABLE, TOOLBAR, TEXT};
 
   Menu menu;
   Object layoutData;
@@ -60,7 +69,7 @@ public class Control extends Widget {
     if (parent != null) {
       this.peer = display.createControl(this);
       parent.children.add(this);
-      if (!(parent instanceof ScrolledComposite)) {
+      if (!(parent instanceof ScrolledComposite) && !(parent instanceof ToolBar)) {
         display.addChild(parent, this);
       }
     }

@@ -12,6 +12,7 @@ import android.os.Build;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.*;
 import android.support.v7.widget.PopupMenu;
 import android.text.InputFilter;
@@ -49,6 +50,7 @@ public class AndroidDisplay extends PlatformDisplay {
   DrawerLayout navigationDrawer;
   NavigationView navigationView;
   LinearLayout mainLayout;
+  Context flatButtonContext;
 
   private static int getArgb(Color color) {
     return (color.getAlpha() << 24) | (color.getRed() << 16) | (color.getGreen() << 8) | (color.getBlue());
@@ -75,6 +77,8 @@ public class AndroidDisplay extends PlatformDisplay {
     this.navigationDrawer = navigationDrawer;
     this.navigationView = navigationView;
     this.mainLayout = mainLayout;
+    flatButtonContext = new ContextThemeWrapper(activity,
+            android.support.v7.appcompat.R.style.Widget_AppCompat_Button_Borderless);
 
     navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
       @Override
@@ -115,7 +119,7 @@ public class AndroidDisplay extends PlatformDisplay {
   @Override
   public Object createControl(final Control control) {
     switch (control.getControlType()) {
-      case BUTTON:
+      case BUTTON: {
         if ((control.style & SWT.RADIO) != 0) {
           RadioButton radioButton = new AppCompatRadioButton(activity);
           radioButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -127,10 +131,18 @@ public class AndroidDisplay extends PlatformDisplay {
           });
           return radioButton;
         }
-        if ((control.style & (SWT.CHECK | SWT.TOGGLE)) != 0) {
+        if ((control.style & SWT.TOGGLE) != 0) {
+          return new android.widget.Switch(activity);
+        }
+        if ((control.style & (SWT.CHECK)) != 0) {
           return new AppCompatCheckBox(activity);
         }
-        return new AppCompatButton(activity);
+        if ((control.style & SWT.FLAT) != 0) {
+          return new AppCompatButton(flatButtonContext, null, 0);
+        }
+        AppCompatButton button = new AppCompatButton(activity);
+        return button;
+      }
       case COMBO: {
         android.widget.Spinner spinner = new android.widget.Spinner(activity);
         spinner.setAdapter(new ArrayAdapter<String>(activity, android.R.layout.simple_dropdown_item_1line));
@@ -185,6 +197,8 @@ public class AndroidDisplay extends PlatformDisplay {
         editText.setInputType(InputType.TYPE_CLASS_NUMBER);
         return editText;
       }
+      case TOOLBAR:
+        return new android.support.v7.widget.Toolbar(activity);
       default:
         throw new RuntimeException("Unrecognized control type " + control.getControlType() + " for " + control);
     }
@@ -700,7 +714,6 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public void setImage(Control control, Image image) {
-    Bitmap bitmap = (Bitmap) image.peer;
     if (control.peer instanceof TextView && !(control.peer instanceof CompoundButton)) {
       // Regular button, but might turn into image button.
       TextView textView = (TextView) control.peer;
@@ -708,7 +721,7 @@ public class AndroidDisplay extends PlatformDisplay {
         textView.setMinWidth(0);
         textView.setMinimumWidth(0);
       }
-      Drawable icon = new BitmapDrawable(activity.getResources(), (Bitmap) image.peer);
+      Drawable icon = image == null ? null : new BitmapDrawable(activity.getResources(), (Bitmap) image.peer);
       ((android.widget.TextView) control.peer).setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null);
     }
   }

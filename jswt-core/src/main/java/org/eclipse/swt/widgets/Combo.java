@@ -7,7 +7,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Point;
 
-public class Combo extends Control {
+public class Combo extends Composite {
 
     public static final int LIMIT = Integer.MAX_VALUE;
 

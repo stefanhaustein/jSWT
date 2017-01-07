@@ -137,6 +137,7 @@ public class SwingDisplay extends PlatformDisplay {
       case CANVAS:
         return new SwingSwtCanvas((Canvas) control);
       case COMPOSITE:
+      case TOOLBAR:
         return new JPanel(new SwingSwtLayoutManager((Composite) control));
       case GROUP: {
         JPanel panel = new JPanel(new SwingSwtLayoutManager((Composite) control));
@@ -837,7 +838,7 @@ public class SwingDisplay extends PlatformDisplay {
     switch (control.getControlType()) {
       case BUTTON:
         if ((control.style & (SWT.RADIO | SWT.TOGGLE | SWT.CHECK | SWT.ARROW)) == 0) {
-          ImageIcon imageIcon = new ImageIcon((java.awt.Image) image.peer);
+          ImageIcon imageIcon = image == null ? null : new ImageIcon((java.awt.Image) image.peer);
           ((AbstractButton) control.peer).setIcon(imageIcon);
         }
         break;   // Image would overwrite control

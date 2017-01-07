@@ -74,7 +74,7 @@ public class Composite extends Scrollable {
   public Point computeSize(int wHint, int hHint, boolean changed) {
     checkWidget ();
 
-    if (this instanceof TabFolder) {
+    if (this instanceof TabFolder || this instanceof Combo) {
       return super.computeSize(wHint, hHint, changed);
     }
 

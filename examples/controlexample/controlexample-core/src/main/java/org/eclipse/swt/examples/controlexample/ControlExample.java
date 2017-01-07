@@ -128,7 +128,7 @@ public class ControlExample {
 		//	new TabFolderTab (this),
 			new TableTab (this),
 			new TextTab (this),
-		//	new ToolBarTab (this),
+			new ToolBarTab (this),
 		//	new ToolTipTab (this),
 		//	new TreeTab (this),
 		//	new BrowserTab (this),

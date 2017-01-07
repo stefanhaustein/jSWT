@@ -34,7 +34,7 @@ public abstract class PlatformDisplay extends Display {
     abstract void addItem(Control control, String s, int index);
 
     /**
-     * Not part of the public API; used internally by ScrolledComposite.
+     * Not part of the public API; used internally to delay child addition (e.g. in ScrolledComposite and ToolBar)
      */
     public abstract void addChild(Composite parent, Control control);
 
