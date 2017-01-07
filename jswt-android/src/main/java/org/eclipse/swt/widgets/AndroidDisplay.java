@@ -232,14 +232,7 @@ public class AndroidDisplay extends PlatformDisplay {
     }
     topShell = shell;
 
-    android.support.v7.app.ActionBar actionBar = activity.getSupportActionBar();
-    String text = view.text;
-    if (text != null) {
-      actionBar.show();
-      actionBar.setTitle(text);
-    } else {
-      actionBar.hide();
-    }
+    ((AndroidShell) shell.peer).update();
 
     mainLayout.addView(view);
 
