@@ -136,4 +136,9 @@ class AndroidComposite extends ViewGroup {
            super(WRAP_CONTENT, WRAP_CONTENT);
         }
     }
+
+    AndroidDisplay getAndroidDisplay() {
+        return (AndroidDisplay) composite.display;
+    }
+
 }

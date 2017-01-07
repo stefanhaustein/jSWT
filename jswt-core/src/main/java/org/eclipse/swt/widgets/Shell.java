@@ -62,4 +62,9 @@ public class Shell extends Decorations {
   public void close() {
     System.err.println("FIXME: Shell.close()");
   }
+
+  public ToolBar getToolBar() {
+    return display.getToolBar(this);
+  }
+
 }

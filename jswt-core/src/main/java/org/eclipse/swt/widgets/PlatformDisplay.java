@@ -214,6 +214,8 @@ public abstract class PlatformDisplay extends Display {
 
     abstract void updateTable(Table table);
 
+    abstract ToolBar getToolBar(Shell shell);
+
     public static class Insets {
         public int top;
         public int left;

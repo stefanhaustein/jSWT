@@ -18,55 +18,12 @@ import org.eclipse.swt.R;
  */
 public class SwtActivity extends AppCompatActivity {
 
-    DrawerLayout navigationDrawer;
-    NavigationView navigationView;
-    ActionBarDrawerToggle actionBarDrawerToggle;
     AndroidDisplay display;
-    LinearLayout mainLayout;
 
     @Override
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
-        navigationDrawer = new android.support.v4.widget.DrawerLayout(this);
-//    final FrameLayout fl = new FrameLayout(this);
-        //   fl.setId(CONTENT_VIEW_ID);
-        navigationView = new NavigationView(this);
-
-        DrawerLayout.LayoutParams params = new DrawerLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT);
-
-        Toolbar toolbar = new Toolbar(this);
-//        toolbar.setTitle("WTF? Why?");
- //       toolbar.setVisibility(View.VISIBLE);
-        setSupportActionBar(toolbar);
-
-        params.gravity = Gravity.START;
-        navigationView.setLayoutParams(params);
-
-        mainLayout = new LinearLayout(this);
-        mainLayout.setOrientation(LinearLayout.VERTICAL);
-
-        mainLayout.addView(toolbar);
-
-//    drawer.addView(fl, new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-        navigationDrawer.addView(mainLayout);
-        navigationDrawer.addView(navigationView);
-
-        this.setContentView(navigationDrawer);
-
-        actionBarDrawerToggle = new ActionBarDrawerToggle(this, navigationDrawer, R.string.open, R.string.close) /*{
-            @Override
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-                drawerView.bringToFront();
-              //  drawerView.requestLayout();
-            }
-        }*/;
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-
-        display = new AndroidDisplay(this, navigationDrawer, navigationView, mainLayout);
+        display = new AndroidDisplay(this);
     }
 
     public AndroidDisplay getDisplay() {
@@ -76,19 +33,28 @@ public class SwtActivity extends AppCompatActivity {
     @Override
     protected void onPostCreate(Bundle bundle) {
         super.onPostCreate(bundle);
-        actionBarDrawerToggle.syncState();
+        if (display.topShell != null) {
+            ((AndroidShell) display.topShell.peer).actionBarDrawerToggle.syncState();
+        }
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        actionBarDrawerToggle.onConfigurationChanged(newConfig);
+        if (display.topShell != null) {
+            ((AndroidShell) display.topShell.peer).actionBarDrawerToggle.onConfigurationChanged(newConfig);
+        }
 
     }
 
     @Override
     public boolean onOptionsItemSelected(android.view.MenuItem menuItem) {
-        return super.onOptionsItemSelected(menuItem) ||
-            actionBarDrawerToggle.onOptionsItemSelected(menuItem);
+        if (super.onOptionsItemSelected(menuItem)) {
+            return true;
+        }
+        if (display.topShell != null) {
+            return ((AndroidShell) display.topShell.peer).actionBarDrawerToggle.onOptionsItemSelected(menuItem);
+        }
+        return false;
     }
 }

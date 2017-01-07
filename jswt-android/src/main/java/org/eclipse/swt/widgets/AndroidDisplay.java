@@ -15,12 +15,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.*;
 import android.support.v7.widget.PopupMenu;
+import android.support.v7.widget.Toolbar;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.method.KeyListener;
 import android.text.method.PasswordTransformationMethod;
 import android.text.method.TransformationMethod;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,9 +49,6 @@ public class AndroidDisplay extends PlatformDisplay {
 
   AppCompatActivity activity;
   Shell topShell;
-  DrawerLayout navigationDrawer;
-  NavigationView navigationView;
-  LinearLayout mainLayout;
   Context flatButtonContext;
 
   private static int getArgb(Color color) {
@@ -71,29 +70,12 @@ public class AndroidDisplay extends PlatformDisplay {
     }
   }
 
-  public AndroidDisplay(AppCompatActivity activity, final DrawerLayout navigationDrawer, NavigationView navigationView,
-                        LinearLayout mainLayout) {
+  public AndroidDisplay(AppCompatActivity activity) {
     this.activity = activity;
-    this.navigationDrawer = navigationDrawer;
-    this.navigationView = navigationView;
-    this.mainLayout = mainLayout;
     flatButtonContext = new ContextThemeWrapper(activity,
             android.support.v7.appcompat.R.style.Widget_AppCompat_Button_Borderless);
 
-    navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-      @Override
-      public boolean onNavigationItemSelected(android.view.MenuItem item) {
-        if (topShell != null && topShell.menuBar != null) {
-          MenuItem result = findMenuItem(topShell.menuBar, item.getTitle().toString());
-          if (result != null) {
-            result.notifyListeners(SWT.Selection, null);
-            navigationDrawer.closeDrawers();
-            return true;
-          }
-        }
-        return false;
-      }
-    });
+
   }
 
   @Override
@@ -231,27 +213,7 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public void openShell(Shell shell) {
-    AndroidShell view = (AndroidShell) shell.peer;
-    if (view.dialogBuilder != null) {
-      view.dialog = view.dialogBuilder.show();
-      return;
-    }
-
-    if (topShell != null) {
-      if (topShell == shell) {
-        return;
-      }
-      // TODO: stack
-      mainLayout.removeView((View) topShell.peer);
-    }
-    topShell = shell;
-
-    ((AndroidShell) shell.peer).update();
-
-    mainLayout.addView(view);
-
-    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
-    params.weight = 1;
+    ((AndroidShell) shell.peer).open();
 
     // navigationDrawer.addView(view, 0);
     // TODO: update menu bar!
@@ -414,7 +376,7 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
 
-  private MenuItem findMenuItem(Menu menu, String title) {
+  MenuItem findMenuItem(Menu menu, String title) {
     for (int i = 0; i < menu.getItemCount(); i++) {
       MenuItem item = menu.getItem(i);
       if (item.subMenu != null) {
@@ -458,9 +420,12 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public void updateMenuBar(Decorations decorations) {
-    android.view.Menu androidMenu = navigationView.getMenu();
-    androidMenu.clear();
-    populateMenu(decorations.menuBar, androidMenu, true);
+    AndroidShell androidShell = ((AndroidShell) decorations.peer);
+    if (androidShell.navigationView != null) {
+      android.view.Menu androidMenu = androidShell.navigationView.getMenu();
+      androidMenu.clear();
+      populateMenu(decorations.menuBar, androidMenu, true);
+    }
   }
 
   @Override
@@ -708,6 +673,11 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
+  ToolBar getToolBar(Shell shell) {
+    return ((AndroidShell) shell.peer).toolBar;
+  }
+
+  @Override
   void updateMenuItem(MenuItem item) {
 
   }
@@ -942,10 +912,18 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
-  public void addChild(Composite parent, Control control) {
+  public void addChild(Composite parent, Control child) {
     if (!(parent instanceof TabFolder)) {
-      ((ViewGroup) parent.peer).addView((View) control.peer);
+      View childView = (View) child.peer;
+      ((ViewGroup) parent.peer).addView(childView);
+      if (parent instanceof ToolBar) {
+        Toolbar.LayoutParams params = ((Toolbar.LayoutParams) childView.getLayoutParams());
+        params.gravity = Gravity.END;
+        childView.setLayoutParams(params);
+
+      }
     }
+
   }
 
   @Override

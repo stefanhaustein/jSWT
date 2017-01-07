@@ -1083,6 +1083,11 @@ public class GwtDisplay extends PlatformDisplay {
 
     }
 
+    @Override
+    ToolBar getToolBar(Shell shell) {
+        return null;
+    }
+
     void updateWindowTitle() {
         if (rootShells.size() > 0) {
             Document.get().setTitle(rootShells.get(rootShells.size() - 1).text);

@@ -79,4 +79,14 @@ public class ToolItem extends Item {
             });
         }
     }
+
+    public void dispose() {
+        if (control != null) {
+            control.dispose();
+        }
+    }
+
+    public void setEnabled(boolean enabled) {
+        control.setEnabled(enabled);
+    }
 }

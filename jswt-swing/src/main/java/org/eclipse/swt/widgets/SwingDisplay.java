@@ -812,6 +812,11 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
+  ToolBar getToolBar(Shell shell) {
+    return null;
+  }
+
+  @Override
   void setTopIndex(Control control, int topIndex) {
     switch (control.getControlType()) {
       case LIST:
