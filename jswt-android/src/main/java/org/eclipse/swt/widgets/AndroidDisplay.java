@@ -208,7 +208,7 @@ public class AndroidDisplay extends PlatformDisplay {
   public void openShell(Shell shell) {
     ((AndroidShellView) shell.peer).open();
 
-    // navigationDrawer.addView(view, 0);
+    // drawerLayout.addView(view, 0);
     // TODO: update menu bar!
 //    activity.setContentView(view);
   }
@@ -287,7 +287,8 @@ public class AndroidDisplay extends PlatformDisplay {
   public void setBounds(Control control, int x, int y, int width, int height) {
     View view = (View) control.peer;
 
-    view.measure(View.MeasureSpec.EXACTLY | width, View.MeasureSpec.EXACTLY | height);
+    view.measure(View.MeasureSpec.EXACTLY | width,
+            View.MeasureSpec.EXACTLY | height);
 
     ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
     if (layoutParams != null) {
@@ -297,8 +298,10 @@ public class AndroidDisplay extends PlatformDisplay {
         AndroidCompositeView.LayoutParams lmlParams = (AndroidCompositeView.LayoutParams) layoutParams;
         lmlParams.marginLeft = x;
         lmlParams.marginTop = y;
-        view.setX(x);
-        view.setY(y);
+       /* if (!(view instanceof AndroidShellView)) {
+          view.setX(x);
+          view.setY(y);
+        } */
       } else {
         System.err.println("setBounds for " + control + ": LayoutParams are not an instance of AndroidComposite.LayoutParams");
       }
@@ -395,7 +398,7 @@ public class AndroidDisplay extends PlatformDisplay {
           @Override
           public boolean onMenuItemClick(android.view.MenuItem menuItem) {
             AndroidShellView androidShellView = (AndroidShellView) topShell.peer;
-            androidShellView.navigationDrawer.closeDrawer(androidShellView.navigationView, false);
+            androidShellView.drawerLayout.closeDrawer(androidShellView.navigationView, false);
             Event event = new Event();
             event.display = AndroidDisplay.this;
             event.widget = item;

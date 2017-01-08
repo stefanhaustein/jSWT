@@ -9,7 +9,7 @@ buildscript {
     }
     dependencies {
         classpath 'de.richsource.gradle.plugins:gwt-gradle-plugin:0.6'
-        classpath 'com.android.tools.build:gradle:2.1.2'
+        classpath 'com.android.tools.build:gradle:2.2.0'
         classpath 'org.gradle.api.plugins:gradle-cargo-plugin:0.6.1'
         classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
 
