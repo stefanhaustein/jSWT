@@ -17,22 +17,7 @@ class AndroidCompositeView extends ViewGroup {
         super(context);
         this.composite = container;
     }
-/*
-    @Override
-    public LayoutParams generateLayoutParams(AttributeSet attrs) {
-        return new LayoutParams();
-    }
 
-    @Override
-    protected LayoutParams generateDefaultLayoutParams() {
-        return new LayoutParams();
-    }
-
-    @Override
-    protected LayoutParams generateLayoutParams(ViewGroup.LayoutParams layoutParams) {
-        return new LayoutParams();
-    }
-*/
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         if (this instanceof AndroidShellView) {

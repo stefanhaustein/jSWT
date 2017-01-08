@@ -217,7 +217,6 @@ public class AndroidDisplay extends PlatformDisplay {
   public Rectangle getBounds(Control control) {
     View view = (View) control.peer;
     return new Rectangle(view.getLeft(), view.getTop(), view.getMeasuredWidth(), view.getMeasuredHeight());
-
   }
 
   @Override
@@ -278,10 +277,16 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public void setBounds(Control control, int x, int y, int width, int height) {
-    View view = (View) control.peer;
+    if (control instanceof Shell) {
+      return;
+    }
 
+    View view = (View) control.peer;
     view.measure(View.MeasureSpec.EXACTLY | width,
             View.MeasureSpec.EXACTLY | height);
+    view.setLeft(x);
+    view.setTop(y);
+
     view.setLeft(x);
     view.setTop(y);
 
