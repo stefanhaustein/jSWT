@@ -15,7 +15,6 @@ import android.widget.LinearLayout;
 import org.eclipse.swt.R;
 import org.eclipse.swt.SWT;
 
-import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 class AndroidShellView extends AndroidCompositeView {
     String text;
@@ -26,7 +25,7 @@ class AndroidShellView extends AndroidCompositeView {
     AlertDialog dialog;
 
     // Root shell case
-    DrawerLayout navigationDrawer;
+    DrawerLayout drawerLayout;
     NavigationView navigationView;
     LinearLayout mainLayout;
     Toolbar androidToolbar;
@@ -41,37 +40,47 @@ class AndroidShellView extends AndroidCompositeView {
             dialogBuilder = new AlertDialog.Builder(getContext());
             dialogBuilder.setView(this);
         } else {
-            navigationDrawer = new android.support.v4.widget.DrawerLayout(getContext());
-            navigationView = new NavigationView(getContext());
+            // Absolute root
+            drawerLayout = new android.support.v4.widget.DrawerLayout(getContext());
 
-            DrawerLayout.LayoutParams params = new DrawerLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT, MATCH_PARENT);
-            params.gravity = Gravity.START;
-            navigationView.setLayoutParams(params);
-
+            // Main root: toolbar and content
             mainLayout = new LinearLayout(context);
             mainLayout.setOrientation(LinearLayout.VERTICAL);
+            drawerLayout.addView(mainLayout, new DrawerLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
-            navigationDrawer.addView(mainLayout);
-            navigationDrawer.addView(navigationView);
-
-            ViewGroup.LayoutParams mainParams = mainLayout.getLayoutParams();
-            mainParams.width = MATCH_PARENT;
-            mainParams.height = MATCH_PARENT;
-
+            // Toolbar
             androidToolbar = new Toolbar(context);
-            mainLayout.addView(androidToolbar);
-            ((LinearLayout.LayoutParams) androidToolbar.getLayoutParams()).width = MATCH_PARENT;
+            LinearLayout.LayoutParams androidToolbarParams = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+            androidToolbarParams.gravity = 0;
+            // androidToolbar.setBackgroundColor(0x0ffff8888);
 
             shell.peer = this;
             toolBar = new ToolBar(shell, SWT.FLAT);
+            shell.children.remove(toolBar);
             View swtToolbarPeer = (View) toolBar.peer;
             this.removeView(swtToolbarPeer);
-            androidToolbar.addView(swtToolbarPeer);
-            ((Toolbar.LayoutParams) swtToolbarPeer.getLayoutParams()).gravity = Gravity.RIGHT;
+            androidToolbar.addView(swtToolbarPeer, new Toolbar.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.END));
 
-            actionBarDrawerToggle = new ActionBarDrawerToggle(getAndroidDisplay().activity, navigationDrawer, R.string.open, R.string.close);
+            mainLayout.addView(androidToolbar, androidToolbarParams);
+            // Navigation Drawer
 
+            navigationView = new NavigationView(getContext());
+            drawerLayout.addView(navigationView, new DrawerLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, Gravity.START));
+
+            actionBarDrawerToggle = new ActionBarDrawerToggle(getAndroidDisplay().activity, drawerLayout, R.string.open, R.string.close);
+
+            LinearLayout.LayoutParams contentLayoutParams = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            contentLayoutParams.weight = 1;
+            mainLayout.addView(this, contentLayoutParams);
+
+
+            // this.setBackgroundColor(0x0ff88ff88);
             /*
             navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
                 @Override
@@ -79,13 +88,14 @@ class AndroidShellView extends AndroidCompositeView {
                  MenuItem result = getAndroidDisplay().findMenuItem(shell.menuBar, item.getTitle().toString());
                  if (result != null) {
                       result.notifyListeners(SWT.Selection, null);
-                      navigationDrawer.closeDrawers();
+                      drawerLayout.closeDrawers();
                       return true;
                  }
                  return false;
                 }
             });
             */
+
        }
     }
 
@@ -123,15 +133,10 @@ class AndroidShellView extends AndroidCompositeView {
         if (dialogBuilder != null) {
             dialog = dialogBuilder.show();
         } else {
-            // Hack to avoid adding self to mainLayout while under construction.
-            if (mainLayout.indexOfChild(this) == -1) {
-                mainLayout.addView(this);
-                ((LinearLayout.LayoutParams) this.getLayoutParams()).weight = 1;
-            }
 
             AndroidDisplay display = (AndroidDisplay) shell.display;
 
-            display.activity.setContentView(navigationDrawer);
+            display.activity.setContentView(drawerLayout);
             display.activity.setSupportActionBar(androidToolbar);
 
             display.activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -139,6 +144,8 @@ class AndroidShellView extends AndroidCompositeView {
 
             display.topShell = shell;
             update();
+
+            invalidate();
         }
     }
 }

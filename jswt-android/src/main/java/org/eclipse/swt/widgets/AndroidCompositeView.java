@@ -79,7 +79,6 @@ class AndroidCompositeView extends ViewGroup {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-
         int widthSize = View.MeasureSpec.getSize(widthMeasureSpec);
         int widthMode = View.MeasureSpec.getMode(widthMeasureSpec);
         int heightSize = View.MeasureSpec.getSize(heightMeasureSpec);
