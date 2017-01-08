@@ -19,21 +19,6 @@ class AndroidCompositeView extends ViewGroup {
     }
 
     @Override
-    public LayoutParams generateLayoutParams(AttributeSet attrs) {
-        return new LayoutParams();
-    }
-
-    @Override
-    protected LayoutParams generateDefaultLayoutParams() {
-        return new LayoutParams();
-    }
-
-    @Override
-    protected LayoutParams generateLayoutParams(ViewGroup.LayoutParams layoutParams) {
-        return new LayoutParams();
-    }
-
-    @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         if (Control.DEBUG_LAYOUT) {
             System.err.println(composite.depth() + "enter onLayout(" + changed + ", " + left + ", " + top + "," + right + ", " + bottom + ") for " + composite);
@@ -43,12 +28,11 @@ class AndroidCompositeView extends ViewGroup {
         // }
         for (int i = 0; i < getChildCount(); i++) {
             View childView = getChildAt(i);
-            LayoutParams childLayoutParams = getChildLayoutParams(i);
             childView.layout(
-                    childLayoutParams.marginLeft,
-                    childLayoutParams.marginTop,
-                    childLayoutParams.marginLeft + childLayoutParams.width,
-                    childLayoutParams.marginTop + childLayoutParams.height);
+                    childView.getLeft(),
+                    childView.getTop(),
+                    childView.getLeft() + childView.getMeasuredWidth(),
+                    childView.getTop() + childView.getMeasuredHeight());
         }
         if (Control.DEBUG_LAYOUT) {
             System.err.println(composite.depth() + "exit onLayout(" + changed + ", " + left + ", " + top + "," + right + ", " + bottom + ") for " + composite);
@@ -108,32 +92,12 @@ class AndroidCompositeView extends ViewGroup {
         composite.notifyListeners(SWT.Resize, null);
     }
 
-
-    /** 
-     * This method just enables calling setMeasuredDimension from the outside.
-     */
-    void setMeasuredSize(int width, int height) {
-        setMeasuredDimension(width, height);
-    }
-
-    private LayoutParams getChildLayoutParams(int i) {
-        return (LayoutParams) getChildAt(i).getLayoutParams();
-    }
-
     String getText() {
         return text;
     }
 
     void setText(String text) {
         this.text = text;
-    }
-
-    class LayoutParams extends ViewGroup.LayoutParams {
-        int marginLeft;
-        int marginTop;
-        LayoutParams() {
-           super(WRAP_CONTENT, WRAP_CONTENT);
-        }
     }
 
     AndroidDisplay getAndroidDisplay() {
