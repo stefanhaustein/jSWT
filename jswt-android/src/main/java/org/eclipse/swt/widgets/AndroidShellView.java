@@ -9,11 +9,15 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import org.eclipse.swt.R;
 import org.eclipse.swt.SWT;
 
-class AndroidShell extends AndroidComposite {
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+
+class AndroidShellView extends AndroidCompositeView {
     String text;
     Shell shell;
 
@@ -30,7 +34,7 @@ class AndroidShell extends AndroidComposite {
     ActionBarDrawerToggle actionBarDrawerToggle;
 
 
-    AndroidShell(Context context, final Shell shell) {
+    AndroidShellView(Context context, final Shell shell) {
         super(context, shell);
         this.shell = shell;
         if (shell.parent != null) {
@@ -41,25 +45,34 @@ class AndroidShell extends AndroidComposite {
             navigationView = new NavigationView(getContext());
 
             DrawerLayout.LayoutParams params = new DrawerLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT);
+                    LinearLayout.LayoutParams.WRAP_CONTENT, MATCH_PARENT);
             params.gravity = Gravity.START;
             navigationView.setLayoutParams(params);
 
             mainLayout = new LinearLayout(context);
             mainLayout.setOrientation(LinearLayout.VERTICAL);
+
             navigationDrawer.addView(mainLayout);
             navigationDrawer.addView(navigationView);
 
+            ViewGroup.LayoutParams mainParams = mainLayout.getLayoutParams();
+            mainParams.width = MATCH_PARENT;
+            mainParams.height = MATCH_PARENT;
+
+            androidToolbar = new Toolbar(context);
+            mainLayout.addView(androidToolbar);
+            ((LinearLayout.LayoutParams) androidToolbar.getLayoutParams()).width = MATCH_PARENT;
+
             shell.peer = this;
             toolBar = new ToolBar(shell, SWT.FLAT);
-            androidToolbar = (Toolbar) toolBar.peer;
-            this.removeView(androidToolbar);
-            mainLayout.addView(androidToolbar);
-            ((LinearLayout.LayoutParams) androidToolbar.getLayoutParams()).width = LinearLayout.LayoutParams.MATCH_PARENT;
-
+            View swtToolbarPeer = (View) toolBar.peer;
+            this.removeView(swtToolbarPeer);
+            androidToolbar.addView(swtToolbarPeer);
+            ((Toolbar.LayoutParams) swtToolbarPeer.getLayoutParams()).gravity = Gravity.RIGHT;
 
             actionBarDrawerToggle = new ActionBarDrawerToggle(getAndroidDisplay().activity, navigationDrawer, R.string.open, R.string.close);
 
+            /*
             navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(android.view.MenuItem item) {
@@ -72,6 +85,7 @@ class AndroidShell extends AndroidComposite {
                  return false;
                 }
             });
+            */
        }
     }
 
@@ -79,6 +93,7 @@ class AndroidShell extends AndroidComposite {
         this.text = text;
         update();
     }
+
 
     void update() {
         if (dialogBuilder != null) {
@@ -91,13 +106,13 @@ class AndroidShell extends AndroidComposite {
                     actionBar.hide();
                 } else {
                     actionBar.show();
-                    int cut = text.lastIndexOf('-');
+                    int cut = text.indexOf('-');
                     if (cut == -1) {
                         actionBar.setTitle(text);
                         actionBar.setSubtitle(null);
                     } else {
-                        actionBar.setTitle(text.substring(cut + 1).trim());
-                        actionBar.setSubtitle(text.substring(0, cut).trim());
+                        actionBar.setSubtitle(text.substring(cut + 1).trim());
+                        actionBar.setTitle(text.substring(0, cut).trim());
                     }
                 }
             }
@@ -116,8 +131,8 @@ class AndroidShell extends AndroidComposite {
 
             AndroidDisplay display = (AndroidDisplay) shell.display;
 
-            display.activity.setSupportActionBar(androidToolbar);
             display.activity.setContentView(navigationDrawer);
+            display.activity.setSupportActionBar(androidToolbar);
 
             display.activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             display.activity.getSupportActionBar().setHomeButtonEnabled(true);

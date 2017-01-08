@@ -2,15 +2,7 @@ package org.eclipse.swt.widgets;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Gravity;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.support.v7.widget.Toolbar;
-import org.eclipse.swt.R;
 
 /**
  * The goal is to make this a convenience class, not a requirement -- and to hand in all required information
@@ -34,7 +26,7 @@ public class SwtActivity extends AppCompatActivity {
     protected void onPostCreate(Bundle bundle) {
         super.onPostCreate(bundle);
         if (display.topShell != null) {
-            ((AndroidShell) display.topShell.peer).actionBarDrawerToggle.syncState();
+            ((AndroidShellView) display.topShell.peer).actionBarDrawerToggle.syncState();
         }
     }
 
@@ -42,7 +34,7 @@ public class SwtActivity extends AppCompatActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         if (display.topShell != null) {
-            ((AndroidShell) display.topShell.peer).actionBarDrawerToggle.onConfigurationChanged(newConfig);
+            ((AndroidShellView) display.topShell.peer).actionBarDrawerToggle.onConfigurationChanged(newConfig);
         }
 
     }
@@ -53,7 +45,7 @@ public class SwtActivity extends AppCompatActivity {
             return true;
         }
         if (display.topShell != null) {
-            return ((AndroidShell) display.topShell.peer).actionBarDrawerToggle.onOptionsItemSelected(menuItem);
+            return ((AndroidShellView) display.topShell.peer).actionBarDrawerToggle.onOptionsItemSelected(menuItem);
         }
         return false;
     }

@@ -8,21 +8,16 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
-import android.support.design.widget.NavigationView;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.*;
 import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.Toolbar;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.method.KeyListener;
 import android.text.method.PasswordTransformationMethod;
-import android.text.method.TransformationMethod;
 import android.util.Log;
-import android.view.Gravity;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +34,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 
@@ -50,6 +44,7 @@ public class AndroidDisplay extends PlatformDisplay {
   AppCompatActivity activity;
   Shell topShell;
   Context flatButtonContext;
+  float pixelPerDp;
 
   private static int getArgb(Color color) {
     return (color.getAlpha() << 24) | (color.getRed() << 16) | (color.getGreen() << 8) | (color.getBlue());
@@ -74,8 +69,7 @@ public class AndroidDisplay extends PlatformDisplay {
     this.activity = activity;
     flatButtonContext = new ContextThemeWrapper(activity,
             android.support.v7.appcompat.R.style.Widget_AppCompat_Button_Borderless);
-
-
+    pixelPerDp = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, activity.getResources().getDisplayMetrics());
   }
 
   @Override
@@ -159,7 +153,7 @@ public class AndroidDisplay extends PlatformDisplay {
       case SLIDER:
         return new android.widget.SeekBar(activity);
       case SHELL:
-        return new AndroidShell(activity, (Shell) control);
+        return new AndroidShellView(activity, (Shell) control);
       case TABLE:
         return new AndroidTableView(activity, (Table) control);
       case TAB_FOLDER:
@@ -168,7 +162,8 @@ public class AndroidDisplay extends PlatformDisplay {
         return new AndroidCanvas(activity, (Canvas) control);
       case GROUP:
       case COMPOSITE:
-        return new AndroidComposite(activity, (Composite) control);
+      case TOOLBAR:
+        return new AndroidCompositeView(activity, (Composite) control);
       case PROGRESS_BAR: {
         android.widget.ProgressBar progressBar = new android.widget.ProgressBar(activity, null, android.R.attr.progressBarStyleHorizontal);
         progressBar.setIndeterminate((control.style & SWT.INDETERMINATE) != 0);
@@ -179,8 +174,6 @@ public class AndroidDisplay extends PlatformDisplay {
         editText.setInputType(InputType.TYPE_CLASS_NUMBER);
         return editText;
       }
-      case TOOLBAR:
-        return new android.support.v7.widget.Toolbar(activity);
       default:
         throw new RuntimeException("Unrecognized control type " + control.getControlType() + " for " + control);
     }
@@ -213,7 +206,7 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public void openShell(Shell shell) {
-    ((AndroidShell) shell.peer).open();
+    ((AndroidShellView) shell.peer).open();
 
     // navigationDrawer.addView(view, 0);
     // TODO: update menu bar!
@@ -224,8 +217,8 @@ public class AndroidDisplay extends PlatformDisplay {
   public Rectangle getBounds(Control control) {
     View view = (View) control.peer;
     ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
-    if (layoutParams instanceof AndroidComposite.LayoutParams) {
-      AndroidComposite.LayoutParams lmlParams = (AndroidComposite.LayoutParams) layoutParams;
+    if (layoutParams instanceof AndroidCompositeView.LayoutParams) {
+      AndroidCompositeView.LayoutParams lmlParams = (AndroidCompositeView.LayoutParams) layoutParams;
       return new Rectangle(lmlParams.marginLeft, lmlParams.marginTop,
           lmlParams.width, lmlParams.height);
     }
@@ -300,10 +293,12 @@ public class AndroidDisplay extends PlatformDisplay {
     if (layoutParams != null) {
       layoutParams.width = width;
       layoutParams.height = height;
-      if (layoutParams instanceof AndroidComposite.LayoutParams) {
-        AndroidComposite.LayoutParams lmlParams = (AndroidComposite.LayoutParams) layoutParams;
+      if (layoutParams instanceof AndroidCompositeView.LayoutParams) {
+        AndroidCompositeView.LayoutParams lmlParams = (AndroidCompositeView.LayoutParams) layoutParams;
         lmlParams.marginLeft = x;
         lmlParams.marginTop = y;
+        view.setX(x);
+        view.setY(y);
       } else {
         System.err.println("setBounds for " + control + ": LayoutParams are not an instance of AndroidComposite.LayoutParams");
       }
@@ -344,14 +339,14 @@ public class AndroidDisplay extends PlatformDisplay {
     if (peer instanceof TextView) {
       return ((TextView) peer).getText().toString();
     }
-    if (peer instanceof AndroidShell) {
-      return ((AndroidShell) peer).text;
+    if (peer instanceof AndroidShellView) {
+      return ((AndroidShellView) peer).text;
     }
     if (peer instanceof Spinner) {
       return (String) (((Spinner) peer).getSelectedItem());
     }
-    if (peer instanceof AndroidComposite) {
-      return ((AndroidComposite) peer).getText();
+    if (peer instanceof AndroidCompositeView) {
+      return ((AndroidCompositeView) peer).getText();
     }
     return null;
   }
@@ -363,10 +358,10 @@ public class AndroidDisplay extends PlatformDisplay {
       ((android.widget.Button) peer).setText(removeAccelerators(text));
     } else if (peer instanceof TextView) {
       ((TextView) peer).setText(text);
-    } else if (peer instanceof AndroidShell) {
-      ((AndroidShell) peer).setText(text);
-    } else if (peer instanceof AndroidComposite) {
-      ((AndroidComposite) peer).setText(text);
+    } else if (peer instanceof AndroidShellView) {
+      ((AndroidShellView) peer).setText(text);
+    } else if (peer instanceof AndroidCompositeView) {
+      ((AndroidCompositeView) peer).setText(text);
     }
   }
 
@@ -375,7 +370,7 @@ public class AndroidDisplay extends PlatformDisplay {
     ((View) control.peer).setVisibility(visible ? View.VISIBLE : View.GONE);
   }
 
-
+/*
   MenuItem findMenuItem(Menu menu, String title) {
     for (int i = 0; i < menu.getItemCount(); i++) {
       MenuItem item = menu.getItem(i);
@@ -390,17 +385,17 @@ public class AndroidDisplay extends PlatformDisplay {
     }
     return null;
   }
-
+*/
   private void populateMenu(Menu sourceMenu, android.view.Menu androidMenu, boolean flattenFirst) {
     for (int i = 0; i < sourceMenu.getItemCount(); i++) {
       final MenuItem item = sourceMenu.getItem(i);
       if (item.subMenu == null) {
-        //android.view.MenuItem androidItem =
-        androidMenu.add(item.getText());
-        /*
+        android.view.MenuItem androidItem = androidMenu.add(item.getText());
         androidItem.setOnMenuItemClickListener(new android.view.MenuItem.OnMenuItemClickListener() {
           @Override
           public boolean onMenuItemClick(android.view.MenuItem menuItem) {
+            AndroidShellView androidShellView = (AndroidShellView) topShell.peer;
+            androidShellView.navigationDrawer.closeDrawer(androidShellView.navigationView, false);
             Event event = new Event();
             event.display = AndroidDisplay.this;
             event.widget = item;
@@ -408,7 +403,7 @@ public class AndroidDisplay extends PlatformDisplay {
             item.listeners.sendEvent(event);
             return true;
           }
-        });*/
+        });
       } else if (i == 0 && flattenFirst) {
         populateMenu(item.subMenu, androidMenu, false);
       } else {
@@ -420,7 +415,7 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public void updateMenuBar(Decorations decorations) {
-    AndroidShell androidShell = ((AndroidShell) decorations.peer);
+    AndroidShellView androidShell = ((AndroidShellView) decorations.peer);
     if (androidShell.navigationView != null) {
       android.view.Menu androidMenu = androidShell.navigationView.getMenu();
       androidMenu.clear();
@@ -674,7 +669,7 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   ToolBar getToolBar(Shell shell) {
-    return ((AndroidShell) shell.peer).toolBar;
+    return ((AndroidShellView) shell.peer).toolBar;
   }
 
   @Override
@@ -687,9 +682,9 @@ public class AndroidDisplay extends PlatformDisplay {
     if (control.peer instanceof TextView && !(control.peer instanceof CompoundButton)) {
       // Regular button, but might turn into image button.
       TextView textView = (TextView) control.peer;
-      if (textView instanceof android.widget.Button && textView.getText().length() == 0) {
-        textView.setMinWidth(0);
-        textView.setMinimumWidth(0);
+      if (textView instanceof android.widget.Button && textView.getText().length() == 0 && image != null) {
+        textView.setMinWidth(Math.round(36 * pixelPerDp));
+        textView.setMinimumWidth(Math.round(36 * pixelPerDp));
       }
       Drawable icon = image == null ? null : new BitmapDrawable(activity.getResources(), (Bitmap) image.peer);
       ((android.widget.TextView) control.peer).setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null);
@@ -818,13 +813,13 @@ public class AndroidDisplay extends PlatformDisplay {
     View anchor = (View) ((Control) menu.getParent()).peer;
     PopupMenu popupMenu = new PopupMenu(activity, anchor);
     populateMenu(menu, popupMenu.getMenu(), false);
-    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+    /*popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
       @Override
       public boolean onMenuItemClick(android.view.MenuItem item) {
         findMenuItem(menu, item.getTitle().toString());
         return true;
       }
-    });
+    }); */
     popupMenu.show();
   }
 
@@ -876,7 +871,7 @@ public class AndroidDisplay extends PlatformDisplay {
   @Override
   public void disposePeer(Control control) {
     if (control.getControlType() == Control.ControlType.SHELL) {
-      AndroidShell shellView = (AndroidShell) control.peer;
+      AndroidShellView shellView = (AndroidShellView) control.peer;
       if (shellView.dialog != null) {
         shellView.dialog.hide();
         shellView.dialog = null;
@@ -916,14 +911,7 @@ public class AndroidDisplay extends PlatformDisplay {
     if (!(parent instanceof TabFolder)) {
       View childView = (View) child.peer;
       ((ViewGroup) parent.peer).addView(childView);
-      if (parent instanceof ToolBar) {
-        Toolbar.LayoutParams params = ((Toolbar.LayoutParams) childView.getLayoutParams());
-        params.gravity = Gravity.END;
-        childView.setLayoutParams(params);
-
-      }
     }
-
   }
 
   @Override
@@ -936,6 +924,7 @@ public class AndroidDisplay extends PlatformDisplay {
   public void addListener(final Control control, final int eventType, Listener listener) {
     View view = (View) control.peer;
     switch (eventType) {
+      case SWT.MouseMove:
       case SWT.MouseDown:
       case SWT.MouseUp:
         view.setOnTouchListener(new View.OnTouchListener() {
@@ -950,11 +939,15 @@ public class AndroidDisplay extends PlatformDisplay {
               case MotionEvent.ACTION_POINTER_UP:
                 notifyListeners(control, SWT.MouseUp, motionEvent);
                 return true;
+              case MotionEvent.ACTION_MOVE:
+                notifyListeners(control, SWT.MouseMove, motionEvent);
+                return true;
             }
             return false;
           }
         });
         break;
+
 
       case SWT.Selection:
         if (view instanceof android.widget.Button) {
@@ -1026,7 +1019,7 @@ public class AndroidDisplay extends PlatformDisplay {
   public Object loadImage(InputStream is) {
 
     Bitmap result = BitmapFactory.decodeStream(is);
-
+    /*
     System.out.println("Image size: " + result.getWidth() + "x" + result.getHeight());
     for (int y = 0; y < result.getHeight(); y++) {
       for (int x = 0; x < result.getWidth(); x++) {
@@ -1036,7 +1029,7 @@ public class AndroidDisplay extends PlatformDisplay {
       }
       System.out.println();
     }
-
+*/
     return result;
   }
 

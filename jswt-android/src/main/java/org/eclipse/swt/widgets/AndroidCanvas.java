@@ -4,7 +4,7 @@ import android.content.Context;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;
 
-class AndroidCanvas extends AndroidComposite {
+class AndroidCanvas extends AndroidCompositeView {
 
     Canvas swtCanvas;
 

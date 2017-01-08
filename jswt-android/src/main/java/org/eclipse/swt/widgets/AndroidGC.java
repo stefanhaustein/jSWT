@@ -164,11 +164,11 @@ public class AndroidGC extends GC {
 
     @Override
     public FontMetrics getFontMetrics() {
-        Paint.FontMetrics androidMetrics = foregroundPaint.getFontMetrics();
+        Paint.FontMetrics androidMetrics = textPaint.getFontMetrics();
         FontMetrics result = new FontMetrics(
                 Math.round(-androidMetrics.ascent),
                 Math.round(androidMetrics.descent),
-                Math.round(foregroundPaint.measureText(" ")),
+                Math.round(textPaint.measureText(" ")),
                 Math.round(Math.abs(androidMetrics.leading)),
                 Math.round((androidMetrics.bottom - androidMetrics.top)));
         return result;
@@ -240,9 +240,11 @@ public class AndroidGC extends GC {
     }
 
     @Override
-    public void setAntialias(int antialias) {
-        foregroundPaint.setAntiAlias(antialias != 0);
-        backgroundPaint.setAntiAlias(antialias != 0);
+    public void setAntialias(int value) {
+        boolean aa = value != SWT.OFF;
+        foregroundPaint.setAntiAlias(aa);
+        backgroundPaint.setAntiAlias(aa);
+        textPaint.setAntiAlias(aa);
     }
 
     public Point textExtent(String text, int flags) {

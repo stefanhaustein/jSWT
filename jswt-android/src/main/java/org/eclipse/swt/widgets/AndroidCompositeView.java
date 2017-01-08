@@ -8,12 +8,12 @@ import android.view.ViewGroup;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 
-class AndroidComposite extends ViewGroup {
+class AndroidCompositeView extends ViewGroup {
 
     Composite composite;
     String text;  // Group label
 
-    AndroidComposite(Context context, Composite container) {
+    AndroidCompositeView(Context context, Composite container) {
         super(context);
         this.composite = container;
     }
