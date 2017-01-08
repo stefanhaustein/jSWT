@@ -74,10 +74,6 @@ class AndroidShellView extends AndroidCompositeView {
 
             actionBarDrawerToggle = new ActionBarDrawerToggle(getAndroidDisplay().activity, drawerLayout, R.string.open, R.string.close);
 
-            LinearLayout.LayoutParams contentLayoutParams = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            contentLayoutParams.weight = 1;
-            mainLayout.addView(this, contentLayoutParams);
 
 
             // this.setBackgroundColor(0x0ff88ff88);
@@ -136,6 +132,16 @@ class AndroidShellView extends AndroidCompositeView {
 
             AndroidDisplay display = (AndroidDisplay) shell.display;
 
+            if (mainLayout.indexOfChild(this) == -1) {
+                LinearLayout.LayoutParams contentLayoutParams = new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                contentLayoutParams.weight = 1;
+                //  setBackgroundColor(0x0ffff8888);
+                mainLayout.addView(this, contentLayoutParams);
+
+            }
+
+
             display.activity.setContentView(drawerLayout);
             display.activity.setSupportActionBar(androidToolbar);
 
@@ -145,7 +151,7 @@ class AndroidShellView extends AndroidCompositeView {
             display.topShell = shell;
             update();
 
-            invalidate();
+            drawerLayout.invalidate();
         }
     }
 }

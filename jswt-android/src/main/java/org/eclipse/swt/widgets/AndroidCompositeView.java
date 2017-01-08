@@ -17,7 +17,7 @@ class AndroidCompositeView extends ViewGroup {
         super(context);
         this.composite = container;
     }
-
+/*
     @Override
     public LayoutParams generateLayoutParams(AttributeSet attrs) {
         return new LayoutParams();
@@ -32,9 +32,12 @@ class AndroidCompositeView extends ViewGroup {
     protected LayoutParams generateLayoutParams(ViewGroup.LayoutParams layoutParams) {
         return new LayoutParams();
     }
-
+*/
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        if (this instanceof AndroidShellView) {
+            System.out.println("ShellView.onLayout(left: " + left + ", top: " + top + ", right: " + right + ", bottom: " + bottom + ")");
+        }
         if (Control.DEBUG_LAYOUT) {
             System.err.println(composite.depth() + "enter onLayout(" + changed + ", " + left + ", " + top + "," + right + ", " + bottom + ") for " + composite);
         }
@@ -43,12 +46,11 @@ class AndroidCompositeView extends ViewGroup {
         // }
         for (int i = 0; i < getChildCount(); i++) {
             View childView = getChildAt(i);
-            LayoutParams childLayoutParams = getChildLayoutParams(i);
             childView.layout(
-                    childLayoutParams.marginLeft,
-                    childLayoutParams.marginTop,
-                    childLayoutParams.marginLeft + childLayoutParams.width,
-                    childLayoutParams.marginTop + childLayoutParams.height);
+                    childView.getLeft(),
+                    childView.getTop(),
+                    childView.getLeft() + childView.getMeasuredWidth(),
+                    childView.getTop() + childView.getMeasuredHeight());
         }
         if (Control.DEBUG_LAYOUT) {
             System.err.println(composite.depth() + "exit onLayout(" + changed + ", " + left + ", " + top + "," + right + ", " + bottom + ") for " + composite);
@@ -79,6 +81,9 @@ class AndroidCompositeView extends ViewGroup {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        if (this instanceof AndroidShellView) {
+            System.out.println("ShellView");
+        }
         int widthSize = View.MeasureSpec.getSize(widthMeasureSpec);
         int widthMode = View.MeasureSpec.getMode(widthMeasureSpec);
         int heightSize = View.MeasureSpec.getSize(heightMeasureSpec);
@@ -108,18 +113,6 @@ class AndroidCompositeView extends ViewGroup {
         composite.notifyListeners(SWT.Resize, null);
     }
 
-
-    /** 
-     * This method just enables calling setMeasuredDimension from the outside.
-     */
-    void setMeasuredSize(int width, int height) {
-        setMeasuredDimension(width, height);
-    }
-
-    private LayoutParams getChildLayoutParams(int i) {
-        return (LayoutParams) getChildAt(i).getLayoutParams();
-    }
-
     String getText() {
         return text;
     }
@@ -128,16 +121,7 @@ class AndroidCompositeView extends ViewGroup {
         this.text = text;
     }
 
-    class LayoutParams extends ViewGroup.LayoutParams {
-        int marginLeft;
-        int marginTop;
-        LayoutParams() {
-           super(WRAP_CONTENT, WRAP_CONTENT);
-        }
-    }
-
     AndroidDisplay getAndroidDisplay() {
         return (AndroidDisplay) composite.display;
     }
-
 }

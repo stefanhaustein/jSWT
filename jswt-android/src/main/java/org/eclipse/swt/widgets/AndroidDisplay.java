@@ -216,14 +216,7 @@ public class AndroidDisplay extends PlatformDisplay {
   @Override
   public Rectangle getBounds(Control control) {
     View view = (View) control.peer;
-    ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
-    if (layoutParams instanceof AndroidCompositeView.LayoutParams) {
-      AndroidCompositeView.LayoutParams lmlParams = (AndroidCompositeView.LayoutParams) layoutParams;
-      return new Rectangle(lmlParams.marginLeft, lmlParams.marginTop,
-          lmlParams.width, lmlParams.height);
-    }
-
-    return new Rectangle(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
+    return new Rectangle(view.getLeft(), view.getTop(), view.getMeasuredWidth(), view.getMeasuredHeight());
 
   }
 
@@ -289,22 +282,13 @@ public class AndroidDisplay extends PlatformDisplay {
 
     view.measure(View.MeasureSpec.EXACTLY | width,
             View.MeasureSpec.EXACTLY | height);
+    view.setLeft(x);
+    view.setTop(y);
 
     ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
     if (layoutParams != null) {
-      layoutParams.width = width;
-      layoutParams.height = height;
-      if (layoutParams instanceof AndroidCompositeView.LayoutParams) {
-        AndroidCompositeView.LayoutParams lmlParams = (AndroidCompositeView.LayoutParams) layoutParams;
-        lmlParams.marginLeft = x;
-        lmlParams.marginTop = y;
-       /* if (!(view instanceof AndroidShellView)) {
-          view.setX(x);
-          view.setY(y);
-        } */
-      } else {
-        System.err.println("setBounds for " + control + ": LayoutParams are not an instance of AndroidComposite.LayoutParams");
-      }
+      layoutParams.width = View.MeasureSpec.EXACTLY | width;
+      layoutParams.height = View.MeasureSpec.EXACTLY | height;
     } else {
       System.err.println("setBounds for " + control + ": LayoutParams are null");
     }
