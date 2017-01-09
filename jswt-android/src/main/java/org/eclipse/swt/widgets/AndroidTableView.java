@@ -24,6 +24,7 @@ public class AndroidTableView extends RecyclerView {
         this.table = table;
         setAdapter(new TableItemAdapter());
         setLayoutManager(new LinearLayoutManager(context));
+        columnOffset = (table.style & (SWT.SINGLE | SWT.MULTI | SWT.CHECK)) != 0 ? 1 : 0;
     }
 
     void select(int index) {
@@ -94,7 +95,7 @@ public class AndroidTableView extends RecyclerView {
                 checkBox = new CheckBox(getContext());
                 checkBox.setOnClickListener(this);
                 linearLayout.addView(checkBox);
-            } else {
+            } else if ((table.style & (SWT.SINGLE | SWT.MULTI)) != 0) {
                 radioButton = new RadioButton(getContext());
                 radioButton.setOnClickListener(this);
                 linearLayout.addView(radioButton);

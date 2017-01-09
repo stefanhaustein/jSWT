@@ -61,23 +61,31 @@ public class ToolItem extends Item {
     public void setWidth(int x) {
     }
 
-    public void setControl(Combo combo) {
-        System.err.println("TBD: ToolItem.setControl()");
+    public void setControl(Control control) {
+        this.control.dispose();
+        this.control = control;
+        display.addChild(getParent(), control);
     }
 
     public void addSelectionListener(final SelectionListener listener) {
-        if (style != SWT.SEPARATOR) {
+        if (control instanceof Button) {
             Button button = (Button) control;
             button.addSelectionListener(new SelectionListener() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     e.widget = ToolItem.this;
+                    if ((style & SWT.DROP_DOWN) != 0) {
+                        e.detail = SWT.ARROW;
+                    }
                     listener.widgetSelected(e);
                 }
 
                 @Override
                 public void widgetDefaultSelected(SelectionEvent e) {
                     e.widget = ToolItem.this;
+                    if ((style & SWT.DROP_DOWN) != 0) {
+                        e.detail = SWT.ARROW;
+                    }
                     listener.widgetDefaultSelected(e);
                 }
             });
