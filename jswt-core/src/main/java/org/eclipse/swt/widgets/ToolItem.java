@@ -21,9 +21,13 @@ public class ToolItem extends Item {
 
         switch (style) {
             case SWT.PUSH:
-            case SWT.CHECK:
-            case SWT.RADIO:
                 control = new Button(parent, style | parentButtonStyle);
+                break;
+            case SWT.CHECK:
+                control = new Button(parent, parentButtonStyle | SWT.TOGGLE);
+                break;
+            case SWT.RADIO:
+                control = new Button(parent, style | parentButtonStyle | SWT.TOGGLE);
                 break;
             case SWT.SEPARATOR:
                 control = new Label(parent, SWT.SEPARATOR | (parent.vertical ? SWT.HORIZONTAL : SWT.VERTICAL));

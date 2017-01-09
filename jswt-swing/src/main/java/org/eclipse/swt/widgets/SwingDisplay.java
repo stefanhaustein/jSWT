@@ -29,6 +29,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.ListSelectionModel;
 import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
@@ -113,17 +114,19 @@ public class SwingDisplay extends PlatformDisplay {
   public Object createControl(final Control control) {
     switch (control.getControlType()) {
       case BUTTON:
-        if ((control.style & SWT.RADIO) != 0) {
-          Composite parent = control.getParent();
-          ButtonGroup group = (ButtonGroup) parent.radioGroup;
-          if (group == null) {
-            parent.radioGroup = group = new ButtonGroup();
+        if ((control.style & (SWT.TOGGLE | SWT.RADIO)) != 0) {
+          JToggleButton result = (control.style & SWT.TOGGLE) != 0 ? new JToggleButton() : new JRadioButton();
+          if ((control.style & SWT.RADIO) != 0) {
+            Composite parent = control.getParent();
+            ButtonGroup group = (ButtonGroup) parent.radioGroup;
+            if (group == null) {
+              parent.radioGroup = group = new ButtonGroup();
+            }
+            group.add(result);
           }
-          JRadioButton result = new JRadioButton();
-          group.add(result);
           return result;
         }
-        if ((control.style & (SWT.CHECK | SWT.TOGGLE)) != 0) {
+        if ((control.style & SWT.CHECK) != 0) {
           return new JCheckBox();
         }
         return new JButton();
@@ -842,7 +845,7 @@ public class SwingDisplay extends PlatformDisplay {
   public void setImage(Control control, Image image) {
     switch (control.getControlType()) {
       case BUTTON:
-        if ((control.style & (SWT.RADIO | SWT.TOGGLE | SWT.CHECK | SWT.ARROW)) == 0) {
+        if (!(control.peer instanceof JRadioButton) && !(control.peer instanceof JCheckBox)) {
           ImageIcon imageIcon = image == null ? null : new ImageIcon((java.awt.Image) image.peer);
           ((AbstractButton) control.peer).setIcon(imageIcon);
         }

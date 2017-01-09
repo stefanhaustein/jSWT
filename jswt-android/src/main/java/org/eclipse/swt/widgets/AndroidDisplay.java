@@ -81,11 +81,10 @@ public class AndroidDisplay extends PlatformDisplay {
     if (!selected) {
       return;
     }
-    CompoundButton androidButton = (CompoundButton) button.peer;
-    if (button.style == SWT.RADIO) {
+    if ((button.style & SWT.RADIO) != 0) {
       Composite parent = (Composite) button.parent;
       for (Control child: parent.children) {
-        if (child != button && child.style == SWT.RADIO && (child instanceof Button)) {
+        if (child != button && (child.style & SWT.RADIO) != 0 && (child instanceof Button)) {
           ((CompoundButton) child.peer).setChecked(false);
         }
       }
@@ -96,6 +95,23 @@ public class AndroidDisplay extends PlatformDisplay {
   public Object createControl(final Control control) {
     switch (control.getControlType()) {
       case BUTTON: {
+        if ((control.style & SWT.TOGGLE) != 0) {
+          ToggleButton toggleButton = new ToggleButton(activity);
+          toggleButton.setTextOn("");
+          toggleButton.setTextOff("");
+          toggleButton.setText("");
+
+          if ((control.style & SWT.RADIO) != 0) {
+            toggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+              @Override
+              public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                handleRadioGroup((Button) control, b);
+                control.notifyListeners(SWT.Selection, null);
+              }
+            });
+          }
+          return toggleButton;
+        }
         if ((control.style & SWT.RADIO) != 0) {
           RadioButton radioButton = new AppCompatRadioButton(activity);
           radioButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -106,9 +122,6 @@ public class AndroidDisplay extends PlatformDisplay {
             }
           });
           return radioButton;
-        }
-        if ((control.style & SWT.TOGGLE) != 0) {
-          return new android.widget.Switch(activity);
         }
         if ((control.style & (SWT.CHECK)) != 0) {
           return new AppCompatCheckBox(activity);
@@ -347,7 +360,13 @@ public class AndroidDisplay extends PlatformDisplay {
   public void setText(Control control, String text) {
     Object peer = control.peer;
     if (peer instanceof android.widget.Button) {
-      ((android.widget.Button) peer).setText(removeAccelerators(text));
+      String rawText = removeAccelerators(text);
+      ((android.widget.Button) peer).setText(rawText);
+      if (peer instanceof ToggleButton) {
+        ToggleButton toggleButton = (ToggleButton) peer;
+        toggleButton.setTextOn(rawText);
+        toggleButton.setTextOff(rawText);
+      }
     } else if (peer instanceof TextView) {
       ((TextView) peer).setText(text);
     } else if (peer instanceof AndroidShellView) {
@@ -671,12 +690,14 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public void setImage(Control control, Image image) {
-    if (control.peer instanceof TextView && !(control.peer instanceof CompoundButton)) {
+    if (control.peer instanceof TextView && (control.peer instanceof ToggleButton || !(control.peer instanceof CompoundButton))) {
       // Regular button, but might turn into image button.
       TextView textView = (TextView) control.peer;
-      if (textView instanceof android.widget.Button && textView.getText().length() == 0 && image != null) {
-        textView.setMinWidth(Math.round(36 * pixelPerDp));
-        textView.setMinimumWidth(Math.round(36 * pixelPerDp));
+      if (textView instanceof android.widget.Button) {
+        int minWidth = (textView.getText().length() == 0 && image != null)
+                ? Math.round(24 * pixelPerDp) + image.getBounds().width : Math.round(88 * pixelPerDp);
+        textView.setMinWidth(minWidth);
+        textView.setMinimumWidth(minWidth);
       }
       Drawable icon = image == null ? null : new BitmapDrawable(activity.getResources(), (Bitmap) image.peer);
       ((android.widget.TextView) control.peer).setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null);
