@@ -12,8 +12,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.*;
 import android.support.v7.widget.PopupMenu;
+import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.text.method.KeyListener;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
@@ -961,6 +963,24 @@ public class AndroidDisplay extends PlatformDisplay {
         });
         break;
 
+      case SWT.Modify:
+        if (view instanceof TextView) {
+          ((TextView) view).addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+              control.notifyListeners(SWT.Modify, null);
+            }
+          });
+        }
+        break;
 
       case SWT.Selection:
         if (view instanceof android.widget.Button) {
@@ -980,6 +1000,8 @@ public class AndroidDisplay extends PlatformDisplay {
         }
         break;
     }
+
+
   }
 
   @Override
