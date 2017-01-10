@@ -253,8 +253,8 @@ public class SwingDisplay extends PlatformDisplay {
         // Adjust for frame insets and menu bar only.
         if (root != null) {
           java.awt.Insets insets = root.getInsets();
-          rect.x += insets.top + container.getY();
-          rect.y += insets.left;
+          rect.x += insets.left;
+          rect.y += insets.top + container.getY();
         }
       }
     }
@@ -559,12 +559,14 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
-  public void showPopupMenu(Menu menu) {
+  public void showPopupMenu(Menu menu, int x, int y) {
     JPopupMenu popupMenu = new JPopupMenu();
     menuAddAll(menu, popupMenu);
-    JComponent parent = (JComponent) ((Control) menu.parent).peer;
+    JComponent parent = ((JComponent) ((Control) menu.getParent()).peer).getRootPane();
+    java.awt.Point parentScreenLocation = parent.getLocationOnScreen();
+    //JComponent parent = (JComponent) ((Control) menu.parent).peer;
    // parent.add(popupMenu);
-    popupMenu.show(parent, parent.getWidth() / 2, parent.getHeight() / 2);
+    popupMenu.show(parent, x - parentScreenLocation.x, y - parentScreenLocation.y); //parent.getWidth() / 2, parent.getHeight() / 2);
   }
 
   @Override

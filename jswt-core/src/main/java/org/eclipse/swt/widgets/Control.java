@@ -28,12 +28,20 @@ public class Control extends Widget {
 
 
   public Point toControl(int x, int y) {
-    System.err.println("FIXME: Control.toControl(x,y)");
-    return new Point(x, y);
+    Point result = toDisplay(0, 0);
+    result.x = x - result.x;
+    result.y = y - result.y;
+    return result;
   }
 
   public Point toDisplay(int x, int y) {
-    System.err.println("FIXME: Control.toDisplay(x,y)");
+    Control control = this;
+    do {
+      Point p = control.getLocation();
+      x += p.x;
+      y += p.y;
+      control = control.getParent();
+    } while (control != null);
     return new Point(x, y);
   }
 

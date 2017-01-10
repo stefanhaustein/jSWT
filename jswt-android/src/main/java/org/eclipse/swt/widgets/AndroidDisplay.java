@@ -20,6 +20,7 @@ import android.text.method.KeyListener;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -824,10 +825,35 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
-  public void showPopupMenu(final Menu menu) {
-    View anchor = (View) ((Control) menu.getParent()).peer;
-    PopupMenu popupMenu = new PopupMenu(activity, anchor);
+  public void showPopupMenu(final Menu menu, int x, int y) {
+
+    final ViewGroup root = (ViewGroup) activity.getWindow().getDecorView().findViewById(android.R.id.content);
+
+    final View view = new View(activity);
+    view.setLayoutParams(new ViewGroup.LayoutParams(1, 1));
+    view.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+
+    root.addView(view);
+
+    view.setX(x);
+    view.setY(y);
+
+    PopupMenu popupMenu = new PopupMenu(activity, view, Gravity.CENTER);
+
+    popupMenu.setOnDismissListener(new PopupMenu.OnDismissListener()
+    {
+      @Override
+      public void onDismiss(PopupMenu menu)
+      {
+        root.removeView(view);
+      }
+    });
     populateMenu(menu, popupMenu.getMenu(), false);
+    popupMenu.show();
+
+
+//    PopupMenu popupMenu = new PopupMenu(activity, anchor);
+  //  populateMenu(menu, popupMenu.getMenu(), false);
     /*popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
       @Override
       public boolean onMenuItemClick(android.view.MenuItem item) {
@@ -835,7 +861,7 @@ public class AndroidDisplay extends PlatformDisplay {
         return true;
       }
     }); */
-    popupMenu.show();
+    // popupMenu.show();
   }
 
   @Override
