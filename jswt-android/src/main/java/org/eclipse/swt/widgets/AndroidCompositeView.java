@@ -20,6 +20,7 @@ class AndroidCompositeView extends ViewGroup {
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        //composite.setBounds(left, top, right - left, bottom - top);
         if (this instanceof AndroidShellView) {
             System.out.println("ShellView.onLayout(left: " + left + ", top: " + top + ", right: " + right + ", bottom: " + bottom + ")");
         }
@@ -31,6 +32,7 @@ class AndroidCompositeView extends ViewGroup {
         // }
         for (int i = 0; i < getChildCount(); i++) {
             View childView = getChildAt(i);
+            ViewGroup.LayoutParams params = childView.getLayoutParams();
             childView.layout(
                     childView.getLeft(),
                     childView.getTop(),

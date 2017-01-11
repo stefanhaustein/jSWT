@@ -3,6 +3,7 @@ package org.eclipse.swt.widgets;
 import android.content.Context;
 import android.support.design.widget.TabLayout;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TabHost;
@@ -17,17 +18,15 @@ class AndroidTabFolder extends LinearLayout {
         super(context);
         setOrientation(LinearLayout.VERTICAL);
         tabLayout = new TabLayout(context);
-        addView(tabLayout);
+        addView(tabLayout, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         // Create the FrameLayout (the content area)
         tabContent = new FrameLayout(context);
-        LinearLayout.LayoutParams frameLayoutParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
-        addView(tabContent);
+        addView(tabContent, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
 
 //        int px = px(context, 4);
 //        frameLayoutParams.setMargins(px, 4 * px, px, 2 * px);
-        tabContent.setLayoutParams(frameLayoutParams);
 
         // Make sure the total size accounts for the largest tab.
         tabContent.setMeasureAllChildren(true);

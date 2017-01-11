@@ -173,10 +173,12 @@ public class Composite extends Scrollable {
     Control [] children = _getChildren ();
     Rectangle clientArea = getClientArea ();
     int width = 0, height = 0;
+    Rectangle childBounds = new Rectangle(0, 0, 0, 0);
     for (int i=0; i<children.length; i++) {
-      Rectangle rect = children [i].getBounds ();
-      width = Math.max (width, rect.x - clientArea.x + rect.width);
-      height = Math.max (height, rect.y - clientArea.y + rect.height);
+      display.getLocation(children [i], childBounds, null);
+      display.getSize(children [i], childBounds, null);
+      width = Math.max (width, childBounds.x - clientArea.x + childBounds.width);
+      height = Math.max (height, childBounds.y - clientArea.y + childBounds.height);
     }
     return new Point (width, height);
   }

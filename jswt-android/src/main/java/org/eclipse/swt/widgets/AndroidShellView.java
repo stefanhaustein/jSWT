@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import org.eclipse.swt.R;
 import org.eclipse.swt.SWT;
@@ -43,6 +44,10 @@ class AndroidShellView extends AndroidCompositeView {
             // Absolute root
             drawerLayout = new android.support.v4.widget.DrawerLayout(getContext());
 
+            AndroidDisplay display = (AndroidDisplay) shell.getDisplay();
+            display.rootLayout.addView(drawerLayout, new FrameLayout.LayoutParams(
+                    LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+
             // Main root: toolbar and content
             mainLayout = new LinearLayout(context);
             mainLayout.setOrientation(LinearLayout.VERTICAL);
@@ -74,24 +79,10 @@ class AndroidShellView extends AndroidCompositeView {
 
             actionBarDrawerToggle = new ActionBarDrawerToggle(getAndroidDisplay().activity, drawerLayout, R.string.open, R.string.close);
 
-
-
-            // this.setBackgroundColor(0x0ff88ff88);
-            /*
-            navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-                @Override
-                public boolean onNavigationItemSelected(android.view.MenuItem item) {
-                 MenuItem result = getAndroidDisplay().findMenuItem(shell.menuBar, item.getTitle().toString());
-                 if (result != null) {
-                      result.notifyListeners(SWT.Selection, null);
-                      drawerLayout.closeDrawers();
-                      return true;
-                 }
-                 return false;
-                }
-            });
-            */
-
+            LinearLayout.LayoutParams contentLayoutParams = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            contentLayoutParams.weight = 1;
+            mainLayout.addView(this, contentLayoutParams);
        }
     }
 
@@ -131,21 +122,17 @@ class AndroidShellView extends AndroidCompositeView {
         } else {
 
             AndroidDisplay display = (AndroidDisplay) shell.display;
-
+/*
             if (mainLayout.indexOfChild(this) == -1) {
-                LinearLayout.LayoutParams contentLayoutParams = new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                contentLayoutParams.weight = 1;
-                //  setBackgroundColor(0x0ffff8888);
-                mainLayout.addView(this, contentLayoutParams);
+
 
             }
+*/
 
-
-            display.activity.setContentView(drawerLayout);
+            drawerLayout.setVisibility(VISIBLE);
             display.activity.setSupportActionBar(androidToolbar);
 
-            display.activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+           // display.activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             display.activity.getSupportActionBar().setHomeButtonEnabled(true);
 
             display.topShell = shell;

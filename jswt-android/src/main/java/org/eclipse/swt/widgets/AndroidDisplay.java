@@ -47,6 +47,7 @@ public class AndroidDisplay extends PlatformDisplay {
   AppCompatActivity activity;
   Shell topShell;
   Context flatButtonContext;
+  FrameLayout rootLayout;
   float pixelPerDp;
 
   private static int getArgb(Color color) {
@@ -73,6 +74,8 @@ public class AndroidDisplay extends PlatformDisplay {
     flatButtonContext = new ContextThemeWrapper(activity,
             android.support.v7.appcompat.R.style.Widget_AppCompat_Button_Borderless);
     pixelPerDp = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, activity.getResources().getDisplayMetrics());
+    rootLayout = new FrameLayout(activity);
+    activity.setContentView(rootLayout);
   }
 
   @Override
@@ -230,9 +233,29 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
-  public Rectangle getBounds(Control control) {
+  public void getLocation(Control control, Rectangle bounds, Point location) {
     View view = (View) control.peer;
-    return new Rectangle(view.getLeft(), view.getTop(), view.getMeasuredWidth(), view.getMeasuredHeight());
+    if (bounds != null) {
+      bounds.x = view.getLeft();
+      bounds.y = view.getTop();
+    }
+    if (location != null) {
+      location.x = view.getLeft();
+      location.y = view.getTop();
+    }
+  }
+
+  @Override
+  public void getSize(Control control, Rectangle bounds, Point size) {
+    View view = (View) control.peer;
+    if (bounds != null) {
+      bounds.width = view.getMeasuredWidth();
+      bounds.height = view.getMeasuredHeight();
+    }
+    if (size != null) {
+      size.x = view.getMeasuredWidth();
+      size.y = view.getMeasuredHeight();
+    }
   }
 
   @Override
@@ -300,9 +323,6 @@ public class AndroidDisplay extends PlatformDisplay {
     View view = (View) control.peer;
     view.measure(View.MeasureSpec.EXACTLY | width,
             View.MeasureSpec.EXACTLY | height);
-    view.setLeft(x);
-    view.setTop(y);
-
     view.setLeft(x);
     view.setTop(y);
 

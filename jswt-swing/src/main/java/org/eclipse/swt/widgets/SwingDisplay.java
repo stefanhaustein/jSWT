@@ -239,26 +239,54 @@ public class SwingDisplay extends PlatformDisplay {
     return new Point(wHint == SWT.DEFAULT ? d.width : wHint, hHint == SWT.DEFAULT ? d.height : hHint);
   }
 
+
   @Override
-  public Rectangle getBounds(Control control) {
-    java.awt.Rectangle rect = new java.awt.Rectangle();
+  void getSize(Control control, Rectangle bounds, Point size) {
+    java.awt.Component component = (Component) control.peer;
     if (control.getControlType() == Control.ControlType.SHELL) {
-      Component root = SwingUtilities.getRoot((java.awt.Component) control.peer);
-      root.getBounds(rect);
+      component = SwingUtilities.getRoot(component);
+    }
+    if (bounds != null) {
+      bounds.width = component.getWidth();
+      bounds.height = component.getHeight();
+    }
+    if (size != null) {
+      size.x = component.getWidth();
+      size.y = component.getHeight();
+    }
+  }
+
+  @Override
+  public void getLocation(Control control, Rectangle bounds, Point location) {
+    java.awt.Component component = (Component) control.peer;
+    int x;
+    int y;
+    if (control.getControlType() == Control.ControlType.SHELL) {
+      component = SwingUtilities.getRoot(component);
+      x = component.getX();
+      y = component.getY();
     } else {
-      ((Component) control.peer).getBounds(rect);
+      x = component.getX();
+      y = component.getY();
       if (control.getParent().getControlType() == Control.ControlType.SHELL) {
         Container container = (Container) control.getParent().peer;
         Window root = SwingUtilities.getWindowAncestor((java.awt.Component) control.peer);
         // Adjust for frame insets and menu bar only.
         if (root != null) {
           java.awt.Insets insets = root.getInsets();
-          rect.x += insets.left;
-          rect.y += insets.top + container.getY();
+          x += insets.left;
+          y += insets.top + container.getY();
         }
       }
     }
-    return new Rectangle(rect.x, rect.y, rect.width, rect.height);
+    if (bounds != null) {
+      bounds.x = x;
+      bounds.y = y;
+    }
+    if (location != null) {
+      location.x = x;
+      location.y = y;
+    }
   }
 
   @Override

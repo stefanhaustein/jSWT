@@ -1,6 +1,8 @@
 package org.eclipse.swt.widgets;
 
 import java.util.ArrayList;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 
 public class TabFolder extends Composite {
 
@@ -8,6 +10,7 @@ public class TabFolder extends Composite {
 
     public TabFolder(Composite parent, int style) {
         super(parent, style);
+        setBackground(display.getSystemColor(SWT.COLOR_GREEN));
     }
 
     ControlType getControlType() {

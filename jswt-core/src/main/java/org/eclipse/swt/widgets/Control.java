@@ -148,8 +148,10 @@ public class Control extends Widget {
   }
 
   public Rectangle getBounds() {
-    // Find a way to improve this, e.g. hand in an object that is shared in some way
-    return display.getBounds(this);
+    Rectangle bounds = new Rectangle(0, 0, 0,0);
+    display.getLocation(this, bounds, null);
+    display.getSize(this, bounds, null);
+    return bounds;
   }
 
   ControlType getControlType() {
@@ -181,8 +183,9 @@ public class Control extends Widget {
     }
 
   public Point getLocation() {
-    Rectangle bounds = display.getBounds(this);
-    return new Point(bounds.x, bounds.y);
+    Point result = new Point(0, 0);
+    display.getLocation(this, null, result);
+    return result;
   }
 
   public Menu getMenu() {
@@ -202,8 +205,9 @@ public class Control extends Widget {
   }
 
   public Point getSize() {
-    Rectangle bounds = getBounds();
-    return new Point(bounds.width, bounds.height);
+    Point size = new Point(0, 0);
+    display.getSize(this, null, size);
+    return size;
   }
 
   public Shell getShell() {

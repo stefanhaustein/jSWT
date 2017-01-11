@@ -2,6 +2,7 @@ package org.eclipse.swt.widgets;
 
 import com.google.gwt.core.client.JsArrayNumber;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -490,7 +491,7 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    Rectangle getBounds(Control control) {
+    void getLocation(Control control, Rectangle bounds, Point location) {
         Element element = ((Element) control.peer);
         int x = element.getOffsetLeft();
         int y = element.getOffsetTop();
@@ -504,7 +505,27 @@ public class GwtDisplay extends PlatformDisplay {
             y += Math.round(getPx(parentStyle, "marginTop") + getPx(parentStyle, "borderTopWidth"));
         }
 
-        return new Rectangle(x, y, element.getOffsetWidth(), element.getOffsetHeight());
+        if (bounds != null) {
+            bounds.x = x;
+            bounds.y = y;
+        }
+        if (location != null) {
+            location.x = x;
+            location.y = y;
+        }
+    }
+
+    @Override
+    void getSize(Control control, Rectangle bounds, Point size) {
+        Element element = ((Element) control.peer);
+        if (bounds != null) {
+            bounds.width = element.getOffsetWidth();
+            bounds.height = element.getOffsetHeight();
+        }
+        if (size != null) {
+            size.x = element.getOffsetWidth();
+            size.y = element.getOffsetHeight();
+        }
     }
 
     @Override

@@ -58,7 +58,9 @@ public abstract class PlatformDisplay extends Display {
 
     abstract Color getBackground(Control control);
 
-    abstract Rectangle getBounds(Control control);
+    abstract void getLocation(Control control, Rectangle bounds, Point location);
+
+    abstract void getSize(Control control, Rectangle bounds, Point size);
 
     abstract Color getForeground(Control control);
 
@@ -215,6 +217,7 @@ public abstract class PlatformDisplay extends Display {
     abstract void updateTable(Table table);
 
     abstract ToolBar getToolBar(Shell shell);
+
 
     public static class Insets {
         public int top;
