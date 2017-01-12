@@ -595,14 +595,13 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
-  public void showPopupMenu(Menu menu, int x, int y) {
+  public void showPopupMenu(Menu menu, Rectangle anchor) {
     JPopupMenu popupMenu = new JPopupMenu();
     menuAddAll(menu, popupMenu);
     JComponent parent = ((JComponent) ((Control) menu.getParent()).peer).getRootPane();
     java.awt.Point parentScreenLocation = parent.getLocationOnScreen();
-    //JComponent parent = (JComponent) ((Control) menu.parent).peer;
-   // parent.add(popupMenu);
-    popupMenu.show(parent, x - parentScreenLocation.x, y - parentScreenLocation.y); //parent.getWidth() / 2, parent.getHeight() / 2);
+    // Seems to be always displayed to the top right, so we add the width and ignore the height
+    popupMenu.show(parent, anchor.x + anchor.width - parentScreenLocation.x, anchor.y - parentScreenLocation.y);
   }
 
   @Override

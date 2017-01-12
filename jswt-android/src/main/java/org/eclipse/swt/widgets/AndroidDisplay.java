@@ -851,18 +851,18 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
-  public void showPopupMenu(final Menu menu, int x, int y) {
+  public void showPopupMenu(final Menu menu, Rectangle anchor) {
 
     final ViewGroup root = (ViewGroup) activity.getWindow().getDecorView().findViewById(android.R.id.content);
 
     final View view = new View(activity);
-    view.setLayoutParams(new ViewGroup.LayoutParams(1, 1));
+    view.setLayoutParams(new ViewGroup.LayoutParams(Math.max(anchor.width, 1), Math.max(anchor.height, 1)));
     view.setBackgroundColor(android.graphics.Color.TRANSPARENT);
 
     root.addView(view);
 
-    view.setX(x);
-    view.setY(y);
+    view.setX(anchor.x);
+    view.setY(anchor.y);
 
     PopupMenu popupMenu = new PopupMenu(activity, view, Gravity.CENTER);
 

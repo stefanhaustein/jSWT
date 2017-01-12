@@ -939,7 +939,7 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    void showPopupMenu(Menu menu, int x, int y) {
+    void showPopupMenu(Menu menu, Rectangle anchor) {
         throw new RuntimeException("FIXME: GwtDisplay.showPopupMenu");
     }
 

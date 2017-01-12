@@ -4,6 +4,7 @@ package org.eclipse.swt.widgets;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Point;
 
 public class ToolItem extends Item {
 
@@ -77,6 +78,9 @@ public class ToolItem extends Item {
                     if ((style & SWT.DROP_DOWN) != 0) {
                         e.detail = SWT.ARROW;
                     }
+                    Point controlLocation = control.getLocation();
+                    e.x += controlLocation.x;
+                    e.y += controlLocation.y;
                     listener.widgetSelected(e);
                 }
 
@@ -86,6 +90,9 @@ public class ToolItem extends Item {
                     if ((style & SWT.DROP_DOWN) != 0) {
                         e.detail = SWT.ARROW;
                     }
+                    Point controlLocation = control.getLocation();
+                    e.x += controlLocation.x;
+                    e.y += controlLocation.y;
                     listener.widgetDefaultSelected(e);
                 }
             });

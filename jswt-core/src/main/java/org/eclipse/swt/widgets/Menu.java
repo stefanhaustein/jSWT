@@ -11,8 +11,8 @@ import java.util.ArrayList;
 public class Menu extends Widget {
 
     ArrayList<MenuItem> items = new ArrayList<MenuItem>();
-    int x = -1;
-    int y = -1;
+    Rectangle location;
+    boolean explicitLocation;
 
     Menu(Widget parent, int style) {
         super(parent, style);
@@ -41,19 +41,22 @@ public class Menu extends Widget {
 
     public void setVisible(boolean visible) {
         if (visible) {
-            if (x == -1) {
-                if (parent instanceof Control) {
-                    Rectangle bounds = ((Control) parent).getBounds();
-                    Point global = ((Control) parent).toDisplay(bounds.width / 2, bounds.height / 2);
-                    x = global.x;
-                    y = global.y;
-                    System.out.println("bounds: " + bounds);
-                    System.out.println("global: " + global);
+            Widget widget = parent;
+            if (!explicitLocation) {
+                while (widget != null && !(widget instanceof Control)) {
+                    widget = widget.parent;
+                }
+
+                if (widget instanceof Control) {
+                    location = ((Control) widget).getBounds();
+                    Point global = ((Control) widget).toDisplay(0, 0);
+                    location.x = global.x;
+                    location.y = global.y;
                 } else {
                     System.err.println("show popup without parent control(-coordinates)");
                 }
             }
-            display.showPopupMenu(this, x, y);
+            display.showPopupMenu(this, location);
         }
     }
 
@@ -67,6 +70,7 @@ public class Menu extends Widget {
     }
 
     public void setLocation(int x, int y) {
-        System.err.println("FIXME: Menu.setLoclation(x,y);");
+        explicitLocation = true;
+        location = new Rectangle(x, y, 0, 0);
     }
 }

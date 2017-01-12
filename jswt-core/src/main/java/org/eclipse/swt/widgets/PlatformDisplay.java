@@ -144,7 +144,7 @@ public abstract class PlatformDisplay extends Display {
 
     abstract void setVisible(Control control, boolean visible);
 
-    abstract void showPopupMenu(Menu menu, int x, int y);
+    abstract void showPopupMenu(Menu menu, Rectangle anchor);
 
     abstract void updateMenuBar(Decorations decorations);
 
