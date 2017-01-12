@@ -407,12 +407,11 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
-  public void setBounds(Control control, int x, int y, int width, int height) {
+  public void setLocation(Control control, int x, int y) {
     Component component = (Component) control.peer;
     if (control.getControlType() == Control.ControlType.SHELL) {
       Window root = SwingUtilities.getWindowAncestor(component);
       root.setLocation(x, y);
-      root.setSize(width, height);
     } else {
       if (control.getParent().getControlType() == Control.ControlType.SHELL) {
         // Adjust for frame insets and menu bar only.
@@ -424,11 +423,20 @@ public class SwingDisplay extends PlatformDisplay {
           y -= insets.top + container.getY();
         }
       }
-      component.setBounds(x, y, width, height);
+      component.setLocation(x, y);
     }
   /*  if (component.getParent() instanceof JScrollPane) {
       component.getParent().doLayout();
     }*/
+  }
+
+  @Override
+  public void setSize(Control control, int width, int height) {
+    Component component = (Component) control.peer;
+    if (control.getControlType() == Control.ControlType.SHELL) {
+      component = SwingUtilities.getWindowAncestor(component);
+    }
+    component.setSize(width, height);
   }
 
   @Override

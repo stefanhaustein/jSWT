@@ -259,7 +259,8 @@ public class Control extends Widget {
     if (DEBUG_LAYOUT) {
       System.err.println(depth() + "setBounds(" + x + ", " + y + ", " + width + ", " + height + ") for " + this);
     }
-    display.setBounds(this, x, y, width, height);
+    display.setLocation(this, x, y);
+    display.setSize(this, width, height);
   }
 
   public void setBounds(Rectangle rect) {
@@ -296,17 +297,15 @@ public class Control extends Widget {
   }
 
   public void setLocation(int x, int y) {
-    Rectangle bounds = getBounds();
-    setBounds(x, y, bounds.width, bounds.height);
+    display.setLocation(this, x, y);
   }
 
   public void setLocation(Point p) {
-    setLocation(p.x, p.y);
+    display.setLocation(this, p.x, p.y);
   }
 
   public void setSize(int width, int height) {
-    Rectangle bounds = getBounds();
-    setBounds(bounds.x, bounds.y, width, height);
+    display.setSize(this, width, height);
   }
 
   public void setSize(Point p) {

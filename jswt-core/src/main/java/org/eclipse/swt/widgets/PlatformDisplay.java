@@ -118,8 +118,6 @@ public abstract class PlatformDisplay extends Display {
 
     abstract void setBackgroundImage(Control control, Image image);
 
-    abstract void setBounds(Control control, int x, int y, int width, int height);
-
     abstract void setEnabled(Control control, boolean b);
 
     abstract void setFocus(Control control);
@@ -217,6 +215,10 @@ public abstract class PlatformDisplay extends Display {
     abstract void updateTable(Table table);
 
     abstract ToolBar getToolBar(Shell shell);
+
+    abstract void setLocation(Control control, int x, int y);
+
+    abstract void setSize(Control control, int width, int height);
 
 
     public static class Insets {

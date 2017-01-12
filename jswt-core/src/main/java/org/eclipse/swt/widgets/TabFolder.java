@@ -10,7 +10,6 @@ public class TabFolder extends Composite {
 
     public TabFolder(Composite parent, int style) {
         super(parent, style);
-        setBackground(display.getSystemColor(SWT.COLOR_GREEN));
     }
 
     ControlType getControlType() {

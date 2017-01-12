@@ -441,6 +441,10 @@ public class GwtDisplay extends PlatformDisplay {
                 result.appendChild(title);
                 return result;
             }
+            case TABLE:
+                return createControlElement(control, "table");
+            case TOOLBAR:
+                return createControlElement(control, "swt-toolbar");
             case COMPOSITE:
                 return createControlElement(control, "swt-composite");
             case PROGRESS_BAR:
@@ -477,7 +481,7 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public GC createGCForPlatformImage(Object platformImage) {
-        throw new RuntimeException("FIXME: GwtDisplay.GCForPlatformImage");
+        return new GwtGC((Element) platformImage);
     }
 
     @Override
@@ -545,7 +549,11 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public Rectangle getImageBounds(Object platformImage) {
-        throw new RuntimeException("FIXME: GwtDisplay.getImageBounds");
+        Element canvas = (Element) platformImage;
+        // TODO(haustein): Use properties instead (?!)
+        return new Rectangle(0, 0,
+                Integer.parseInt(canvas.getAttribute("width")),
+                Integer.parseInt(canvas.getAttribute("height")));
     }
 
     private static float getPx(Style style, String propertyName) {
@@ -690,15 +698,10 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    void setBounds(Control control, int x, int y, int w, int h) {
+    void setLocation(Control control, int x, int y) {
         Composite parent = control.getParent();
         if (parent == null) {
             return;
-        }
-
-        int sliderPos = -1;
-        if (control.getControlType() == Control.ControlType.SLIDER) {
-            sliderPos = ((Slider) control).getSelection();
         }
 
         Element element = (Element) control.peer;
@@ -713,6 +716,23 @@ public class GwtDisplay extends PlatformDisplay {
         Style style = element.getStyle();
         style.setLeft(x + "px");
         style.setTop(y + "px");
+    }
+
+    @Override
+    void setSize(Control control, int w, int h) {
+        Composite parent = control.getParent();
+        if (parent == null) {
+            return;
+        }
+
+        int sliderPos = -1;
+        if (control.getControlType() == Control.ControlType.SLIDER) {
+            sliderPos = ((Slider) control).getSelection();
+        }
+
+        Element element = (Element) control.peer;
+
+        Style style = element.getStyle();
         style.setWidth(w + "px");
         style.setHeight(h + "px");
         if (element.getLocalName().equals("canvas")) {
@@ -727,6 +747,8 @@ public class GwtDisplay extends PlatformDisplay {
             slider.setSelection(sliderPos);
         }
     }
+
+
 
     @Override
     void setEnabled(Control control, boolean b) {
@@ -1207,8 +1229,8 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     Font getFont(Control control) {
-        log("FIXME: GwtDisplay.setFont");
-        return null;
+        log("FIXME: GwtDisplay.getFont");
+        return new Font(this, "Dummy", 12, 0);
     }
 
     @Override

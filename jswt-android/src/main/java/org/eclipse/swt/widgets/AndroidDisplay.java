@@ -315,7 +315,17 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
-  public void setBounds(Control control, int x, int y, int width, int height) {
+  public void setLocation(Control control, int x, int y) {
+    if (control instanceof Shell) {
+      return;
+    }
+    View view = (View) control.peer;
+    view.setLeft(x);
+    view.setTop(y);
+  }
+
+  @Override
+  public void setSize(Control control, int width, int height) {
     if (control instanceof Shell) {
       return;
     }
@@ -323,15 +333,11 @@ public class AndroidDisplay extends PlatformDisplay {
     View view = (View) control.peer;
     view.measure(View.MeasureSpec.EXACTLY | width,
             View.MeasureSpec.EXACTLY | height);
-    view.setLeft(x);
-    view.setTop(y);
 
     ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
     if (layoutParams != null) {
       layoutParams.width = View.MeasureSpec.EXACTLY | width;
       layoutParams.height = View.MeasureSpec.EXACTLY | height;
-    } else {
-      System.err.println("setBounds for " + control + ": LayoutParams are null");
     }
     if (view instanceof EditText) {
       ((EditText) view).setMaxWidth(width);
