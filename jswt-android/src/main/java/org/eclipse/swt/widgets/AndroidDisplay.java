@@ -320,8 +320,12 @@ public class AndroidDisplay extends PlatformDisplay {
       return;
     }
     View view = (View) control.peer;
+    int w = view.getWidth();
+    int h = view.getHeight();
     view.setLeft(x);
     view.setTop(y);
+    view.setRight(x + w);
+    view.setBottom(y + h);
   }
 
   @Override
@@ -339,6 +343,10 @@ public class AndroidDisplay extends PlatformDisplay {
       layoutParams.width = View.MeasureSpec.EXACTLY | width;
       layoutParams.height = View.MeasureSpec.EXACTLY | height;
     }
+
+    view.setRight(view.getLeft() + width);
+    view.setBottom(view.getTop() + height);
+
     if (view instanceof EditText) {
       ((EditText) view).setMaxWidth(width);
     }
@@ -851,43 +859,28 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
-  public void showPopupMenu(final Menu menu, Rectangle anchor) {
+  public void showPopupMenu(final Menu menu, Control anchor, int x, int y) {
+    PopupMenu popupMenu;
+    if (anchor == null) {
+      final ViewGroup root = (ViewGroup) activity.getWindow().getDecorView().findViewById(android.R.id.content);
 
-    final ViewGroup root = (ViewGroup) activity.getWindow().getDecorView().findViewById(android.R.id.content);
+      final View view = new View(activity);
+      root.addView(view, new ViewGroup.LayoutParams(1, 1));
+      view.setX(x);
+      view.setY(y);
 
-    final View view = new View(activity);
-    view.setLayoutParams(new ViewGroup.LayoutParams(Math.max(anchor.width, 1), Math.max(anchor.height, 1)));
-    view.setBackgroundColor(android.graphics.Color.TRANSPARENT);
-
-    root.addView(view);
-
-    view.setX(anchor.x);
-    view.setY(anchor.y);
-
-    PopupMenu popupMenu = new PopupMenu(activity, view, Gravity.CENTER);
-
-    popupMenu.setOnDismissListener(new PopupMenu.OnDismissListener()
-    {
-      @Override
-      public void onDismiss(PopupMenu menu)
-      {
-        root.removeView(view);
-      }
-    });
+      popupMenu = new PopupMenu(activity, view, Gravity.CENTER);
+      popupMenu.setOnDismissListener(new PopupMenu.OnDismissListener() {
+        @Override
+        public void onDismiss(PopupMenu menu) {
+          root.removeView(view);
+        }
+      });
+    } else {
+      popupMenu = new PopupMenu(activity, (View) anchor.peer);
+    }
     populateMenu(menu, popupMenu.getMenu(), false);
     popupMenu.show();
-
-
-//    PopupMenu popupMenu = new PopupMenu(activity, anchor);
-  //  populateMenu(menu, popupMenu.getMenu(), false);
-    /*popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-      @Override
-      public boolean onMenuItemClick(android.view.MenuItem item) {
-        findMenuItem(menu, item.getTitle().toString());
-        return true;
-      }
-    }); */
-    // popupMenu.show();
   }
 
   @Override
@@ -951,12 +944,12 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public void setBackground(Control control, Color color) {
-
+    ((View) control.peer).setBackgroundColor(getArgb(color));
   }
 
   @Override
   public void setBackgroundImage(Control control, Image image) {
-
+    System.err.println("FIXME: AndroidDisplay.setBackgroundImage()");
   }
 
   @Override
