@@ -3,8 +3,10 @@ package org.eclipse.swt.widgets;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -18,6 +20,7 @@ public class AndroidTableView extends RecyclerView {
     Table table;
     int columnOffset = 1;
     int selectedIndex = -1;
+    ItemDecoration itemDecoration;
 
     public AndroidTableView(Context context, Table table) {
         super(context);
@@ -25,6 +28,21 @@ public class AndroidTableView extends RecyclerView {
         setAdapter(new TableItemAdapter());
         setLayoutManager(new LinearLayoutManager(context));
         columnOffset = (table.style & (SWT.SINGLE | SWT.MULTI | SWT.CHECK)) != 0 ? 1 : 0;
+        updateStyle();
+    }
+
+    void updateStyle() {
+        if (table.getLinesVisible()) {
+            if (itemDecoration == null) {
+                itemDecoration = new DividerItemDecoration(getContext(), LinearLayout.VERTICAL);
+                addItemDecoration(itemDecoration);
+            }
+        } else {
+            if (itemDecoration != null) {
+                removeItemDecoration(itemDecoration);
+                itemDecoration = null;
+            }
+        }
     }
 
     void select(int index) {
@@ -53,7 +71,7 @@ public class AndroidTableView extends RecyclerView {
             }
             TableItem tableItem = table.getItem(position);
             for (int i = holder.linearLayout.getChildCount(); i < columnCount; i++) {
-                TextView view = new TextView(getContext());
+                TextView view = new TextView(getContext(), null, android.R.attr.textAppearanceListItemSmall);
                 holder.linearLayout.addView(view);
                 LinearLayout.LayoutParams params = ((LinearLayout.LayoutParams) view.getLayoutParams());
                 params.weight = 1;
@@ -65,6 +83,7 @@ public class AndroidTableView extends RecyclerView {
                 Image image = tableItem.getImage(i - columnOffset);
                 BitmapDrawable icon = image == null ? null : new BitmapDrawable(getResources(), (Bitmap) image.peer);
                 textView.setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null);
+                ((LinearLayout.LayoutParams) textView.getLayoutParams()).gravity = Gravity.CENTER_VERTICAL;
             }
             if (holder.radioButton != null) {
                 holder.radioButton.setChecked(position == selectedIndex);
@@ -95,12 +114,15 @@ public class AndroidTableView extends RecyclerView {
                 checkBox = new CheckBox(getContext());
                 checkBox.setOnClickListener(this);
                 linearLayout.addView(checkBox);
+                ((LinearLayout.LayoutParams) checkBox.getLayoutParams()).gravity = Gravity.CENTER_VERTICAL;
             } else if ((table.style & (SWT.SINGLE | SWT.MULTI)) != 0) {
                 radioButton = new RadioButton(getContext());
                 radioButton.setOnClickListener(this);
                 linearLayout.addView(radioButton);
+                ((LinearLayout.LayoutParams) radioButton.getLayoutParams()).gravity = Gravity.CENTER_VERTICAL;
             }
             linearLayout.setOnClickListener(this);
+            linearLayout.setMinimumHeight(Math.round(((AndroidDisplay) table.display).pixelPerDp * 48));
         }
 
         @Override

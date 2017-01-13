@@ -129,6 +129,7 @@ public class Table extends Composite {
 
     public void setLinesVisible(boolean linesVisible) {
         this.linesVisible = linesVisible;
+        display.updateTable(this);
     }
 
     public TableItem getItem(Point coords) {

@@ -712,7 +712,7 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   void updateTable(Table table) {
-
+    ((AndroidTableView) table.peer).updateStyle();
   }
 
   @Override
@@ -944,7 +944,9 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public void setBackground(Control control, Color color) {
-    ((View) control.peer).setBackgroundColor(getArgb(color));
+    if (color != null) {
+      ((View) control.peer).setBackgroundColor(getArgb(color));
+    }
   }
 
   @Override
