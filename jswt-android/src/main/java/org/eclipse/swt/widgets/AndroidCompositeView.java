@@ -32,12 +32,12 @@ class AndroidCompositeView extends ViewGroup {
         // }
         for (int i = 0; i < getChildCount(); i++) {
             View childView = getChildAt(i);
-            ViewGroup.LayoutParams params = childView.getLayoutParams();
+            MarginLayoutParams params = (MarginLayoutParams) childView.getLayoutParams();
             childView.layout(
-                    childView.getLeft(),
-                    childView.getTop(),
-                    childView.getLeft() + childView.getMeasuredWidth(),
-                    childView.getTop() + childView.getMeasuredHeight());
+                    params.leftMargin,
+                    params.topMargin,
+                    params.leftMargin + childView.getMeasuredWidth(),
+                    params.topMargin + childView.getMeasuredHeight());
         }
         if (Control.DEBUG_LAYOUT) {
             System.err.println(composite.depth() + "exit onLayout(" + changed + ", " + left + ", " + top + "," + right + ", " + bottom + ") for " + composite);
@@ -94,6 +94,27 @@ class AndroidCompositeView extends ViewGroup {
         }
 
     }
+
+    @Override
+    public LayoutParams generateLayoutParams(AttributeSet attrs) {
+        return new MarginLayoutParams(getContext(), attrs);
+    }
+
+    @Override
+    protected LayoutParams generateDefaultLayoutParams() {
+        return new MarginLayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+    }
+
+    @Override
+    protected ViewGroup.LayoutParams generateLayoutParams(ViewGroup.LayoutParams p) {
+        return new LayoutParams(p);
+    }
+
+    @Override
+    protected boolean checkLayoutParams(ViewGroup.LayoutParams p) {
+        return p instanceof MarginLayoutParams;
+    }
+
 
     @Override
     protected void onSizeChanged (int w, int h, int oldw, int oldh) {

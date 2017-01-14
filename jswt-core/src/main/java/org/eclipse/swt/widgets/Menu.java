@@ -70,4 +70,8 @@ public class Menu extends Widget {
     public void setLocation(int x, int y) {
         explicitLocation = new Point(x, y);
     }
+
+    public void setLocation(Point point) {
+        setLocation(point.x, point.y);
+    }
 }

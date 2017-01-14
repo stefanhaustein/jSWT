@@ -235,13 +235,23 @@ public class AndroidDisplay extends PlatformDisplay {
   @Override
   public void getLocation(Control control, Rectangle bounds, Point location) {
     View view = (View) control.peer;
+    int x;
+    int y;
+    if (view.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
+      ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+      x = params.leftMargin;
+      y = params.topMargin;
+    } else {
+      x = view.getLeft();
+      y = view.getTop();
+    }
     if (bounds != null) {
-      bounds.x = view.getLeft();
-      bounds.y = view.getTop();
+      bounds.x = x;
+      bounds.y = y;
     }
     if (location != null) {
-      location.x = view.getLeft();
-      location.y = view.getTop();
+      location.x = x;
+      location.y = y;
     }
   }
 
@@ -320,12 +330,23 @@ public class AndroidDisplay extends PlatformDisplay {
       return;
     }
     View view = (View) control.peer;
+    ViewGroup.LayoutParams params = view.getLayoutParams();
+    if (params instanceof ViewGroup.MarginLayoutParams) {
+      ViewGroup.MarginLayoutParams marginParams = (ViewGroup.MarginLayoutParams) params;
+      marginParams.leftMargin = x;
+      marginParams.topMargin = y;
+      view.invalidate();
+    }
+
+    /*
     int w = view.getWidth();
     int h = view.getHeight();
+
     view.setLeft(x);
     view.setTop(y);
     view.setRight(x + w);
     view.setBottom(y + h);
+    */
   }
 
   @Override
@@ -344,8 +365,10 @@ public class AndroidDisplay extends PlatformDisplay {
       layoutParams.height = View.MeasureSpec.EXACTLY | height;
     }
 
+    /*
     view.setRight(view.getLeft() + width);
     view.setBottom(view.getTop() + height);
+*/
 
     if (view instanceof EditText) {
       ((EditText) view).setMaxWidth(width);
@@ -620,6 +643,8 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   int setTextLimit(Control control, int limit) {
+
+    /*
     switch (control.getControlType()) {
       case TEXT:
         ((EditText) control.peer).setFilters(new InputFilter[] {new InputFilter.LengthFilter(limit)});
@@ -627,6 +652,7 @@ public class AndroidDisplay extends PlatformDisplay {
       default:
         unsupported(control, "setTextLimit");
     }
+    */
     return limit;
   }
 
@@ -1015,15 +1041,19 @@ public class AndroidDisplay extends PlatformDisplay {
           ((TextView) view).addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+              System.out.println("beforeTextChanged: " + charSequence + ", " + i + ", " + i1 + ", " + i2);
             }
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+              System.out.println("onTextChanged: " + charSequence + ", " + i + ", " + i1 + ", " + i2);
             }
 
             @Override
             public void afterTextChanged(Editable editable) {
+              System.out.println("aftetTextChanged enter");
               control.notifyListeners(SWT.Modify, null);
+              System.out.println("aftetTextChanged exit");
             }
           });
         }

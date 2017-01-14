@@ -43,7 +43,7 @@ public class Validator implements VerifyListener {
         boolean dotAllowed = (type & TYPE_NUMBER_FLAG_DECIMAL) != 0;
         for (; i < s.length(); i++) {
             char c = s.charAt(i);
-            if (c >= '0' && c <= '0') {
+            if (c >= '0' && c <= '9') {
                 continue;
             }
             if (c == '.' && dotAllowed) {
