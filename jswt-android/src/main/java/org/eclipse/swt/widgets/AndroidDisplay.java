@@ -13,7 +13,6 @@ import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.*;
 import android.support.v7.widget.PopupMenu;
 import android.text.Editable;
-import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.text.method.KeyListener;
@@ -22,6 +21,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
@@ -335,7 +335,6 @@ public class AndroidDisplay extends PlatformDisplay {
       ViewGroup.MarginLayoutParams marginParams = (ViewGroup.MarginLayoutParams) params;
       marginParams.leftMargin = x;
       marginParams.topMargin = y;
-      view.invalidate();
     }
 
     /*
@@ -616,9 +615,9 @@ public class AndroidDisplay extends PlatformDisplay {
     EditText editText = (EditText) control.peer;
     KeyListener keyListener = editText.getKeyListener();
     if (editable && keyListener == null) {
-      editText.setKeyListener((KeyListener) editText.getTag());
+      editText.setKeyListener(getTag(editText).keyListener);
     } else if (!editable && keyListener != null) {
-      editText.setTag(keyListener);
+      getTag(editText).keyListener = keyListener;
       editText.setKeyListener(null);
     }
     return editable;
@@ -903,6 +902,9 @@ public class AndroidDisplay extends PlatformDisplay {
         }
       });
     } else {
+      Rectangle bounds = anchor.getBounds();
+      View view = (View) anchor.peer;
+      view.layout(bounds.x, bounds.y, bounds.x + bounds.width, bounds.y + bounds.height);
       popupMenu = new PopupMenu(activity, (View) anchor.peer);
     }
     populateMenu(menu, popupMenu.getMenu(), false);
@@ -1009,31 +1011,20 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
-  public void addListener(final Control control, final int eventType, Listener listener) {
+  public void addListener(final Control control, final int eventType) { // }, Listener listener) {
     View view = (View) control.peer;
     switch (eventType) {
       case SWT.MouseMove:
       case SWT.MouseDown:
       case SWT.MouseUp:
-        view.setOnTouchListener(new View.OnTouchListener() {
-          @Override
-          public boolean onTouch(View view, MotionEvent motionEvent) {
-            switch (motionEvent.getAction()) {
-              case MotionEvent.ACTION_DOWN:
-              case MotionEvent.ACTION_POINTER_DOWN:
-                notifyListeners(control, SWT.MouseDown, motionEvent);
-                return true;
-              case MotionEvent.ACTION_UP:
-              case MotionEvent.ACTION_POINTER_UP:
-                notifyListeners(control, SWT.MouseUp, motionEvent);
-                return true;
-              case MotionEvent.ACTION_MOVE:
-                notifyListeners(control, SWT.MouseMove, motionEvent);
-                return true;
-            }
-            return false;
-          }
-        });
+      case SWT.Gesture:
+        TouchAdapter touchAdapter = getTag(view).touchAdapter;
+        if (touchAdapter == null) {
+          touchAdapter = new TouchAdapter(control);
+          getTag(view).touchAdapter = touchAdapter;
+          view.setOnTouchListener(touchAdapter);
+        }
+        touchAdapter.addEvent(eventType);
         break;
 
       case SWT.Modify:
@@ -1146,11 +1137,100 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
 
-  void notifyListeners(Control control, int type, MotionEvent motionEvent) {
+  void notifyMotionListeners(Control control, int type, MotionEvent motionEvent) {
     Event event = new Event();
     event.x = Math.round(motionEvent.getX());
     event.y = Math.round(motionEvent.getY());
     control.notifyListeners(type, event);
   }
+
+  void notifyScaleGestureListeners(Control control, int detail, ScaleGestureDetector scaleGestureDetector) {
+    Event event = new Event();
+    event.x = Math.round(scaleGestureDetector.getFocusX());
+    event.y = Math.round(scaleGestureDetector.getFocusY());
+    event.detail = detail;
+    event.magnification = scaleGestureDetector.getScaleFactor();
+    control.notifyListeners(SWT.Gesture, event);
+  }
+
+  Tag getTag(View view) {
+    Tag tag = (Tag) view.getTag();
+    if (tag == null) {
+      tag = new Tag();
+      view.setTag(tag);
+    }
+    return tag;
+  }
+
+  private class TouchAdapter implements View.OnTouchListener {
+    long events;
+    final Control control;
+    ScaleGestureDetector scaleGestureDetector;
+
+    TouchAdapter(Control control) {
+      this.control = control;
+    }
+
+    public void addEvent(int eventType) {
+      events |= 1 << eventType;
+      if (eventType == SWT.Gesture && scaleGestureDetector == null) {
+        scaleGestureDetector = new ScaleGestureDetector(activity, new ScaleGestureDetector.OnScaleGestureListener() {
+          @Override
+          public boolean onScaleBegin(ScaleGestureDetector scaleGestureDetector) {
+            notifyScaleGestureListeners(control, SWT.GESTURE_BEGIN, scaleGestureDetector);
+            return true;
+          }
+
+          @Override
+          public boolean onScale(ScaleGestureDetector scaleGestureDetector) {
+            notifyScaleGestureListeners(control, SWT.GESTURE_MAGNIFY, scaleGestureDetector);
+            return true;
+          }
+
+          @Override
+          public void onScaleEnd(ScaleGestureDetector scaleGestureDetector) {
+            notifyScaleGestureListeners(control, SWT.GESTURE_END, scaleGestureDetector);
+          }
+        });
+      }
+    }
+
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+      if (scaleGestureDetector != null && scaleGestureDetector.onTouchEvent(motionEvent) && scaleGestureDetector.isInProgress()) {
+        return true;
+      }
+      switch (motionEvent.getAction()) {
+             case MotionEvent.ACTION_DOWN:
+            case MotionEvent.ACTION_POINTER_DOWN:
+              if ((events & (1 << SWT.MouseDown)) != 0) {
+                notifyMotionListeners(control, SWT.MouseDown, motionEvent);
+                return true;
+              }
+              return false;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_POINTER_UP:
+              if ((events & (1 << SWT.MouseUp)) != 0) {
+                notifyMotionListeners(control, SWT.MouseUp, motionEvent);
+                return true;
+              }
+              return false;
+            case MotionEvent.ACTION_MOVE:
+              if ((events & (1 << SWT.MouseMove)) != 0) {
+                notifyMotionListeners(control, SWT.MouseMove, motionEvent);
+                return true;
+              }
+              return false;
+      }
+      return false;
+    }
+
+  }
+
+  private static class Tag {
+    KeyListener keyListener;
+    TouchAdapter touchAdapter;
+  }
+
 
 }

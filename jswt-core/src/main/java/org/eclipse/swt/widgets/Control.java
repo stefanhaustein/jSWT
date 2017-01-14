@@ -93,7 +93,7 @@ public class Control extends Widget {
     super.addListener(eventType, listener);
     if ((registeredListenerTypes & (1L << eventType)) == 0) {
       registeredListenerTypes |= 1L << eventType;
-      display.addListener(this, eventType, listener);
+      display.addListener(this, eventType);
     }
   }
 
@@ -106,6 +106,10 @@ public class Control extends Widget {
 
   public void addMouseMoveListener(MouseMoveListener mouseMoveListener) {
     addListener(SWT.MouseMove, new TypedListener(mouseMoveListener));
+  }
+
+  public void addGestureListener(GestureListener gestureListener) {
+    addListener(SWT.Gesture, new TypedListener(gestureListener));
   }
 
   public void addMouseWheelListener(MouseWheelListener mouseWheelListener) {

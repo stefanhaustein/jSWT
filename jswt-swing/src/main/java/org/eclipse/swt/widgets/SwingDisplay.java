@@ -1001,7 +1001,7 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
-  public void addListener(final Control control, final int eventType, Listener listener) {
+  public void addListener(final Control control, final int eventType) {
     Component component = (Component) control.peer;
     switch (eventType) {
       case SWT.Modify:

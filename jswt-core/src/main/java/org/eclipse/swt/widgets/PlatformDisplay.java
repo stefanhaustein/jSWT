@@ -40,7 +40,7 @@ public abstract class PlatformDisplay extends Display {
 
     abstract void addTab(TabFolder tabFolder, int index, TabItem tabItem);
 
-    abstract void addListener(Control control, int eventType, Listener listener);
+    abstract void addListener(Control control, int eventType); // , Listener listener);
 
     abstract void copy(Control control);
 

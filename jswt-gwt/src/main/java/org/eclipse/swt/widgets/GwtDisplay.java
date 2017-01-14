@@ -120,7 +120,7 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    void addListener(final Control control, int eventType, Listener listener) {
+    void addListener(final Control control, int eventType) {
         final Element element = (Element) control.peer;
         switch (eventType) {
             case SWT.Selection:

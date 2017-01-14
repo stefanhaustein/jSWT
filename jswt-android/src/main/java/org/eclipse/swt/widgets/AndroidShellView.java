@@ -83,6 +83,7 @@ class AndroidShellView extends AndroidCompositeView {
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             contentLayoutParams.weight = 1;
             mainLayout.addView(this, contentLayoutParams);
+
        }
     }
 
@@ -132,8 +133,8 @@ class AndroidShellView extends AndroidCompositeView {
             drawerLayout.setVisibility(VISIBLE);
             display.activity.setSupportActionBar(androidToolbar);
 
-           // display.activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             display.activity.getSupportActionBar().setHomeButtonEnabled(true);
+            display.activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
             display.topShell = shell;
             update();
