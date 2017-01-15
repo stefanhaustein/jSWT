@@ -40,7 +40,8 @@ class AndroidShellView extends AndroidCompositeView {
         this.shell = shell;
         if (shell.parent != null) {
             dialogBuilder = new AlertDialog.Builder(getContext());
-            dialogBuilder.setView(this);
+            int sideBorderWidth = Math.round(getAndroidDisplay().pixelPerDp * 16);
+            dialogBuilder.setView(this, sideBorderWidth, 0, sideBorderWidth, 0);
         } else {
             // Absolute root
             drawerLayout = new android.support.v4.widget.DrawerLayout(getContext());
