@@ -8,6 +8,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,6 +57,11 @@ class AndroidShellView extends AndroidCompositeView {
 
             // Toolbar
             androidToolbar = new Toolbar(context);
+
+            TypedValue value = new TypedValue ();
+            context.getTheme ().resolveAttribute (R.attr.colorPrimary, value, true);
+            androidToolbar.setBackgroundColor(value.data);
+
             LinearLayout.LayoutParams androidToolbarParams = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
@@ -121,20 +127,15 @@ class AndroidShellView extends AndroidCompositeView {
         if (dialogBuilder != null) {
             dialog = dialogBuilder.show();
         } else {
-
-            AndroidDisplay display = (AndroidDisplay) shell.display;
-/*
-            if (mainLayout.indexOfChild(this) == -1) {
-
-
-            }
-*/
+            AndroidDisplay display = getAndroidDisplay();
 
             drawerLayout.setVisibility(VISIBLE);
             display.activity.setSupportActionBar(androidToolbar);
 
             display.activity.getSupportActionBar().setHomeButtonEnabled(true);
             display.activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+            actionBarDrawerToggle.syncState();
 
             display.topShell = shell;
             update();

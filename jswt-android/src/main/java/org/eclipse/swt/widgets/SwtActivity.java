@@ -25,17 +25,21 @@ public class SwtActivity extends AppCompatActivity {
     @Override
     protected void onPostCreate(Bundle bundle) {
         super.onPostCreate(bundle);
+        /*
         if (display.topShell != null) {
             ((AndroidShellView) display.topShell.peer).actionBarDrawerToggle.syncState();
         }
+        */
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        /*
         if (display.topShell != null) {
             ((AndroidShellView) display.topShell.peer).actionBarDrawerToggle.onConfigurationChanged(newConfig);
         }
+        */
 
     }
 
