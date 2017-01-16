@@ -40,7 +40,7 @@ class AndroidShellView extends AndroidCompositeView {
         this.shell = shell;
         if (shell.parent != null) {
             dialogBuilder = new AlertDialog.Builder(getContext());
-            int sideBorderWidth = Math.round(getAndroidDisplay().pixelPerDp * 16);
+            int sideBorderWidth = Math.round(getAndroidDisplay().pixelPerDp * 20);
             dialogBuilder.setView(this, sideBorderWidth, 0, sideBorderWidth, 0);
         } else {
             // Absolute root
