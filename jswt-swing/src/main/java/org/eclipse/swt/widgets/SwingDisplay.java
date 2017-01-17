@@ -844,9 +844,32 @@ public class SwingDisplay extends PlatformDisplay {
 
   }
 
+  int getComponentIndex(Component component) {
+    Container container = component.getParent();
+    for (int i = 0; i < container.getComponentCount(); i++) {
+      if (container.getComponent(i) == component) {
+        return i;
+      }
+    }
+    throw new RuntimeException("impossible");
+  }
+
   @Override
   void moveAbove(Control control, Control other) {
-    System.err.println("FIXME: SwingDisplay.moveAbove");
+    Component component = (Component) control.peer;
+    Container container = component.getParent();
+    container.remove(component);
+    int index = other == null ? container.getComponentCount() : (1 + getComponentIndex((Component) other.peer));
+    container.add(component, index);
+  }
+
+  @Override
+  void moveBelow(Control control, Control other) {
+    Component component = (Component) control.peer;
+    Container container = component.getParent();
+    container.remove(component);
+    int index = other == null ? 0 : getComponentIndex((Component) other.peer);
+    container.add(component, index);
   }
 
   @Override

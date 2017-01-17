@@ -1118,7 +1118,12 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     void moveAbove(Control control, Control other) {
+        unsupported(control, "moveAbove");
+    }
 
+    @Override
+    void moveBelow(Control control, Control other) {
+        unsupported(control, "moveBelow");
     }
 
     @Override

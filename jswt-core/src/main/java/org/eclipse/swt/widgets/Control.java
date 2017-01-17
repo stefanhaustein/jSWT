@@ -10,6 +10,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
+import java.util.ArrayList;
+
 public class Control extends Widget {
 
   static final boolean DEBUG_LAYOUT = false;
@@ -19,8 +21,22 @@ public class Control extends Widget {
   }
 
     public void moveAbove(Control other) {
+      ArrayList<Control> list = getParent().children;
+      list.remove(this);
+      int newIndex = other == null ? list.size() : (1 + list.indexOf(other));
+      list.add(newIndex, this);
+
       display.moveAbove(this, other);
     }
+
+  public void moveBelow(Control other) {
+    ArrayList<Control> list = getParent().children;
+    list.remove(this);
+    int newIndex = other == null ? 0 : list.indexOf(other);
+    list.add(newIndex, this);
+
+    display.moveBelow(this, other);
+  }
 
   public Point toControl(Point point) {
     return toControl(point.x, point.y);

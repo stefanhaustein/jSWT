@@ -220,6 +220,8 @@ public abstract class PlatformDisplay extends Display {
 
     abstract void setSize(Control control, int width, int height);
 
+    abstract void moveBelow(Control control, Control other);
+
 
     public static class Insets {
         public int top;
