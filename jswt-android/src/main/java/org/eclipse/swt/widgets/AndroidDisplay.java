@@ -24,6 +24,7 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.*;
 
 import android.widget.Spinner;
@@ -732,11 +733,19 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   void moveAbove(Control control, Control other) {
-    unsupported(control, "moveAbove");
+    View view = (View) control.peer;
+    ViewGroup parent = (ViewGroup) view.getParent();
+    parent.removeView(view);
+    int index = other == null ? parent.getChildCount() : (1 + parent.indexOfChild((View) other.peer));
+    parent.addView(view, index);
   }
   @Override
   void moveBelow(Control control, Control other) {
-    unsupported(control, "moveBelow");
+    View view = (View) control.peer;
+    ViewGroup parent = (ViewGroup) view.getParent();
+    parent.removeView(view);
+    int index = other == null ? 0 : parent.indexOfChild((View) other.peer);
+    parent.addView(view, index);
   }
 
   @Override
