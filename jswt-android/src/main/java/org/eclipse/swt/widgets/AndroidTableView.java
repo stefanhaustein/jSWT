@@ -65,6 +65,7 @@ public class AndroidTableView extends RecyclerView {
         @Override
         public void onBindViewHolder(TableViewHolder holder, int position) {
             holder.index = position;
+            holder.item = table.getItem(position);
             int columnCount = Math.max(table.getColumnCount(), 1) + columnOffset;
             while (holder.linearLayout.getChildCount() > columnCount) {
                 holder.linearLayout.removeViewAt(holder.linearLayout.getChildCount() - 1);
@@ -79,9 +80,9 @@ public class AndroidTableView extends RecyclerView {
             }
             for (int i = columnOffset; i < columnCount; i++) {
                 TextView textView = ((TextView) holder.linearLayout.getChildAt(i));
-                textView.setText(tableItem.getText(i - columnOffset));
                 Image image = tableItem.getImage(i - columnOffset);
                 BitmapDrawable icon = image == null ? null : new BitmapDrawable(getResources(), (Bitmap) image.peer);
+                textView.setText((icon == null ? "" : " ") + tableItem.getText(i - columnOffset));
                 textView.setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null);
                 ((LinearLayout.LayoutParams) textView.getLayoutParams()).gravity = Gravity.CENTER_VERTICAL;
             }
@@ -103,6 +104,7 @@ public class AndroidTableView extends RecyclerView {
         RadioButton radioButton;
         LinearLayout linearLayout;
         int index;
+        TableItem item;
 
         public TableViewHolder(View itemView) {
             super(itemView);
@@ -132,6 +134,9 @@ public class AndroidTableView extends RecyclerView {
             } else {
                 select(index);
             }
+            Event event = new Event();
+            event.widget = item;
+            table.notifyListeners(SWT.Selection, event);
         }
     }
 

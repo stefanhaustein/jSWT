@@ -103,6 +103,9 @@ class AndroidShellView extends AndroidCompositeView {
     void update() {
         if (dialogBuilder != null) {
             dialogBuilder.setTitle(text);
+            if (dialog != null) {
+                dialog.setTitle(text);
+            }
         } else {
             AndroidDisplay display = (AndroidDisplay) shell.display;
             if (display.topShell == shell) {

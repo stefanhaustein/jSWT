@@ -118,7 +118,8 @@ public class TableItem extends Item {
     }
 
     public Image getImage(int i) {
-        return getCell(i).image;
+        Image result = getCell(i).image;
+        return result == null ? image : result;
     }
 
 

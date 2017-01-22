@@ -886,6 +886,9 @@ public class AndroidDisplay extends PlatformDisplay {
       case SPINNER:
         ((android.widget.EditText) control.peer).setText(String.valueOf(selection));
         break;
+      case COMBO:
+        ((android.widget.Spinner) control.peer).setSelection(selection);
+        break;
       default:
         System.err.println("FIXME: setSelection() for " + control.getControlType());
     }
@@ -950,6 +953,8 @@ public class AndroidDisplay extends PlatformDisplay {
         }
       case TABLE:
         return ((AndroidTableView) control.peer).selectedIndex;
+      case COMBO:
+        return ((android.widget.Spinner) control.peer).getSelectedItemPosition();
       default:
         System.err.println("NYI: getSelection() for " + control.getControlType());
         return 0;
@@ -1078,7 +1083,35 @@ public class AndroidDisplay extends PlatformDisplay {
               control.notifyListeners(SWT.Selection, null);
             }
           });
+        } else if (view instanceof android.widget.Spinner) {
+          ((android.widget.Spinner) view).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+              control.notifyListeners(SWT.Selection, null);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+              control.notifyListeners(SWT.Selection, null);
+            }
+          });
+        } else if (view instanceof android.widget.SeekBar) {
+          ((android.widget.SeekBar) view).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+              control.notifyListeners(SWT.Selection, null);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+          });
         }
+        // Table selection listeners are handled inside AndroidTableView.
         break;
     }
 

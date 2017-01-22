@@ -33,6 +33,8 @@ import javax.swing.JToggleButton;
 import javax.swing.ListSelectionModel;
 import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.JTableHeader;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -1178,6 +1180,30 @@ public class SwingDisplay extends PlatformDisplay {
                   notifyListeners(control, SWT.Selection, e);
                 }
               });
+            break;
+          }
+          case TABLE: {
+            final Table table = (Table) control;
+            final JTable jtable = getTable(control);
+            jtable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+              @Override
+              public void valueChanged(ListSelectionEvent e) {
+                Event event = new Event();
+                if (!e.getValueIsAdjusting() && jtable.getSelectedRow() >= 0 && jtable.getSelectedRow() < table.getItemCount()) {
+                  event.widget = table.getItem(jtable.getSelectedRow());
+                  table.notifyListeners(SWT.Selection, event);
+                }
+              }
+            });
+          }
+          case COMBO: {
+            JComboBox<String> jComboBox = (JComboBox<String>) component;
+            jComboBox.addActionListener(new ActionListener() {
+              @Override
+              public void actionPerformed(ActionEvent e) {
+                control.notifyListeners(SWT.Selection, null);
+              }
+            });
             break;
           }
         }

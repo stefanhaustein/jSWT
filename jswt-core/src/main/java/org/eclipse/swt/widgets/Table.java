@@ -136,4 +136,33 @@ public class Table extends Composite {
         System.out.println("FIXME: Table.getItem(point)");
         return null;
     }
+
+    public void clear(int i) {
+        System.out.println("Fixme: Table.clear(i)");
+    }
+
+    public void clear(int start, int end) {
+        for (int i = end; i >= start; i--) {
+            clear(i);
+        }
+    }
+
+    public void clearAll() {
+        clear(0, getItemCount() - 1);
+    }
+
+    public void remove(int index) {
+        display.removeTableItem(this, rows.remove(index));
+    }
+
+    public void remove(int start, int end) {
+        for (int i = end; i >= start; i--) {
+            remove(i);
+        }
+    }
+
+    public void removeAll() {
+        remove(0, getItemCount() - 1);
+    }
+
 }

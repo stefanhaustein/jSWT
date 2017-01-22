@@ -94,7 +94,7 @@ public class GC extends Resource {
     }
 
     public void fillOval(int x, int y, int width, int height) {
-        delegate.drawOval(x, y, width, height);
+        delegate.fillOval(x, y, width, height);
     }
 
     public void fillPolygon(int[] pointArray) {
