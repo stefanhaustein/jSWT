@@ -38,11 +38,11 @@ public class MenuItem extends Item {
     }
 
     public void setMenu(Menu menu) {
-        throw new RuntimeException("???");
+        subMenu = menu;
     }
 
     public void setAccelerator(int i) {
-        throw new RuntimeException("???");
+        System.err.println("FIXME: MenuItem.setAccelerator()");
     }
 
     void update() {
