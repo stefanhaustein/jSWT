@@ -46,7 +46,9 @@ public class MenuItem extends Item {
     }
 
     void update() {
-        display.updateMenuItem(this);
+        if (peer != null) {
+            display.updateMenuItem(this);
+        }
     }
 
 }

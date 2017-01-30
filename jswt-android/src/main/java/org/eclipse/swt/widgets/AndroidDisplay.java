@@ -475,6 +475,8 @@ public class AndroidDisplay extends PlatformDisplay {
             return true;
           }
         });
+        item.peer = androidItem;
+        updateMenuItem(item);
       } else if (i == 0 && flattenFirst) {
         populateMenu(item.subMenu, androidMenu, false);
       } else {
@@ -759,8 +761,12 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
-  void updateMenuItem(MenuItem item) {
-
+  void updateMenuItem(MenuItem menuItem) {
+      android.view.MenuItem androidItem = (android.view.MenuItem) menuItem.peer;
+      androidItem.setCheckable((menuItem.style & SWT.CHECK) != 0);
+      androidItem.setChecked(menuItem.getSelection());
+      androidItem.setTitle(menuItem.text);
+      androidItem.setEnabled(menuItem.getEnabled());
   }
 
   @Override

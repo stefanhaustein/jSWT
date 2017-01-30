@@ -78,4 +78,7 @@ public class Display extends Device {
         System.err.println("FIXME: Display.getSystemCursor()");
         return new Cursor(this, cursor);
     }
+
+    public void getPrimaryMonitor() {
+    }
 }

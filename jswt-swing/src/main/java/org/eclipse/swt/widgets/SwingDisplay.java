@@ -1195,6 +1195,7 @@ public class SwingDisplay extends PlatformDisplay {
                 }
               }
             });
+            break;
           }
           case COMBO: {
             JComboBox<String> jComboBox = (JComboBox<String>) component;
