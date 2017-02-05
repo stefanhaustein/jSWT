@@ -113,6 +113,13 @@ public class Control extends Widget {
     }
   }
 
+  public void addKeyListener(KeyListener listener) {
+    TypedListener typedListener = new TypedListener(listener);
+    addListener(SWT.KeyDown, typedListener);
+    addListener(SWT.KeyUp, typedListener);
+  }
+
+
   public void addMouseListener(MouseListener mouseListener) {
     TypedListener typedListener = new TypedListener(mouseListener);
     addListener(SWT.MouseUp, typedListener);

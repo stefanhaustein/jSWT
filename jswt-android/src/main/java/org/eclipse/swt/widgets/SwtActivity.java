@@ -3,6 +3,7 @@ package org.eclipse.swt.widgets;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import org.eclipse.swt.SWT;
 
 /**
  * The goal is to make this a convenience class, not a requirement -- and to hand in all required information
@@ -23,24 +24,19 @@ public class SwtActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPostCreate(Bundle bundle) {
-        super.onPostCreate(bundle);
-        /*
-        if (display.topShell != null) {
-            ((AndroidShellView) display.topShell.peer).actionBarDrawerToggle.syncState();
+    public void onBackPressed() {
+        if (display.topShell == null) {
+            super.onBackPressed();
+        } else {
+            Event event = new Event();
+            event.keyCode = SWT.ARROW_LEFT;
+            event.stateMask = SWT.ALT;
+            display.topShell.notifyListeners(SWT.KeyDown, event);
+            display.topShell.notifyListeners(SWT.KeyUp, event);
+            if (event.doit) {
+                super.onBackPressed();
+            }
         }
-        */
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        /*
-        if (display.topShell != null) {
-            ((AndroidShellView) display.topShell.peer).actionBarDrawerToggle.onConfigurationChanged(newConfig);
-        }
-        */
-
     }
 
     @Override

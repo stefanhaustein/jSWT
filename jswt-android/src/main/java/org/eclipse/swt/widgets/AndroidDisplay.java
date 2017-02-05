@@ -470,8 +470,7 @@ public class AndroidDisplay extends PlatformDisplay {
             Event event = new Event();
             event.display = AndroidDisplay.this;
             event.widget = item;
-            event.type = SWT.Selection;
-            item.listeners.sendEvent(event);
+            item.notifyListeners(SWT.Selection, event);
             return true;
           }
         });
