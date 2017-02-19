@@ -56,7 +56,10 @@ public class Table extends Composite {
     }
 
     public TableItem[] getSelection() {
-        throw new RuntimeException("NYI");
+        if (getSelectionIndex() == -1) {
+            return new TableItem[0];
+        }
+        return new TableItem[]{getItem(getSelectionIndex())};
     }
 
     public void addSelectionListener(SelectionListener listener) {
@@ -104,7 +107,7 @@ public class Table extends Composite {
     }
 
     public int getSelectionCount() {
-        return display.getSelectedRange(this).y;
+        return getSelectionIndex() == -1 ? 0 : 1;
     }
 
     public TableColumn[] getColumns() {

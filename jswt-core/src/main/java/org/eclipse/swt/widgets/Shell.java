@@ -49,6 +49,7 @@ public class Shell extends Decorations {
   }
 
   public void setDefaultButton(Button button) {
+    System.err.println("FIXME: Shell.setDefaultButton()");
   }
 
   public void setFullScreen(boolean fullScreen) {
@@ -60,7 +61,7 @@ public class Shell extends Decorations {
   }
 
   public void close() {
-    System.err.println("FIXME: Shell.close()");
+    dispose();
   }
 
   public ToolBar getToolBar() {

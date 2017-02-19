@@ -163,6 +163,7 @@ public class SwingDisplay extends PlatformDisplay {
         table.setSelectionMode((control.style & SWT.MULTI) == 0 ? ListSelectionModel.SINGLE_SELECTION
                 : ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         model.setJTable(table);
+        table.setInheritsPopupMenu(true);
         return new JScrollPane(table);
       }
       case TEXT:
@@ -594,6 +595,13 @@ public class SwingDisplay extends PlatformDisplay {
       default:
         unsupported(control, "setSelectedIndex");
     }
+  }
+
+  public void setMenu(Control control, Menu menu) {
+    JPopupMenu popupMenu = new JPopupMenu();
+    menuAddAll(menu, popupMenu);
+    ((JComponent) control.peer).setComponentPopupMenu(popupMenu);
+
   }
 
   @Override
