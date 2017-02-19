@@ -56,28 +56,35 @@ class AndroidShellView extends AndroidCompositeView {
             drawerLayout.addView(mainLayout, new DrawerLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
-            // Toolbar
-            androidToolbar = new Toolbar(context);
-
-            TypedValue value = new TypedValue ();
-            context.getTheme ().resolveAttribute (R.attr.colorPrimary, value, true);
-            androidToolbar.setBackgroundColor(value.data);
-
-            LinearLayout.LayoutParams androidToolbarParams = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-
-            androidToolbarParams.gravity = 0;
-            // androidToolbar.setBackgroundColor(0x0ffff8888);
-
             shell.peer = this;
-            toolBar = new ToolBar(shell, SWT.FLAT);
-            shell.children.remove(toolBar);
-            View swtToolbarPeer = (View) toolBar.peer;
-            this.removeView(swtToolbarPeer);
-            androidToolbar.addView(swtToolbarPeer, new Toolbar.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.END));
 
-            mainLayout.addView(androidToolbar, androidToolbarParams);
+            // Toolbar
+
+            if ((shell.style & SWT.TITLE) != 0) {
+                androidToolbar = new Toolbar(context);
+                androidToolbar.setTitle("");
+                androidToolbar.setSubtitle("");
+
+                TypedValue value = new TypedValue();
+                context.getTheme().resolveAttribute(R.attr.colorPrimary, value, true);
+                androidToolbar.setBackgroundColor(value.data);
+
+                LinearLayout.LayoutParams androidToolbarParams = new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                androidToolbarParams.gravity = 0;
+                // androidToolbar.setBackgroundColor(0x0ffff8888);
+                toolBar = new ToolBar(shell, SWT.FLAT);
+
+                shell.children.remove(toolBar);
+                View swtToolbarPeer = (View) toolBar.peer;
+                this.removeView(swtToolbarPeer);
+                androidToolbar.addView(swtToolbarPeer, new Toolbar.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.END));
+                mainLayout.addView(androidToolbar, androidToolbarParams);
+            }
+
+
             // Navigation Drawer
 
             navigationView = new NavigationView(getContext());
@@ -107,21 +114,14 @@ class AndroidShellView extends AndroidCompositeView {
                 dialog.setTitle(text);
             }
         } else {
-            AndroidDisplay display = (AndroidDisplay) shell.display;
-            if (display.topShell == shell) {
-                ActionBar actionBar = display.activity.getSupportActionBar();
-                if (text == null) {
-                    actionBar.hide();
+            if (androidToolbar != null) {
+                int cut = text.indexOf('-');
+                if (cut == -1) {
+                    androidToolbar.setTitle(text);
+                    androidToolbar.setSubtitle(null);
                 } else {
-                    actionBar.show();
-                    int cut = text.indexOf('-');
-                    if (cut == -1) {
-                        actionBar.setTitle(text);
-                        actionBar.setSubtitle(null);
-                    } else {
-                        actionBar.setSubtitle(text.substring(cut + 1).trim());
-                        actionBar.setTitle(text.substring(0, cut).trim());
-                    }
+                    androidToolbar.setSubtitle(text.substring(cut + 1).trim());
+                    androidToolbar.setTitle(text.substring(0, cut).trim());
                 }
             }
         }
@@ -134,15 +134,23 @@ class AndroidShellView extends AndroidCompositeView {
             AndroidDisplay display = getAndroidDisplay();
 
             drawerLayout.setVisibility(VISIBLE);
-            display.activity.setSupportActionBar(androidToolbar);
 
-            display.activity.getSupportActionBar().setHomeButtonEnabled(true);
-            display.activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            if (toolBar != null) {
+                display.activity.setSupportActionBar(androidToolbar);
+
+                display.activity.getSupportActionBar().setHomeButtonEnabled(true);
+                display.activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            } else {
+                display.activity.setSupportActionBar(null);
+            }
 
             actionBarDrawerToggle.syncState();
 
+            if (display.topShell != shell && display.topShell != null) {
+                ((AndroidShellView) display.topShell.peer).drawerLayout.setVisibility(INVISIBLE);
+            }
             display.topShell = shell;
-            update();
+            //update();
 
             drawerLayout.invalidate();
         }
