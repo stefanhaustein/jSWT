@@ -1127,8 +1127,13 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
-    void updateTable(Table table) {
+    void setMenu(Control control, Menu menu) {
+        unsupported(control, "setMenu");
+    }
 
+    @Override
+    void updateTable(Table table) {
+        unsupported(table, "updateTable");
     }
 
     @Override

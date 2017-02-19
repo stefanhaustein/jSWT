@@ -750,6 +750,17 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
+  void setMenu(final Control control, final Menu menu) {
+    ((View) control.peer).setOnLongClickListener(new View.OnLongClickListener() {
+      @Override
+      public boolean onLongClick(View view) {
+        showPopupMenu(menu, control, 0, 0);
+        return true;
+      }
+    });
+  }
+
+  @Override
   void updateTable(Table table) {
     ((AndroidTableView) table.peer).updateStyle();
   }
