@@ -309,7 +309,7 @@ public class Control extends Widget {
 
   public void setMenu(Menu popup) {
     this.menu = popup;
-    System.err.println("FIXME: Control.setMenu()");  // FIXME
+    display.setMenu(this, menu);
   }
 
   public void setFont(Font font) {
