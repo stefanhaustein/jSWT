@@ -816,7 +816,7 @@ public class SwingDisplay extends PlatformDisplay {
     }
     MenuItem menuItem = (MenuItem) item;
     if (item.peer instanceof JCheckBoxMenuItem) {
-      ((JCheckBoxMenuItem) item.peer).setSelected(((MenuItem) item).getSelection());
+      ((JCheckBoxMenuItem) item.peer).setSelected((menuItem).getSelection());
     }
     JMenuItem awtItem = (JMenuItem) item.peer;
     awtItem.setEnabled(menuItem.getEnabled());

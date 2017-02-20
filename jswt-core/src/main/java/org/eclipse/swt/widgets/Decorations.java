@@ -14,6 +14,10 @@ public class Decorations extends Canvas {
     display.updateMenuBar(this);
   }
 
+  public Menu getMenuBar() {
+    return menuBar;
+  }
+
   public String getText() {
     return text;
   }

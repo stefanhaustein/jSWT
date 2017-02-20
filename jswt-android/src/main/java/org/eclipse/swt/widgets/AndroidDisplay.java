@@ -933,6 +933,9 @@ public class AndroidDisplay extends PlatformDisplay {
           root.removeView(view);
         }
       });
+    } else if (anchor instanceof Decorations && ((Decorations) anchor).getMenuBar() == menu) {
+      ((AndroidShellView) anchor.peer).drawerLayout.openDrawer(Gravity.LEFT);
+      return;
     } else {
       Rectangle bounds = anchor.getBounds();
       View view = (View) anchor.peer;
