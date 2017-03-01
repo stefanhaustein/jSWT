@@ -636,12 +636,14 @@ public class SwingDisplay extends PlatformDisplay {
         }
         break;
       }
-      case LIST:
-        JList<String> list = getList(control);
+      case LIST: {
+         JList<String> list = getList(control);
+        DefaultListModel<String> model = (DefaultListModel<String>) list.getModel();
         while (end >= start) {
-          list.remove(end--);
+          model.remove(end--);
         }
         break;
+      }
     }
   }
 

@@ -18,13 +18,14 @@ import android.text.TextWatcher;
 import android.text.method.KeyListener;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.widget.*;
 
 import android.widget.Spinner;
@@ -38,6 +39,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 
@@ -59,12 +61,12 @@ public class AndroidDisplay extends PlatformDisplay {
     Log.d(TAG, "unsupported for " + control.getControlType().name() + ": " + method);
   }
 
-  private static ArrayAdapter<String> getArrayAdapter(Control control) {
+  private static StringListAdapter getSwtListAdapter(Control control) {
     switch (control.getControlType()) {
       case COMBO:
-        return (ArrayAdapter<String>) ((android.widget.Spinner) control.peer).getAdapter();
+        return (StringListAdapter) ((android.widget.Spinner) control.peer).getAdapter();
       case LIST:
-        return (ArrayAdapter<String>) ((android.widget.ListView) control.peer).getAdapter();
+        return (StringListAdapter) ((android.widget.ListView) control.peer).getAdapter();
       default:
         throw new IllegalArgumentException();
     }
@@ -141,7 +143,7 @@ public class AndroidDisplay extends PlatformDisplay {
       }
       case COMBO: {
         android.widget.Spinner spinner = new android.widget.Spinner(activity);
-        spinner.setAdapter(new ArrayAdapter<String>(activity, android.R.layout.simple_dropdown_item_1line));
+        spinner.setAdapter(new StringListAdapter(activity, android.R.layout.simple_dropdown_item_1line));
         return spinner;
       }
       case TEXT: {
@@ -156,13 +158,13 @@ public class AndroidDisplay extends PlatformDisplay {
       case LIST: {
         ListView listView = new ListView(activity);
         if ((control.style & SWT.SINGLE) != 0) {
-          listView.setAdapter(new ArrayAdapter<String>(activity, android.R.layout.simple_list_item_single_choice));
+          listView.setAdapter(new StringListAdapter(activity, android.R.layout.simple_list_item_single_choice));
           listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         } else if ((control.style & SWT.MULTI) != 0) {
-          listView.setAdapter(new ArrayAdapter<String>(activity, android.R.layout.simple_list_item_multiple_choice));
+          listView.setAdapter(new StringListAdapter(activity, android.R.layout.simple_list_item_multiple_choice));
           listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         } else {
-          listView.setAdapter(new ArrayAdapter<String>(activity, android.R.layout.simple_list_item_1));
+          listView.setAdapter(new StringListAdapter(activity, android.R.layout.simple_list_item_1));
           listView.setChoiceMode(ListView.CHOICE_MODE_NONE);
         }
         return listView;
@@ -310,7 +312,7 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public int getItemCount(Control control) {
-    return getArrayAdapter(control).getCount();
+    return getSwtListAdapter(control).getCount();
   }
 
   @Override
@@ -814,8 +816,9 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public boolean isSelected(List list, int i) {
-    unsupported(list, "isSelected");
-    return false;
+    ListView listView = (ListView) list.peer;
+    SparseBooleanArray selections = listView.getCheckedItemPositions();
+    return selections.get(i);
   }
 
   @Override
@@ -830,9 +833,8 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public void setItem(Control control, int index, String string) {
-    ArrayAdapter<String> adapter = getArrayAdapter(control);
-    String old = adapter.getItem(index);
-    adapter.remove(old);
+    StringListAdapter adapter = getSwtListAdapter(control);
+    adapter.removeAt(index);
     adapter.insert(string, index);
   }
 
@@ -852,7 +854,7 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public String getItem(Control control, int i) {
-    return getArrayAdapter(control).getItem(i);
+    return getSwtListAdapter(control).getItem(i);
   }
 
   /*
@@ -987,10 +989,11 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public void removeItems(Control control, int start, int end) {
-    ArrayAdapter<String> adapter = getArrayAdapter(control);
+    StringListAdapter adapter = getSwtListAdapter(control);
     for (int i = end; i >= start; i--) {
-      adapter.remove(adapter.getItem(i));
+      adapter.removeAt(i);
     }
+    adapter.notifyDataSetChanged();
   }
 
   @Override
@@ -1023,10 +1026,10 @@ public class AndroidDisplay extends PlatformDisplay {
   public void addItem(Control control, String s, int index) {
     switch (control.getControlType()) {
       case LIST:
-        ((ArrayAdapter<String>) ((ListView) control.peer).getAdapter()).insert(s, index);
+        ((StringListAdapter) ((ListView) control.peer).getAdapter()).insert(s, index);
         break;
       case COMBO:
-        ((ArrayAdapter<String>) ((android.widget.Spinner) control.peer).getAdapter()).insert(s, index);
+        ((StringListAdapter) ((android.widget.Spinner) control.peer).getAdapter()).insert(s, index);
         break;
       default:
         System.err.println("AndroidDisplay.addItem " + control.getControlType());
@@ -1289,12 +1292,95 @@ public class AndroidDisplay extends PlatformDisplay {
       }
       return false;
     }
-
   }
+
+
+  // Helper classes
+
 
   private static class Tag {
     KeyListener keyListener;
     TouchAdapter touchAdapter;
+  }
+
+  static class StringListAdapter extends BaseAdapter {
+    private final LayoutInflater inflater;
+    ArrayList<Entry> data = new ArrayList<>();
+    long nextId;
+    Context context;
+    int resource;
+
+    StringListAdapter(Context context, int resource) {
+      this.context = context;
+      this.resource = resource;
+      inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    }
+
+    @Override
+    public int getCount() {
+      synchronized (data) {
+        return data.size();
+      }
+    }
+
+    public boolean hasStableIds() {
+      return true;
+    }
+
+    @Override
+    public String getItem(int i) {
+      synchronized (data) {
+        return data.get(i).value;
+      }
+    }
+
+    @Override
+    public long getItemId(int i) {
+      synchronized (data) {
+        return i < data.size() ? data.get(i).id : -1;
+      }
+    }
+
+    public void insert(String s, int index) {
+      synchronized (data) {
+        data.add(new Entry(s, nextId++));
+      }
+      notifyDataSetChanged();
+    }
+
+    public View getView(int position, View convertView, ViewGroup parent) {
+      return createViewFromResource(position, convertView, parent, resource);
+    }
+
+    private View createViewFromResource(int position, View convertView, ViewGroup parent, int resource) {
+      TextView text;
+
+      if (convertView == null) {
+        text = (TextView) inflater.inflate(resource, parent, false);
+      } else {
+        text = (TextView) convertView;
+      }
+      text.setText(getItem(position));
+      return text;
+    }
+
+    public void removeAt(int index) {
+      synchronized (data) {
+        data.remove(index);
+      }
+      notifyDataSetChanged();
+    }
+
+
+    static class Entry {
+      String value;
+      long id;
+
+      Entry(String value, long id) {
+        this.value = value;
+        this.id = id++;
+      }
+    }
   }
 
 
