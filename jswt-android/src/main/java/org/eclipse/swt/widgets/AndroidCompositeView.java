@@ -66,6 +66,10 @@ class AndroidCompositeView extends ViewGroup {
         return specToString(widthMeasureSpec) + " x " + specToString(heightMeasureSpec);
     }
 
+    void setMeasuredDimensionSwt(int width, int height) {
+        setMeasuredDimension(width, height);
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         if (this instanceof AndroidShellView) {
@@ -92,7 +96,6 @@ class AndroidCompositeView extends ViewGroup {
                 System.err.println(composite.depth() + "exit onMeasure(" + widthMode + ":" + widthSize + " x " + heightMode + ":" + heightSize + ") = " + size + " for " + composite);
             }
         }
-
     }
 
     @Override

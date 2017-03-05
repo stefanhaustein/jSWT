@@ -3,6 +3,7 @@ package org.eclipse.swt.widgets;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -17,6 +18,7 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.text.method.KeyListener;
 import android.text.method.PasswordTransformationMethod;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.util.TypedValue;
@@ -26,6 +28,7 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.*;
 
 import android.widget.Spinner;
@@ -170,7 +173,7 @@ public class AndroidDisplay extends PlatformDisplay {
         return listView;
       }
       case SCROLLED_COMPOSITE:
-        return new android.widget.ScrollView(activity);
+        return new ScrollView(activity);
       case SCALE:
       case SLIDER:
         return new android.widget.SeekBar(activity);
@@ -261,13 +264,36 @@ public class AndroidDisplay extends PlatformDisplay {
   @Override
   public void getSize(Control control, Rectangle bounds, Point size) {
     View view = (View) control.peer;
+
+    int w;
+    int h;
+
+    if (control.getControlType() == Control.ControlType.SHELL && control.parent == null) {
+      //h = activity.getResources().getDisplayMetrics().heightPixels;
+      //w = activity.getResources().getDisplayMetrics().widthPixels;
+
+      WindowManager windowManager = activity.getWindowManager();
+      android.view.Display display = windowManager.getDefaultDisplay();
+
+      Resources resources = activity.getResources();
+      int resourceId = resources.getIdentifier( "status_bar_height", "dimen", "android" );
+
+      w = display.getWidth();
+      h = display.getHeight() - (resourceId > 0 ? resources.getDimensionPixelSize(resourceId) : 0);
+
+    } else {
+      w = view.getMeasuredWidth();
+      h = view.getMeasuredHeight();
+    }
+
+
     if (bounds != null) {
-      bounds.width = view.getMeasuredWidth();
-      bounds.height = view.getMeasuredHeight();
+      bounds.width = w;
+      bounds.height = h;
     }
     if (size != null) {
-      size.x = view.getMeasuredWidth();
-      size.y = view.getMeasuredHeight();
+      size.x = w;
+      size.y = h;
     }
   }
 
@@ -357,20 +383,28 @@ public class AndroidDisplay extends PlatformDisplay {
       return;
     }
 
-    View view = (View) control.peer;
-    view.measure(View.MeasureSpec.EXACTLY | width,
-            View.MeasureSpec.EXACTLY | height);
+    if (control instanceof ScrolledComposite) {
+      System.err.println("SetSize for ScrolledComposite: " + width + ", " + height);
+    }
 
+    if (control.parent instanceof ScrolledComposite) {
+      ((View) control.getParent().peer).invalidate();
+    }
+
+    View view = (View) control.peer;
+
+    // TODO(haustein): Not calling measure seems to break context menus on Spinners.
+   /* if (view instanceof AndroidCompositeView) {
+      ((AndroidCompositeView) view).setMeasuredDimensionSwt(width, height);
+    } else { */
+      view.measure(View.MeasureSpec.EXACTLY | width,
+              View.MeasureSpec.EXACTLY | height);
+    //}
     ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
     if (layoutParams != null) {
       layoutParams.width = View.MeasureSpec.EXACTLY | width;
       layoutParams.height = View.MeasureSpec.EXACTLY | height;
     }
-
-    /*
-    view.setRight(view.getLeft() + width);
-    view.setBottom(view.getTop() + height);
-*/
 
     if (view instanceof EditText) {
       ((EditText) view).setMaxWidth(width);
@@ -1026,10 +1060,8 @@ public class AndroidDisplay extends PlatformDisplay {
   public void addItem(Control control, String s, int index) {
     switch (control.getControlType()) {
       case LIST:
-        ((StringListAdapter) ((ListView) control.peer).getAdapter()).insert(s, index);
-        break;
       case COMBO:
-        ((StringListAdapter) ((android.widget.Spinner) control.peer).getAdapter()).insert(s, index);
+        getSwtListAdapter(control).insert(s, index);
         break;
       default:
         System.err.println("AndroidDisplay.addItem " + control.getControlType());
@@ -1303,6 +1335,10 @@ public class AndroidDisplay extends PlatformDisplay {
     TouchAdapter touchAdapter;
   }
 
+  /**
+   * Needed for two reasons: ArrayAdapter doens't have removeAt and stable ids. The latter are required for
+   * list selection management.
+   */
   static class StringListAdapter extends BaseAdapter {
     private final LayoutInflater inflater;
     ArrayList<Entry> data = new ArrayList<>();
@@ -1343,7 +1379,7 @@ public class AndroidDisplay extends PlatformDisplay {
 
     public void insert(String s, int index) {
       synchronized (data) {
-        data.add(new Entry(s, nextId++));
+        data.add(index, new Entry(s, nextId++));
       }
       notifyDataSetChanged();
     }
