@@ -2,6 +2,7 @@ package org.eclipse.swt.widgets;
 
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -12,6 +13,7 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import org.eclipse.swt.R;
@@ -29,7 +31,6 @@ class AndroidShellView extends AndroidCompositeView {
     // Root shell case
     DrawerLayout drawerLayout;
     NavigationView navigationView;
-    LinearLayout mainLayout;
     Toolbar androidToolbar;
     ToolBar toolBar;
     ActionBarDrawerToggle actionBarDrawerToggle;
@@ -50,29 +51,34 @@ class AndroidShellView extends AndroidCompositeView {
             display.rootLayout.addView(drawerLayout, new FrameLayout.LayoutParams(
                     LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 
+
             // Main root: toolbar and content
-            mainLayout = new LinearLayout(context);
-            mainLayout.setOrientation(LinearLayout.VERTICAL);
-            drawerLayout.addView(mainLayout, new DrawerLayout.LayoutParams(
+            drawerLayout.addView(this, new DrawerLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
             shell.peer = this;
+
+            WindowManager windowManager = display.activity.getWindowManager();
+            android.view.Display androidDisplay = windowManager.getDefaultDisplay();
+
+            Resources resources = display.activity.getResources();
+            int resourceId = resources.getIdentifier( "status_bar_height", "dimen", "android" );
+
+            int w = androidDisplay.getWidth();
+            int h = androidDisplay.getHeight() - (resourceId > 0 ? resources.getDimensionPixelSize(resourceId) : 0);
+            setMeasuredDimension(w, h);
 
             // Toolbar
 
             if ((shell.style & SWT.TITLE) != 0) {
                 androidToolbar = new Toolbar(context);
-                androidToolbar.setTitle("");
-                androidToolbar.setSubtitle("");
+                androidToolbar.setTitle("xxx");
+                androidToolbar.setSubtitle("yyy");
 
                 TypedValue value = new TypedValue();
                 context.getTheme().resolveAttribute(R.attr.colorPrimary, value, true);
                 androidToolbar.setBackgroundColor(value.data);
 
-                LinearLayout.LayoutParams androidToolbarParams = new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-
-                androidToolbarParams.gravity = 0;
                 // androidToolbar.setBackgroundColor(0x0ffff8888);
                 toolBar = new ToolBar(shell, SWT.FLAT);
 
@@ -81,9 +87,9 @@ class AndroidShellView extends AndroidCompositeView {
                 this.removeView(swtToolbarPeer);
                 androidToolbar.addView(swtToolbarPeer, new Toolbar.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.END));
-                mainLayout.addView(androidToolbar, androidToolbarParams);
+                addView(androidToolbar);
+                androidToolbar.measure(MeasureSpec.EXACTLY | w, MeasureSpec.UNSPECIFIED);
             }
-
 
             // Navigation Drawer
 
@@ -92,12 +98,6 @@ class AndroidShellView extends AndroidCompositeView {
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, Gravity.START));
 
             actionBarDrawerToggle = new ActionBarDrawerToggle(getAndroidDisplay().activity, drawerLayout, R.string.open, R.string.close);
-
-            LinearLayout.LayoutParams contentLayoutParams = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            contentLayoutParams.weight = 1;
-            mainLayout.addView(this, contentLayoutParams);
-
        }
     }
 
@@ -106,6 +106,14 @@ class AndroidShellView extends AndroidCompositeView {
         update();
     }
 
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        if (androidToolbar != null) {
+            androidToolbar.measure(widthMeasureSpec, MeasureSpec.UNSPECIFIED);
+        }
+    }
 
     void update() {
         if (dialogBuilder != null) {
@@ -123,6 +131,7 @@ class AndroidShellView extends AndroidCompositeView {
                     androidToolbar.setSubtitle(text.substring(cut + 1).trim());
                     androidToolbar.setTitle(text.substring(0, cut).trim());
                 }
+                androidToolbar.invalidate();
             }
         }
     }
@@ -140,6 +149,8 @@ class AndroidShellView extends AndroidCompositeView {
 
                 display.activity.getSupportActionBar().setHomeButtonEnabled(true);
                 display.activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+                androidToolbar.invalidate();
             } else {
                 display.activity.setSupportActionBar(null);
             }

@@ -265,27 +265,8 @@ public class AndroidDisplay extends PlatformDisplay {
   public void getSize(Control control, Rectangle bounds, Point size) {
     View view = (View) control.peer;
 
-    int w;
-    int h;
-
-    if (control.getControlType() == Control.ControlType.SHELL && control.parent == null) {
-      //h = activity.getResources().getDisplayMetrics().heightPixels;
-      //w = activity.getResources().getDisplayMetrics().widthPixels;
-
-      WindowManager windowManager = activity.getWindowManager();
-      android.view.Display display = windowManager.getDefaultDisplay();
-
-      Resources resources = activity.getResources();
-      int resourceId = resources.getIdentifier( "status_bar_height", "dimen", "android" );
-
-      w = display.getWidth();
-      h = display.getHeight() - (resourceId > 0 ? resources.getDimensionPixelSize(resourceId) : 0);
-
-    } else {
-      w = view.getMeasuredWidth();
-      h = view.getMeasuredHeight();
-    }
-
+    int w = view.getMeasuredWidth();
+    int h = view.getMeasuredHeight();
 
     if (bounds != null) {
       bounds.width = w;
@@ -324,7 +305,11 @@ public class AndroidDisplay extends PlatformDisplay {
 
   @Override
   public Insets getInsets(Scrollable scrollable) {
-    return new Insets();
+    Insets result = new Insets();
+    if (scrollable instanceof Shell && scrollable.parent == null && (scrollable.style & SWT.TITLE) != 0) {
+      result.top = ((AndroidShellView) scrollable.peer).androidToolbar.getMeasuredHeight();
+    }
+    return result;
   }
 
 
