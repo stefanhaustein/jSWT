@@ -1,9 +1,10 @@
 package org.eclipse.swt.graphics;
 
-import org.eclipse.swt.widgets.Display;
+
 
 public class Resource {
 
+  public Object peer;
   boolean disposed;
   protected Device device;
 

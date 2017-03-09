@@ -37,6 +37,10 @@ public class GC extends Resource {
         delegate.drawLine(x1, y1, x2, y2);
     }
 
+    public void drawPath(Path path) {
+        delegate.drawPath(path);
+    }
+
     public void drawPoint(int x, int y) {
         drawLine(x, y, x, y);
     }
@@ -95,6 +99,10 @@ public class GC extends Resource {
 
     public void fillOval(int x, int y, int width, int height) {
         delegate.fillOval(x, y, width, height);
+    }
+
+    public void fillPath(Path path) {
+        delegate.fillPath(path);
     }
 
     public void fillPolygon(int[] pointArray) {

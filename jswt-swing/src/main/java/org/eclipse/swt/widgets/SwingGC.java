@@ -6,16 +6,58 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Path;
+import org.eclipse.swt.graphics.PathData;
 import org.eclipse.swt.graphics.Point;
 
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Path2D;
+import java.awt.geom.PathIterator;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 
 class SwingGC extends GC {
+
+    static Path2D getPath2D(Path path) {
+        if (path.peer == null) {
+            Path2D path2D = new Path2D.Float();
+            path.peer = path2D;
+            PathData pathData = path.getPathData();
+            int j = 0;
+            float[] points = pathData.points;
+            for (int i = 0; i < pathData.types.length; i++) {
+                switch (pathData.types[i]) {
+                    case SWT.PATH_MOVE_TO:
+                        path2D.moveTo(points[j], points[j + 1]);
+                        j += 2;
+                        break;
+                    case SWT.PATH_LINE_TO:
+                        path2D.lineTo(points[j], points[j + 1]);
+                        j += 2;
+                        break;
+                    case SWT.PATH_CLOSE:
+                        path2D.closePath();
+                        break;
+                    case SWT.PATH_CUBIC_TO:
+                        path2D.curveTo(points[j], points[j + 1], points[j + 2], points[j + 3], points[j + 4], points[j + 5]);
+                        j += 6;
+                        break;
+                    case SWT.PATH_QUAD_TO:
+                        path2D.quadTo(points[j], points[j + 1], points[j + 2], points[j + 3]);
+                        j += 4;
+                        break;
+                }
+            }
+        }
+        return (Path2D) path.peer;
+    }
+
+
     final java.awt.Graphics2D graphics;
     org.eclipse.swt.graphics.Color foreground;
     Color background;
@@ -71,6 +113,12 @@ class SwingGC extends GC {
     }
 
     @Override
+    public void drawPath(Path path) {
+        useForegroundColor();
+        graphics.draw(getPath2D(path));
+    }
+
+    @Override
     public void drawRectangle(int x, int y, int width, int height) {
         useForegroundColor();
         graphics.drawRect(x, y, width, height);
@@ -97,6 +145,12 @@ class SwingGC extends GC {
     public void fillOval(int x, int y, int width, int height) {
         useBackgroundColor();
         graphics.fillOval(x, y, width, height);
+    }
+
+    @Override
+    public void fillPath(Path path) {
+        useBackgroundColor();
+        graphics.fill(getPath2D(path));
     }
 
     @Override

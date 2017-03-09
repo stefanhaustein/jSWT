@@ -9,8 +9,6 @@ import java.io.InputStream;
 
 public class Image extends Resource {
 
-    public Object peer;
-
     /** Constructs an instance of this class by loading its representation from the specified input stream. */
     public Image(Device device, InputStream stream) {
         this.device = device;

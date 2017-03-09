@@ -1,17 +1,62 @@
 package org.eclipse.swt.widgets;
 
-import android.graphics.*;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Device;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.FontMetrics;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Path;
+import org.eclipse.swt.graphics.PathData;
 import org.eclipse.swt.graphics.Point;
 
 public class AndroidGC extends GC {
+
+    static android.graphics.Path getAndroidPath(Path path) {
+        if (path.peer == null) {
+            android.graphics.Path path2D = new android.graphics.Path();
+            path.peer = path2D;
+            PathData pathData = path.getPathData();
+            int j = 0;
+            float[] points = pathData.points;
+            for (int i = 0; i < pathData.types.length; i++) {
+                switch (pathData.types[i]) {
+                    case SWT.PATH_MOVE_TO:
+                        path2D.moveTo(points[j], points[j + 1]);
+                        j += 2;
+                        break;
+                    case SWT.PATH_LINE_TO:
+                        path2D.lineTo(points[j], points[j + 1]);
+                        j += 2;
+                        break;
+                    case SWT.PATH_CLOSE:
+                        path2D.close();
+                        break;
+                    case SWT.PATH_CUBIC_TO:
+                        path2D.cubicTo(points[j], points[j + 1], points[j + 2], points[j + 3], points[j + 4], points[j + 5]);
+                        j += 6;
+                        break;
+                    case SWT.PATH_QUAD_TO:
+                        path2D.quadTo(points[j], points[j + 1], points[j + 2], points[j + 3]);
+                        j += 4;
+                        break;
+                }
+            }
+        }
+        return (android.graphics.Path) path.peer;
+    }
+
     final Paint backgroundPaint = new Paint();
     final Paint foregroundPaint = new Paint();
     final Paint textPaint = new Paint();
-    Path path;
+    android.graphics.Path path;
     RectF rectF = new RectF();
     Rect rect = new Rect();
     Rect srcRect = new Rect();
@@ -76,6 +121,11 @@ public class AndroidGC extends GC {
     }
 
     @Override
+    public void drawPath(Path path) {
+        canvas.drawPath(getAndroidPath(path), foregroundPaint);
+    }
+
+    @Override
     public void drawRectangle(int x, int y, int width, int height) {
         canvas.drawRect(x, y, x + width, y + height, foregroundPaint);
     }
@@ -112,6 +162,12 @@ public class AndroidGC extends GC {
     }
 
     @Override
+    public void fillPath(Path path) {
+        canvas.drawPath(getAndroidPath(path), backgroundPaint);
+    }
+
+
+    @Override
     public void fillRectangle(int x, int y, int width, int height) {
         rectF.left = x;
         rectF.top = y;
@@ -135,7 +191,7 @@ public class AndroidGC extends GC {
             return;
         }
         if (path == null) {
-            path = new Path();
+            path = new android.graphics.Path();
         } else {
             path.reset();
         }
