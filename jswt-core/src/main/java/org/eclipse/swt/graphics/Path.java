@@ -124,4 +124,48 @@ public class Path extends Resource {
         addPoint(x, y);
     }
 
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        int j = 0;
+        for (int i = 0; i < typeCount; i++) {
+            char c;
+            int pairs;
+            switch (types[i]) {
+                case SWT.PATH_MOVE_TO:
+                    c = 'M';
+                    pairs = 1;
+                    break;
+                case SWT.PATH_LINE_TO:
+                    c = 'L';
+                    pairs = 1;
+                    break;
+                case SWT.PATH_CLOSE:
+                    c = 'Z';
+                    pairs = 0;
+                    break;
+                case SWT.PATH_CUBIC_TO:
+                    c = 'C';
+                    pairs = 2;
+                    break;
+                case SWT.PATH_QUAD_TO:
+                    c = 'Q';
+                    pairs = 3;
+                    break;
+                default:
+                    throw new RuntimeException("Unrecognized Path element: " + types[i]);
+            }
+            if (i > 0) {
+                sb.append(' ');
+            }
+            sb.append(c);
+            for (int k = 0; k < pairs; k++) {
+                sb.append(' ');
+                sb.append(points[j++]);
+                sb.append(',');
+                sb.append(points[j++]);
+            }
+        }
+        return sb.toString();
+    }
+
 }
