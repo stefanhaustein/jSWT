@@ -66,8 +66,7 @@ public class AndroidGC extends GC {
     Color backgroundColor;
 
     public AndroidGC(Device device, android.graphics.Canvas canvas) {
-        super(null);
-        this.device = device;
+        super(device);
         this.canvas = canvas;
         backgroundPaint.setStyle(Paint.Style.FILL);
         foregroundPaint.setStyle(Paint.Style.STROKE);

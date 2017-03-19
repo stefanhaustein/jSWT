@@ -481,7 +481,7 @@ public class GwtDisplay extends PlatformDisplay {
 
     @Override
     public GC createGCForPlatformImage(Object platformImage) {
-        return new GwtGC((Element) platformImage);
+        return new GwtGC(this, (Element) platformImage);
     }
 
     @Override
@@ -1310,8 +1310,8 @@ public class GwtDisplay extends PlatformDisplay {
 
     private void redrawCanvas(Canvas canvas, int x, int y, int w, int h) {
         Element element = (Element) canvas.peer;
-        GwtGC gc = new GwtGC(element);
-        canvas.drawBackground(new GwtGC(element), 0, 0, w, h);
+        GwtGC gc = new GwtGC(this, element);
+        canvas.drawBackground(gc, 0, 0, w, h);
         org.eclipse.swt.widgets.Event event = new org.eclipse.swt.widgets.Event();
         event.gc = gc;
         event.setBounds(new Rectangle(x, y, w, h)); canvas.notifyListeners(SWT.Paint, event);

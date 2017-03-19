@@ -5,10 +5,12 @@ public class Font extends Resource {
     final FontData[] fontData;
 
     public Font(Device device, FontData fd) {
+        super(device);
         this.fontData = new FontData[]{fd};
     }
 
     public Font(Device device, FontData[] fd) {
+        super(device);
         this.fontData = new FontData[fd.length];
         System.arraycopy(fd, 0, fontData, 0, fontData.length);
     }

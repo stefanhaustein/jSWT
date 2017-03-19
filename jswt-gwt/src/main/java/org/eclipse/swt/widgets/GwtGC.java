@@ -18,8 +18,8 @@ public class GwtGC extends GC {
     Font font;
 
 
-    public GwtGC(Element canvas) {
-        super(null);
+    public GwtGC(GwtDisplay display, Element canvas) {
+        super(display);
         ctx = canvas.getContext2d();
         ctx.setTextBaseline("top");
     }

@@ -7,7 +7,7 @@ public class Color extends Resource {
     int alpha;
 
     public Color(Device device, int red, int green, int blue) {
-        this.device = device;
+        super(device);
         this.red = red;
         this.green = green;
         this.blue = blue;
@@ -15,7 +15,7 @@ public class Color extends Resource {
     }
 
     public Color(Device device, int red, int green, int blue, int alpha) {
-        this.device = device;
+        super(device);
         this.red = red;
         this.green = green;
         this.blue = blue;

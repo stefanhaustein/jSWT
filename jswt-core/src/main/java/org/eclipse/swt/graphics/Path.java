@@ -11,7 +11,7 @@ public class Path extends Resource {
     int pointCount = 0;
 
     public Path(Device device) {
-        this.device = device;
+        super(device);
     }
 
     void ensurePointsSpace(int size) {

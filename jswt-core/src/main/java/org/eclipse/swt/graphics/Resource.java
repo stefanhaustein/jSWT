@@ -8,6 +8,10 @@ public class Resource {
   boolean disposed;
   protected Device device;
 
+  Resource(Device device) {
+    this.device = device;
+  }
+
   public boolean isDisposed() {
     return disposed;
   }

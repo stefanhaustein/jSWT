@@ -11,7 +11,7 @@ public class Image extends Resource {
 
     /** Constructs an instance of this class by loading its representation from the specified input stream. */
     public Image(Device device, InputStream stream) {
-        this.device = device;
+        super(device);
         try {
             peer = ((PlatformDisplay) device).loadImage(stream);
         } catch (IOException e) {
@@ -23,7 +23,7 @@ public class Image extends Resource {
      * Constructs an empty instance of this class with the specified width and height.
      */
     public Image(Device device, int width, int height) {
-        this.device = device;
+        super(device);
         peer = ((PlatformDisplay) device).createImage(width, height);
     }
 
@@ -39,7 +39,7 @@ public class Image extends Resource {
      * Constructs an instance of this class by loading its representation from the file with the specified name.
      */
     public Image(Device device, String filename) {
-        this.device = device;
+        super(device);
         try {
             peer = ((PlatformDisplay) device).loadImage(new FileInputStream(filename));
         } catch (IOException e) {
@@ -52,7 +52,7 @@ public class Image extends Resource {
      * TODO: Hide via helper?
      */
     public Image(Device device, Object platformImage) {
-        this.device = device;
+        super(device);
         this.peer = platformImage;
     }
 

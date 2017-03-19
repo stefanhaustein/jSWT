@@ -70,8 +70,7 @@ class SwingGC extends GC {
     int alpha = 255;
 
     SwingGC(PlatformDisplay display, Graphics2D graphics) {
-        super(null);
-        this.device = display;
+        super(display);
         this.graphics = graphics;
     }
 

@@ -7,14 +7,15 @@ import org.eclipse.swt.widgets.PlatformDisplay;
 
 
 public class GC extends Resource {
-    int antialias;
     GC delegate;
 
+    protected GC(Device device) {
+        super(device);
+    }
+
     public GC(Image image) {
-        if (image != null) {
-            this.device = image.device;
-            this.delegate = ((PlatformDisplay) device).createGCForPlatformImage(image.peer);
-        }
+        super (image.device);
+        this.delegate = ((PlatformDisplay) device).createGCForPlatformImage(image.peer);
     }
 
     public void dispose() {
@@ -141,6 +142,10 @@ public class GC extends Resource {
         return delegate.getFontMetrics();
     }
 
+    public Transform getTransform() {
+        return delegate.getTransform();
+    }
+
     public void setAlpha(int alpha) {
         delegate.setAlpha(alpha);
     }
@@ -173,6 +178,9 @@ public class GC extends Resource {
         delegate.setLineWidth(width);
     }
 
+    public void setTransform(Transform transform) {
+        delegate.setTransform(transform);
+    }
 
     public Point stringExtent(String text) {
         return textExtent(text, 0);
