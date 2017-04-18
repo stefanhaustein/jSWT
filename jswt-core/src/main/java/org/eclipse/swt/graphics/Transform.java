@@ -32,14 +32,14 @@ import org.eclipse.swt.SWT;
  * @since 3.1
  */
 public class Transform extends Resource {
-	//  scaleX skewY translateX
-	//  scaleY skewX translateY
+	//  scaleX skewX translateX
+	//  scaleY skewY translateY
 	//    0   0  1
 
 	float scaleX;
-	float skewY;
-	float scaleY;
 	float skewX;
+	float scaleY;
+	float skewY;
 	float translateX;
 	float translateY;
 
@@ -141,9 +141,9 @@ public Transform(Device device, float[] elements) {
 public Transform (Device device, float m11, float m12, float m21, float m22, float dx, float dy) {
 	super(device);
 	this.scaleX = m11;
-	this.skewY = m12;
+	this.skewX = m12;
 	this.scaleY = m21;
-	this.skewX = m22;
+	this.skewY = m22;
 	this.translateX = dx;
 	this.translateY = dy;
 }
@@ -164,7 +164,7 @@ void destroy() {
 
 /**
  * Fills the parameter with the values of the transformation matrix
- * that the receiver represents, in the order {scaleX, skewY, scaleY, skewX, translateX, translateY}.
+ * that the receiver represents, in the order {scaleX, skewX, scaleY, skewY, translateX, translateY}.
  *
  * @param elements array to hold the matrix values
  *
@@ -182,9 +182,9 @@ public void getElements(float[] elements) {
 	if (elements.length < 6) SWT.error(SWT.ERROR_INVALID_ARGUMENT);
 
 	elements[0] = scaleX;
-	elements[1] = skewY;
+	elements[1] = skewX;
 	elements[2] = scaleY;
-	elements[3] = skewX;
+	elements[3] = skewY;
 	elements[4] = translateX;
 	elements[5] = translateY;
 }
@@ -240,8 +240,8 @@ public boolean isDisposed() {
  */
 public boolean isIdentity() {
 	if (isDisposed()) SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
-	return scaleX == 1f && skewY == 0f
-			&& scaleY == 0f && skewX == 1f
+	return scaleX == 1f && skewX == 0f
+			&& scaleY == 0f && skewY == 1f
 			&& translateX == 0f && translateY == 0f;
 }
 
@@ -265,15 +265,15 @@ public void multiply(Transform matrix) {
 	// What we'd really want is preMultiplication... :(
 
 	float a = scaleX;
-	float b = skewY;
-	float c = skewX;
+	float b = skewX;
+	float c = skewY;
 	float d = scaleY;
 	float e = translateX;
 	float f = translateY;
 
 	scaleX = matrix.scaleX;
-	skewY = matrix.skewY;
 	skewX = matrix.skewX;
+	skewY = matrix.skewY;
 	scaleY = matrix.scaleY;
 	scaleY = matrix.scaleY;
 	translateX = matrix.translateX;
@@ -320,16 +320,16 @@ public void scale(float scaleX, float scaleY) {
 private void preMultiply(float a2, float b2, float c2, float d2, float e2, float f2) {
 	if (isDisposed()) SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
 	float a1 = scaleX;
-	float b1 = skewY;
-	float c1 = skewX;
+	float b1 = skewX;
+	float c1 = skewY;
 	float d1 = scaleY;
 	float e1 = translateX;
 	float f1 = translateY;
 
 	scaleX = a1 * a2 + c1 * b2;
-	skewY =  b1 * a2 + d1 * b2;
+	skewX =  b1 * a2 + d1 * b2;
 
-	skewX = a1 * c2 + c1 * d2;
+	skewY = a1 * c2 + c1 * d2;
 	scaleY = b1 * c2 + d1 * d2;
 
 	translateX = (a1 * e2 + c1 * f2)  + e1;
@@ -354,9 +354,9 @@ private void preMultiply(float a2, float b2, float c2, float d2, float e2, float
 public void setElements(float m11, float m12, float m21, float m22, float dx, float dy) {
 	if (isDisposed()) SWT.error(SWT.ERROR_GRAPHIC_DISPOSED);
 	this.scaleX = m11;
-	this.skewY = m12;
+	this.skewX = m12;
 	this.scaleY = m21;
-	this.skewX = m22;
+	this.skewY = m22;
 	this.translateX = dx;
 	this.translateY = dy;
 }
@@ -375,7 +375,7 @@ public void setElements(float m11, float m12, float m21, float m22, float dx, fl
  * @since 3.4
  */
 public void shear(float shearX, float shearY) {
-	preMultiply(1, shearY, 1, shearX, 0, 0);
+	preMultiply(1, shearX, 1, shearY, 0, 0);
 }
 
 /**
@@ -400,8 +400,8 @@ public void transform(float[] pointArray) {
 	for (int i = 0; i < length; i += 2) {
 		float x = pointArray[i];
 		float y = pointArray[i + 1];
-		pointArray[i] = (x * scaleX + y * skewY) + translateX;
-		pointArray[i + 1] = (y * scaleY + x * skewX) + translateY;
+		pointArray[i] = (x * scaleX + y * skewX) + translateX;
+		pointArray[i + 1] = (y * scaleY + x * skewY) + translateY;
 	}
 }
 

@@ -2,6 +2,7 @@ package org.eclipse.swt.widgets;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -16,6 +17,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Path;
 import org.eclipse.swt.graphics.PathData;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Transform;
 
 public class AndroidGC extends GC {
 
@@ -64,6 +66,10 @@ public class AndroidGC extends GC {
     final Canvas canvas;
     Color foregroundColor;
     Color backgroundColor;
+    Matrix matrix;
+    float[] swtElements;
+    float[] androidElements;
+
 
     public AndroidGC(Device device, android.graphics.Canvas canvas) {
         super(device);
@@ -230,6 +236,11 @@ public class AndroidGC extends GC {
     }
 
     @Override
+    public Transform getTransform() {
+        return matrix == null ? new Transform(device) : new Transform(device, swtElements);
+    }
+
+    @Override
     public void setFont(Font font) {
         FontData fd = font.getFontData()[0];
         textPaint.setTextSize(fd.getHeight());
@@ -306,4 +317,27 @@ public class AndroidGC extends GC {
         textPaint.getTextBounds(text, 0, text.length(), rect);
         return new Point(rect.width(), textPaint.getFontMetricsInt(null));
     }
+
+    @Override
+    public void setTransform(Transform transform) {
+        if (matrix == null) {
+            matrix = new Matrix();
+            swtElements = new float[6];
+            androidElements = new float[9];
+            androidElements[Matrix.MPERSP_2] = 1;
+        } else {
+            canvas.restore();
+        }
+        canvas.save();
+        transform.getElements(swtElements);
+        androidElements[Matrix.MSCALE_X] = swtElements[0];
+        androidElements[Matrix.MSKEW_X] = swtElements[1];
+        androidElements[Matrix.MTRANS_X] = swtElements[4];
+        androidElements[Matrix.MSCALE_Y] = swtElements[2];
+        androidElements[Matrix.MSKEW_Y] = swtElements[3];
+        androidElements[Matrix.MTRANS_Y] = swtElements[5];
+        matrix.setValues(androidElements);
+        canvas.concat(matrix);
+    }
+
 }
