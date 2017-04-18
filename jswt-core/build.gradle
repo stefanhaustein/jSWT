@@ -1,5 +1,7 @@
 apply plugin: 'java'
-//apply plugin: 'gwt-base'
+apply plugin: 'maven'
+
+group = 'com.github.stefanhaustein'
 
 compileJava {
     sourceCompatibility = 1.7
