@@ -1132,6 +1132,11 @@ public class GwtDisplay extends PlatformDisplay {
     }
 
     @Override
+    void updateMenu(Menu menu) {
+        log("NYI: GwtDisplay.updateMenu()");
+    }
+
+    @Override
     void updateTable(Table table) {
         unsupported(table, "updateTable");
     }

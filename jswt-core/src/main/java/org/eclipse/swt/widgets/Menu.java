@@ -9,8 +9,8 @@ import org.eclipse.swt.graphics.Rectangle;
 import java.util.ArrayList;
 
 public class Menu extends Widget {
-
-    ArrayList<MenuItem> items = new ArrayList<MenuItem>();
+    Object peer;
+    private ArrayList<MenuItem> items = new ArrayList<MenuItem>();
     Point explicitLocation;
 
     Menu(Widget parent, int style) {
@@ -73,5 +73,21 @@ public class Menu extends Widget {
 
     public void setLocation(Point point) {
         setLocation(point.x, point.y);
+    }
+
+    public void addItem(MenuItem menuItem) {
+        items.add(menuItem);
+        update();
+    }
+
+    void update() {
+        if (peer != null) {
+            display.updateMenu(this);
+        }
+
+        // TODO: Check / update peer instead.
+        if (parent instanceof Decorations && ((Decorations) parent).menuBar == this) {
+            ((Decorations) parent).setMenuBar(this);
+        }
     }
 }

@@ -224,6 +224,8 @@ public abstract class PlatformDisplay extends Display {
 
     abstract void setMenu(Control control, Menu menu);
 
+    abstract void updateMenu(Menu menu);
+
 
     public static class Insets {
         public int top;

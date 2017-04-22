@@ -605,6 +605,13 @@ public class SwingDisplay extends PlatformDisplay {
   }
 
   @Override
+  void updateMenu(Menu menu) {
+    if (menu.parent instanceof Decorations && ((Decorations) menu.parent).menuBar == menu) {
+      updateMenuBar((Decorations) menu.parent);
+    }
+  }
+
+  @Override
   public void showPopupMenu(Menu menu, Control anchor, int x, int y) {
     JPopupMenu popupMenu = new JPopupMenu();
     menuAddAll(menu, popupMenu);
@@ -671,9 +678,10 @@ public class SwingDisplay extends PlatformDisplay {
   @Override
   public void updateMenuBar(Decorations decorations) {
     JMenuBar awtMenuBar = new JMenuBar();
+    decorations.menuBar.peer = awtMenuBar;
     for (int i = 0; i < decorations.menuBar.getItemCount(); i++) {
       MenuItem item = decorations.menuBar.getItem(i);
-      JMenu awtSubMenu = new JMenu(item.text);
+      JMenu awtSubMenu = new JMenu(removeAccelerators(item.text));
       item.peer = awtSubMenu;
       awtMenuBar.add(awtSubMenu);
       if (item.subMenu != null) {
@@ -822,7 +830,7 @@ public class SwingDisplay extends PlatformDisplay {
     }
     JMenuItem awtItem = (JMenuItem) item.peer;
     awtItem.setEnabled(menuItem.getEnabled());
-    awtItem.setText(menuItem.getText());
+    awtItem.setText(removeAccelerators(menuItem.getText()));
   }
 
   @Override

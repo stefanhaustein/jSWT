@@ -11,7 +11,7 @@ public class MenuItem extends Item {
 
     public MenuItem(Menu parent, int style) {
         super(parent, style);
-        parent.items.add(this);
+        parent.addItem(this);
     }
 
 

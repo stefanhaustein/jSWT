@@ -782,6 +782,11 @@ public class AndroidDisplay extends PlatformDisplay {
   }
 
   @Override
+  void updateMenu(Menu menu) {
+    System.err.println("NYI: AndroidDisplay.updateMenu()");
+  }
+
+  @Override
   void updateTable(Table table) {
     ((AndroidTableView) table.peer).updateStyle();
   }
@@ -1403,6 +1408,4 @@ public class AndroidDisplay extends PlatformDisplay {
       }
     }
   }
-
-
 }
