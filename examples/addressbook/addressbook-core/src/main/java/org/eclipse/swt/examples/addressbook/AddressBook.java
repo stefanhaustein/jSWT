@@ -40,6 +40,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.kobjects.swt.Dialogs;
+import org.kobjects.swt.Function;
 
 /**
  * AddressBookExample is an example that uses <code>org.eclipse.swt</code>
@@ -290,18 +292,26 @@ private void newEntry() {
 private void openAddressBook() {
 	FileDialog fileDialog = new FileDialog(shell, SWT.OPEN);
 
-	fileDialog.setFilterExtensions(new String[] {"*.adr;", "*.*"});
-	fileDialog.setFilterNames(new String[] {resAddressBook.getString("Book_filter_name") + " (*.adr)",
-											resAddressBook.getString("All_filter_name") + " (*.*)"});
-	String name = fileDialog.open();
+	fileDialog.setFilterExtensions(new String[]{"*.adr;", "*.*"});
+	fileDialog.setFilterNames(new String[]{resAddressBook.getString("Book_filter_name") + " (*.adr)",
+			resAddressBook.getString("All_filter_name") + " (*.*)"});
 
-	if(name == null) return;
+	Dialogs.openFileDialog(fileDialog).then(new Function<String, Object>() {
+		@Override
+		public Object call(String name) {
+			openAddressBook(name);
+			return null;
+		}
+	});
+}
+
+private void openAddressBook(String name) {
+	if (name == null) return;
 	File file = new File(name);
 	if (!file.exists()) {
-		displayError(resAddressBook.getString("File")+file.getName()+" "+resAddressBook.getString("Does_not_exist"));
+		displayError(resAddressBook.getString("File") + file.getName() + " " + resAddressBook.getString("Does_not_exist"));
 		return;
 	}
-
 	Cursor waitCursor = shell.getDisplay().getSystemCursor(SWT.CURSOR_WAIT);
 	shell.setCursor(waitCursor);
 
@@ -356,10 +366,11 @@ private void openAddressBook() {
 		TableItem item = new TableItem(table, SWT.NONE);
 		item.setText(tableInfo[i]);
 	}
-	shell.setText(resAddressBook.getString("Title_bar")+fileDialog.getFileName());
+	shell.setText(resAddressBook.getString("Title_bar") + name);
 	isModified = false;
 	this.file = file;
 }
+
 private boolean save() {
 	if(file == null) return saveAs();
 
@@ -408,19 +419,29 @@ private boolean save() {
 private boolean saveAs() {
 
 	FileDialog saveDialog = new FileDialog(shell, SWT.SAVE);
-	saveDialog.setFilterExtensions(new String[] {"*.adr;",  "*.*"});
-	saveDialog.setFilterNames(new String[] {"Address Books (*.adr)", "All Files "});
+	saveDialog.setFilterExtensions(new String[]{"*.adr;", "*.*"});
+	saveDialog.setFilterNames(new String[]{"Address Books (*.adr)", "All Files "});
 
-	saveDialog.open();
-	String name = saveDialog.getFileName();
+	Dialogs.openFileDialog(saveDialog).then(
+			new Function<String, Object>() {
+				@Override
+				public Object call(String name) {
+					return saveAs(name);
+				}
+			}
+	);
 
+	return false;
+}
+
+private boolean saveAs(String name) {
 	if(name.isEmpty()) return false;
 
 	if(name.indexOf(".adr") != name.length() - 4) {
 		name += ".adr";
 	}
 
-	File file = new File(saveDialog.getFilterPath(), name);
+	File file = new File(name);
 	if(file.exists()) {
 		MessageBox box = new MessageBox(shell, SWT.ICON_WARNING | SWT.YES | SWT.NO);
 		box.setText(resAddressBook.getString("Save_as_title"));
@@ -432,6 +453,7 @@ private boolean saveAs() {
 	this.file = file;
 	return save();
 }
+
 private void sort(int column) {
 	if(table.getItemCount() <= 1) return;
 
