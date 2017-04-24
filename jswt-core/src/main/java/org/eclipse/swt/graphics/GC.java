@@ -142,8 +142,8 @@ public class GC extends Resource {
         return delegate.getFontMetrics();
     }
 
-    public Transform getTransform() {
-        return delegate.getTransform();
+    public void getTransform(Transform transform) {
+        delegate.getTransform(transform);
     }
 
     public void setAlpha(int alpha) {

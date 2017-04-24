@@ -236,8 +236,12 @@ public class AndroidGC extends GC {
     }
 
     @Override
-    public Transform getTransform() {
-        return matrix == null ? new Transform(device) : new Transform(device, swtElements);
+    public void getTransform(Transform transform) {
+        if (swtElements == null) {
+            transform.identity();
+        } else {
+            transform.setElements(swtElements[0], swtElements[1], swtElements[2], swtElements[3], swtElements[4], swtElements[5]);
+        }
     }
 
     @Override
@@ -332,9 +336,9 @@ public class AndroidGC extends GC {
         transform.getElements(swtElements);
         androidElements[Matrix.MSCALE_X] = swtElements[0];
         androidElements[Matrix.MSKEW_X] = swtElements[1];
-        androidElements[Matrix.MTRANS_X] = swtElements[4];
         androidElements[Matrix.MSCALE_Y] = swtElements[2];
         androidElements[Matrix.MSKEW_Y] = swtElements[3];
+        androidElements[Matrix.MTRANS_X] = swtElements[4];
         androidElements[Matrix.MTRANS_Y] = swtElements[5];
         matrix.setValues(androidElements);
         canvas.concat(matrix);

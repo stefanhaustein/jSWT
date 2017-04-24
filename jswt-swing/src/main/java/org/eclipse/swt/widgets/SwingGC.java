@@ -19,6 +19,7 @@ import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import org.eclipse.swt.graphics.Transform;
 
 
 class SwingGC extends GC {
@@ -184,6 +185,15 @@ class SwingGC extends GC {
     }
 
     @Override
+    public void getTransform(Transform transform) {
+        AffineTransform affineTransform = graphics.getTransform();
+        transform.setElements(
+                (float) affineTransform.getScaleX(), (float) affineTransform.getShearX(),
+                (float) affineTransform.getShearY(), (float) affineTransform.getScaleY(),
+                (float) affineTransform.getTranslateX(), (float) affineTransform.getTranslateY());
+    }
+
+    @Override
     public Color getBackground() {
         return background;
     }
@@ -263,6 +273,14 @@ class SwingGC extends GC {
             lineJoin = join;
             updateStroke();
         }
+    }
+
+    public void setTransform(Transform transform) {
+        float[] elements = new float[6];
+        transform.getElements(elements);
+        AffineTransform affineTransform = new AffineTransform(
+                elements[0], elements[2], elements[1], elements[3], elements[4], elements[5]);
+        graphics.setTransform(affineTransform);
     }
 
     public Point textExtent(String string, int flags) {
