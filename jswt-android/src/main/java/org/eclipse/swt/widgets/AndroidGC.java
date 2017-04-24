@@ -336,8 +336,8 @@ public class AndroidGC extends GC {
         transform.getElements(swtElements);
         androidElements[Matrix.MSCALE_X] = swtElements[0];
         androidElements[Matrix.MSKEW_X] = swtElements[1];
-        androidElements[Matrix.MSCALE_Y] = swtElements[2];
-        androidElements[Matrix.MSKEW_Y] = swtElements[3];
+        androidElements[Matrix.MSKEW_Y] = swtElements[2];
+        androidElements[Matrix.MSCALE_Y] = swtElements[3];
         androidElements[Matrix.MTRANS_X] = swtElements[4];
         androidElements[Matrix.MTRANS_Y] = swtElements[5];
         matrix.setValues(androidElements);
